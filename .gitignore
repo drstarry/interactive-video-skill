@@ -1,0 +1,8 @@
+audio/
+scripts/node_modules/
+*.tmp
+.DS_Store
+docs/
+test-output/
+.claude/
+.superpowers/
