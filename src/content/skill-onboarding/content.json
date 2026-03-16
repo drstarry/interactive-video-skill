@@ -1,0 +1,200 @@
+{
+  "meta": {
+    "lessonId": "skill-onboarding",
+    "voice": "en-US-AndrewNeural",
+    "rate": "+5%",
+    "gap": 1.2,
+    "duration": 220,
+    "audioGenerated": true
+  },
+  "narration": [
+    {
+      "t": 1.2,
+      "text": "Welcome. In the next few minutes, you're going to learn about a tool that turns any source material into an interactive walkthrough. No video editing. No API keys. Just one command."
+    },
+    {
+      "t": 13.18,
+      "text": "The Interactive Video Skill is a Claude Code skill. You type a slash command, point it at something, a blog post, a doc, a codebase, even just a topic, and it generates a complete self-contained HTML walkthrough. Canvas animations, narrated audio, quizzes, interactive widgets. All in a single file you can open in any browser.",
+      "endsBeforeIx": "q-what-it-is"
+    },
+    {
+      "t": 34.9,
+      "text": "So who is this for? It shines whenever the audience needs to get oriented quickly. Think about onboarding. You have a twenty-page doc that new hires never finish reading. This turns it into a five-minute walkthrough they actually complete."
+    },
+    {
+      "t": 49.08,
+      "text": "Or open source projects. Generate walkthroughs from your docs and regenerate them each release so they stay current. Knowledge transfer? When someone leaves the team, turn their notes into something a replacement can absorb in minutes, not days."
+    },
+    {
+      "t": 63.94,
+      "text": "It also works great as a companion to blog posts or conference talks. Offer an interactive version alongside the written post for people who learn better with video and hands-on practice.",
+      "endsBeforeIx": "try-use-cases"
+    },
+    {
+      "t": 75.58,
+      "text": "Installing is the simplest part. You paste a single line into Claude Code. That's it. Claude clones the skill, runs the setup script, and you're ready to go. No manual configuration, no dependencies to manage yourself."
+    },
+    {
+      "t": 90.22,
+      "text": "The install command tells Claude to install the interactive video skill from GitHub into your dot claude skills directory and run its setup script. Claude handles the rest. One line, done.",
+      "endsBeforeIx": "q-install"
+    },
+    {
+      "t": 102.1,
+      "text": "Using the skill is straightforward. You type slash interactive-video followed by your source. That source can be a URL, a file path, a topic description, or even just the word codebase to have Claude analyze your current project."
+    },
+    {
+      "t": 116.45,
+      "text": "After you run the command, Claude researches your source material in depth. Then it opens a configurator in your browser where you pick your preferences: audience level, visual theme, narration voice, language, and which topics to include. You paste the configurator output back, and Claude generates everything automatically. No more questions after that.",
+      "endsBeforeIx": "try-workflow"
+    },
+    {
+      "t": 137.28,
+      "text": "Now let's talk about what you actually get. The output is a self-contained HTML file. It plays canvas animations synchronized with narrated audio. Over four hundred voices across fifty-plus languages, all generated offline, no API key needed."
+    },
+    {
+      "t": 153.67,
+      "text": "Quizzes pause the video and test understanding with misconception-based feedback. Wrong answers don't just say wrong. They name the specific misconception and explain why it's incorrect. Every distractor is designed to teach."
+    },
+    {
+      "t": 167.78,
+      "text": "Interactive widgets go beyond quizzes. Drag to sort for ordering steps. Categorize for grouping related items. Sliders for exploring continuous parameters. Hotspots for examining parts of a system. You've been using some of these already in this very walkthrough.",
+      "endsBeforeIx": "try-features"
+    },
+    {
+      "t": 184.51,
+      "text": "And there are eight visual themes. Terminal for code and DevOps. Chalkboard for theory and math, like what you're looking at right now. Notebook for writing and humanities. Blueprint for engineering. Plus four neutral themes. Each one styles the entire experience from canvas to quiz overlays."
+    },
+    {
+      "t": 202.85,
+      "text": "That's the Interactive Video Skill. One command, one configurator, and you get a complete interactive walkthrough. Install it, point it at something, and let Claude do the rest. Happy teaching."
+    }
+  ],
+  "interactions": {
+    "q-what-it-is": {
+      "time": 33.7,
+      "title": "What Does It Produce?",
+      "desc": "What is the output format of the Interactive Video Skill?",
+      "options": [
+        "An MP4 video file you upload to YouTube",
+        "A self-contained HTML file that runs in any browser",
+        "A PowerPoint presentation with embedded audio"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Exactly right",
+          "body": "The output is vanilla HTML, JS, and CSS. No server needed, no dependencies. Just open the file in a browser."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "It's easy to assume 'video' means MP4 or slides, but this skill generates self-contained HTML files. They run in any browser with zero dependencies."
+        }
+      }
+    },
+    "try-use-cases": {
+      "time": 74.38,
+      "title": "Match the Use Cases",
+      "desc": "Drag each scenario into the right category.",
+      "widget": "categorize",
+      "categories": [
+        {
+          "label": "Great Fit",
+          "items": [
+            "20-page onboarding doc nobody reads",
+            "Open source docs that change each release",
+            "Senior dev leaving with undocumented knowledge"
+          ]
+        },
+        {
+          "label": "Not the Best Fit",
+          "items": [
+            "Live coding session with audience Q&A",
+            "Real-time collaborative editing"
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": {
+          "body": "The skill excels at turning static material into engaging, self-paced walkthroughs. Live or real-time interaction needs different tools."
+        },
+        "wrong": {
+          "body": "The skill works best for turning existing content into self-paced walkthroughs. Live, real-time scenarios need other tools."
+        }
+      }
+    },
+    "q-install": {
+      "time": 100.9,
+      "title": "Install Check",
+      "desc": "How do you install the Interactive Video Skill?",
+      "options": [
+        "Run npm install interactive-video-skill globally",
+        "Paste a single install line into Claude Code",
+        "Download a zip from GitHub and extract manually"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "That's it",
+          "body": "One line in Claude Code. Claude clones the repo, runs setup, and you're ready. No npm, no manual extraction."
+        },
+        "wrong": {
+          "title": "Simpler than that",
+          "body": "You don't need npm or manual downloads. Just paste one line into Claude Code and it handles everything."
+        }
+      }
+    },
+    "try-workflow": {
+      "time": 136.08,
+      "title": "Order the Workflow",
+      "desc": "Drag to arrange the steps from first to last.",
+      "widget": "sort",
+      "sortItems": [
+        "Type /interactive-video with your source",
+        "Claude researches the source material",
+        "Configurator opens in browser",
+        "Paste configurator output back to terminal",
+        "Claude generates the walkthrough"
+      ],
+      "feedback": {
+        "correct": {
+          "body": "That's the full flow. One command kicks it off, you make one choice in the configurator, and Claude handles the rest."
+        },
+        "wrong": {
+          "body": "The correct order starts with the slash command, then research, configurator, paste output, and finally generation."
+        }
+      }
+    },
+    "try-features": {
+      "time": 183.31,
+      "title": "Explore the Features",
+      "desc": "Tap each feature to learn what it does.",
+      "widget": "hotspot",
+      "hotspots": [
+        {
+          "label": "Canvas Animations",
+          "icon": "🎨",
+          "explanation": "Synchronized visuals drawn on HTML canvas. Each scene has its own animation tied to the narration timeline."
+        },
+        {
+          "label": "Narrated Audio",
+          "icon": "🔊",
+          "explanation": "Text-to-speech with 400+ voices in 50+ languages. Generated offline using edge-tts. No API key needed."
+        },
+        {
+          "label": "Quizzes",
+          "icon": "❓",
+          "explanation": "Pause the video to test understanding. Each wrong answer names a specific misconception and explains why."
+        },
+        {
+          "label": "Interactive Widgets",
+          "icon": "🧩",
+          "explanation": "Drag-to-sort, categorize, sliders, and hotspots. Learn by doing, not just watching."
+        },
+        {
+          "label": "8 Visual Themes",
+          "icon": "🎭",
+          "explanation": "Terminal, Chalkboard, Notebook, Blueprint, Clean Dark, Clean Light, Studio, and Focus."
+        }
+      ]
+    }
+  }
+}
