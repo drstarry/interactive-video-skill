@@ -21,6 +21,9 @@ Parse `$ARGUMENTS` for source (URL, file, topic, or "codebase"), scope hints ("f
 - Inside JS **string literals**, escape `</` as `<\/` (prevents `</script>` inside a string from closing the script block). Do NOT apply this to the actual HTML `</script>` closing tag. No curly quotes. The validator auto-fixes these.
 - Use KaTeX HTML overlays for equations, not `ctx.fillText()`.
 - Set `<body data-theme="THEME_KEY">` for theme CSS activation.
+- **Scene boundaries must be strictly sequential** — each scene's `s` must equal the previous scene's `e`. No gaps, no overlaps.
+- **Canvas text spacing minimums:** 32px between lines of body text (16-18px font), 40px between lines of heading text (20px+ font), 50px between a heading and body text. Boxes must be tall enough to contain their text with these gaps.
+- **Never use `rect` `label` with text inside the box.** The engine renders `label` at the vertical center of the rect, which overlaps with any text elements positioned inside. Instead, remove `label` and add an explicit `text` element near the top of the rect as a heading.
 
 ## Quality principles (the "why" behind good walkthroughs)
 

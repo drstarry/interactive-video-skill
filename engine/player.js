@@ -271,13 +271,9 @@ export function createPlayer({
   }
 
   function setMuted(muted) {
-    narrationEnabled = !muted;
-    if (muted) {
-      stopAudio();
-    } else {
-      // Reset so the current segment can re-trigger immediately
-      lastSpoke = -1;
-    }
+    audio.setVolume(muted ? 0 : 1);
+    // Keep narration enabled so audio keeps playing in sync — just silent.
+    // No stopAudio(), no lastSpoke reset. Audio stays in lockstep with timeline.
   }
 
   // ── Rendering ──

@@ -6,3 +6,4 @@ docs/
 test-output/
 .claude/
 .superpowers/
+.playwright/

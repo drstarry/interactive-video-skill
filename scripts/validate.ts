@@ -113,10 +113,18 @@ if (!existsSync(htmlPath)) {
     if (sBounds.length !== eBounds.length) {
       err('Scene s/e count mismatch');
     } else {
-      // Check contiguity
+      // Check contiguity and overlaps
       for (let i = 1; i < sBounds.length; i++) {
-        if (Math.abs(sBounds[i] - eBounds[i - 1]) > 0.5) {
+        if (sBounds[i] < eBounds[i - 1] - 0.01) {
+          err(`Scene ${i} (starts ${sBounds[i]}) overlaps with scene ${i - 1} (ends ${eBounds[i - 1]}). Scenes must be strictly sequential.`);
+        } else if (Math.abs(sBounds[i] - eBounds[i - 1]) > 0.5) {
           warn(`Gap between scene ${i - 1} (ends ${eBounds[i - 1]}) and scene ${i} (starts ${sBounds[i]})`);
+        }
+      }
+      // Check no scene has e <= s
+      for (let i = 0; i < sBounds.length; i++) {
+        if (eBounds[i] <= sBounds[i]) {
+          err(`Scene ${i} has zero or negative duration (s=${sBounds[i]}, e=${eBounds[i]})`);
         }
       }
       // Check last scene matches duration

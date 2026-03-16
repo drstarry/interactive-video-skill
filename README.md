@@ -1,5 +1,7 @@
 # Interactive Video Skill
 
+**[Live Demo](https://drstarry.github.io/interactive-video-skill/)** — 8 example walkthroughs across all themes.
+
 Turn docs, posts, and codebases into interactive walkthroughs — narrated animation, quizzes, and hands-on widgets. Built as a [Claude Code](https://docs.anthropic.com/en/docs/claude-code) skill. Output is vanilla HTML/JS/CSS — zero dependencies, works in any browser.
 
 ## Who is this for?

@@ -110,6 +110,7 @@ export function createAudioPlayer({
         return;
       }
       audioEl = el;
+      el.volume = volume;
       el.onended = onEnded(thisGen);
       el.onerror = null; // clear now that we're playing
       beginTracking();
@@ -152,6 +153,7 @@ export function createAudioPlayer({
     if (!pf) pf = voices.find((v) => v.lang.startsWith(lang)) || voices[0];
     if (pf) u.voice = pf;
 
+    u.volume = volume;
     estimatedDur = (text.length * MS_PER_CHAR) / 1000;
     utterance = u;
 
@@ -215,11 +217,20 @@ export function createAudioPlayer({
   // Eagerly load voices
   speechSynthesis.getVoices();
 
+  let volume = 1;
+
+  function setVolume(v) {
+    volume = Math.max(0, Math.min(1, v));
+    if (audioEl) audioEl.volume = volume;
+    if (utterance) utterance.volume = volume;
+  }
+
   return {
     play,
     stop,
     pause,
     resume,
+    setVolume,
     get state() {
       return state;
     },
@@ -237,6 +248,9 @@ export function createAudioPlayer({
     },
     get isFinished() {
       return state === "FINISHED";
+    },
+    get volume() {
+      return volume;
     },
   };
 }
