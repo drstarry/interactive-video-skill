@@ -22,14 +22,17 @@ Parse `$ARGUMENTS` for source (URL, file, topic, or "codebase"), scope hints ("f
 - Use KaTeX HTML overlays for equations, not `ctx.fillText()`.
 - Set `<body data-theme="THEME_KEY">` for theme CSS activation.
 - **Scene boundaries must be strictly sequential** — each scene's `s` must equal the previous scene's `e`. No gaps, no overlaps.
+- **Max ~40 seconds per scene.** One scene per narration segment or pair of short segments. If a topic spans multiple narration segments, split into multiple scenes with distinct visuals. A "deep" 8-minute lesson should have 14-20 scenes, not 6-8.
 - **Canvas text spacing minimums:** 32px between lines of body text (16-18px font), 40px between lines of heading text (20px+ font), 50px between a heading and body text. Boxes must be tall enough to contain their text with these gaps.
 - **Never use `rect` `label` with text inside the box.** The engine renders `label` at the vertical center of the rect, which overlaps with any text elements positioned inside. Instead, remove `label` and add an explicit `text` element near the top of the rect as a heading.
 - **Always include the attribution footer** from `page-template.md` — the `<footer class="site-footer">` block goes after `.wrap` and before `<script>`. Do not omit it.
 
 ## Gotchas (common failures — check these before finalizing)
 
-- **Scenes too short for narration.** Estimate ~150 words/minute. A 200-word narration segment needs ~80s, not 30s. If scenes feel rushed, you under-estimated.
-- **Too many text elements per scene.** 3-4 text elements is the sweet spot. More than 5 creates visual clutter — split into two scenes instead.
+- **Scenes too long (>40s).** A 150-second scene means the canvas sits static while narration covers multiple topics. Split long narration segments across 2+ scenes. A 200-word segment (~80s of audio) should be 2 scenes, not 1.
+- **Scenes too short for narration.** Don't create 5-second scenes with a single text element. Each scene should have enough content to fill its duration with progressive reveals.
+- **Title-only visuals while narration gives details.** Every specific example, tool name, or stat mentioned in narration should appear as a text element on canvas. Extract 3-5 key phrases per scene and stagger their `revealAt` to match when they're spoken: `revealAt = (phraseTime - sceneStart) / (sceneEnd - sceneStart)`. The canvas should reinforce what the ear hears.
+- **Too many text elements per scene.** 3-5 text elements is the sweet spot. More than 6 creates visual clutter — split into two scenes instead.
 - **`globalAlpha` not reset.** If you set `ctx.globalAlpha` in a custom draw function, always reset to `1` at the end. Otherwise it bleeds into the next scene.
 - **Hardcoded colors instead of theme palette.** Don't use `#ff0000` — pull colors from `styles.json` for the selected theme. Hardcoded colors break when switching themes.
 - **Quiz distractors that are obviously wrong.** "42", "none of the above", or joke answers don't test comprehension. Each distractor should be a plausible misconception.
