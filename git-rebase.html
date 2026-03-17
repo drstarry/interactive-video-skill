@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net;
+      font-src https://fonts.gstatic.com;
+      media-src 'self';
+      img-src 'self' data:;
+    " />
+    <title>How Git Rebase Works — Interactive Tutorial</title>
+    <link rel="stylesheet" href="src/lesson.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" />
+    <style>
+      :root {
+        --bg: #1a1816;
+        --bg-card: #211f1c;
+        --bg-el: #2a2724;
+        --bg-ov: rgba(26,24,22,0.95);
+        --surface: #211f1c;
+        --border: #332f2a;
+        --text: #e8e0d0;
+        --text2: #7a7060;
+        --accent: #d4a054;
+        --acc-dim: #a07830;
+        --acc-glow: rgba(212,160,84,0.08);
+        --grn: #8ab060;
+        --warm: #d4a054;
+        --cool: #8a9ab0;
+        --red: #c85a4a;
+        --sans: 'DM Sans', -apple-system, sans-serif;
+        --mono: 'JetBrains Mono', monospace;
+        --serif: 'DM Sans', -apple-system, sans-serif;
+      }
+    </style>
+  </head>
+  <body data-theme="terminal">
+    <!-- Navigation -->
+                <nav class="site-nav">
+      <a class="site-nav-brand" href="https://github.com/drstarry/interactive-video-skill">Interactive Video Skill</a>
+      <div class="site-nav-links">
+        <a href="skill-onboarding.html">Onboarding [theme: Chalkboard]</a>
+        <a href="git-rebase.html" class="active">Git Rebase [theme: Terminal]</a>
+        <a href="writing-systems.html">Writing [theme: Notebook]</a>
+        <a href="dns-resolution.html">DNS [theme: Blueprint]</a>
+        <a href="rust-ownership.html">Rust [theme: Clean Dark]</a>
+        <a href="vaccines.html">Vaccines [theme: Clean Light]</a>
+        <a href="sourdough.html">Sourdough [theme: Studio]</a>
+        <a href="big-o.html">Big O [theme: Focus]</a>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="wrap">
+      <div class="hdr">
+        <h1>How Git Rebase Works</h1>
+        <p class="sub">Understand rebase vs merge, interactive rebase, and conflict resolution</p>
+      </div>
+
+      <div class="vid-wrap">
+        <canvas id="cvs"></canvas>
+        <div class="scn-label" id="scn-label"></div>
+        <div class="math-layer" id="math-layer"></div>
+        <div class="ov" id="ov">
+          <div class="top-badge" id="badge"></div>
+          <div class="card" id="card"></div>
+        </div>
+      </div>
+
+      <div class="ctl">
+        <button id="btn-play">
+          <svg id="play-icon" viewBox="0 0 24 24">
+            <polygon points="5,3 19,12 5,21" />
+          </svg>
+        </button>
+        <span class="tl" id="t-cur">0:00</span>
+        <span class="sep">/</span>
+        <span class="tl" id="t-dur">0:00</span>
+        <div class="tbar" id="tbar">
+          <div class="fill" id="tprog"></div>
+          <div class="scrub" id="tscrub"></div>
+        </div>
+        <button class="mute" id="btn-mute">Narration: On</button>
+        <button class="fs" id="btn-fs">Fullscreen</button>
+      </div>
+
+      <div class="scores" id="scores"></div>
+      <div class="chapters-header">Chapters</div>
+      <div id="chapters"></div>
+    </div>
+
+    <script type="module">
+      import { createLesson } from "./src/engine/lesson.js";
+      import { createSceneRenderer } from "./src/engine/scene-renderer.js";
+      import { VW, VH } from "./src/engine/canvas.js";
+
+      // ===== SCENE DATA =====
+      const scenes = [
+        { s: 0, e: 46.97, label: "Merge vs Rebase", bg: "intro" },
+        { s: 46.97, e: 81.79, label: "The Rebase Process", bg: "process" },
+        { s: 81.79, e: 116.92, label: "Rewriting History", bg: "history" },
+        { s: 116.92, e: 148.37, label: "When to Use Each", bg: "whenToUse" },
+        { s: 148.37, e: 181.99, label: "Interactive Rebase", bg: "interactive" },
+        { s: 181.99, e: 206.4, label: "Handling Conflicts", bg: "conflicts" },
+        { s: 206.4, e: 235, label: "Summary", bg: "summary" },
+      ];
+
+      const IX = [
+        {
+          id: "q-merge-vs-rebase",
+          time: 46.97,
+          cat: "q",
+          title: "Merge vs Rebase",
+          desc: "What is the key difference in the resulting commit history?",
+          options: [
+            { k: "A", c: false },
+            { k: "B", c: true },
+            { k: "C", c: false },
+          ],
+        },
+        {
+          id: "try-rebase-steps",
+          time: 81.79,
+          cat: "try",
+          title: "Order the Rebase Steps",
+          desc: "Drag these into the correct order that Git performs during a rebase.",
+        },
+        {
+          id: "q-why-new-sha",
+          time: 116.92,
+          cat: "q",
+          title: "Rewritten History",
+          desc: "After rebasing, your commits have new SHA hashes. Why?",
+          options: [
+            { k: "A", c: false },
+            { k: "B", c: true },
+            { k: "C", c: false },
+          ],
+        },
+        {
+          id: "try-when-to-use",
+          time: 148.37,
+          cat: "try",
+          title: "Rebase or Merge?",
+          desc: "Drag each scenario into the right strategy.",
+        },
+        {
+          id: "q-interactive-rebase",
+          time: 181.99,
+          cat: "q",
+          title: "Interactive Rebase",
+          desc: "Which task can you NOT do with interactive rebase?",
+          options: [
+            { k: "A", c: false },
+            { k: "B", c: true },
+            { k: "C", c: false },
+          ],
+        },
+        {
+          id: "try-conflict-explorer",
+          time: 206.4,
+          cat: "try",
+          title: "Rebase Conflict Commands",
+          desc: "Tap each command to learn what it does during a rebase conflict.",
+        },
+      ];
+
+      // ===== DECLARATIVE ELEMENTS =====
+      const sceneElements = {
+        intro: [
+          { type: "glow", x: 960, y: 540, radius: 500, color: "rgba(212,160,84,0.06)" },
+          { type: "text", x: 960, y: 260, text: "How Git Rebase Works", font: '700 52px "JetBrains Mono"', color: "#d4a054" },
+          { type: "text", x: 960, y: 330, text: "Understanding branch integration strategies", font: '400 22px "DM Sans"', color: "#7a7060", revealAt: 0.15 },
+          { type: "rule", x1: 820, y1: 360, x2: 1100, y2: 360, color: "#d4a054", revealAt: 0.2 },
+        ],
+        summary: [
+          { type: "glow", x: 960, y: 540, radius: 400, color: "rgba(138,176,96,0.06)" },
+          { type: "text", x: 960, y: 240, text: "Key Takeaways", font: '700 44px "JetBrains Mono"', color: "#d4a054" },
+          { type: "rule", x1: 820, y1: 280, x2: 1100, y2: 280, color: "#d4a054", revealAt: 0.1 },
+        ],
+      };
+
+      // ===== CUSTOM DRAW =====
+      const customDraw = {
+        // Scene 1: merge vs rebase comparison diagram
+        intro: (ctx, p, t) => {
+          if (p < 0.25) return;
+          const reveal = Math.max(0, Math.min(1, (p - 0.25) / 0.2));
+          ctx.globalAlpha = reveal;
+
+          const leftX = VW * 0.28, rightX = VW * 0.72;
+          const topY = 420, boxW = 440, boxH = 300;
+
+          // Merge box
+          ctx.fillStyle = "#2a2724";
+          ctx.strokeStyle = "#332f2a";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.roundRect(leftX - boxW/2, topY, boxW, boxH, 12);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = "#8a9ab0";
+          ctx.font = '700 22px "JetBrains Mono"';
+          ctx.textAlign = "center";
+          ctx.fillText("git merge", leftX, topY + 40);
+
+          // Draw merge diagram: forking lines that join
+          ctx.strokeStyle = "#8ab060";
+          ctx.lineWidth = 3;
+          const mBaseY = topY + 80;
+          // Main line
+          ctx.beginPath();
+          ctx.moveTo(leftX - 160, mBaseY + 40);
+          ctx.lineTo(leftX - 60, mBaseY + 40);
+          ctx.lineTo(leftX + 60, mBaseY + 40);
+          ctx.lineTo(leftX + 160, mBaseY + 40);
+          ctx.stroke();
+          // Feature branch
+          ctx.strokeStyle = "#d4a054";
+          ctx.beginPath();
+          ctx.moveTo(leftX - 60, mBaseY + 40);
+          ctx.lineTo(leftX - 20, mBaseY - 20);
+          ctx.lineTo(leftX + 40, mBaseY - 20);
+          ctx.lineTo(leftX + 100, mBaseY + 40);
+          ctx.stroke();
+          // Merge commit dot
+          const mergeReveal = Math.max(0, Math.min(1, (p - 0.5) / 0.15));
+          ctx.globalAlpha = reveal * mergeReveal;
+          ctx.fillStyle = "#8ab060";
+          ctx.beginPath();
+          ctx.arc(leftX + 100, mBaseY + 40, 8, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = reveal;
+
+          // Commit dots on main
+          ctx.fillStyle = "#8ab060";
+          for (const dx of [-160, -60, 160]) {
+            ctx.beginPath();
+            ctx.arc(leftX + dx, mBaseY + 40, 5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          // Commit dots on feature
+          ctx.fillStyle = "#d4a054";
+          for (const dx of [-20, 40]) {
+            ctx.beginPath();
+            ctx.arc(leftX + dx, mBaseY - 20, 5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          ctx.fillStyle = "#7a7060";
+          ctx.font = '400 16px "DM Sans"';
+          ctx.fillText("Preserves branch structure", leftX, topY + 220);
+          ctx.fillText("Creates a merge commit", leftX, topY + 248);
+
+          // "vs" divider
+          ctx.fillStyle = "#7a7060";
+          ctx.font = '500 20px "JetBrains Mono"';
+          ctx.fillText("vs", VW / 2, topY + boxH / 2);
+
+          // Rebase box
+          ctx.fillStyle = "#2a2724";
+          ctx.strokeStyle = "#332f2a";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.roundRect(rightX - boxW/2, topY, boxW, boxH, 12);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.fillStyle = "#d4a054";
+          ctx.font = '700 22px "JetBrains Mono"';
+          ctx.fillText("git rebase", rightX, topY + 40);
+
+          // Draw rebase diagram: straight line
+          ctx.strokeStyle = "#8ab060";
+          ctx.lineWidth = 3;
+          const rBaseY = topY + 100;
+          ctx.beginPath();
+          ctx.moveTo(rightX - 160, rBaseY);
+          ctx.lineTo(rightX + 160, rBaseY);
+          ctx.stroke();
+
+          // Commit dots - all in a line
+          const dotColors = ["#8ab060", "#8ab060", "#8ab060", "#d4a054", "#d4a054"];
+          const dotXs = [-160, -80, 0, 80, 160];
+          for (let i = 0; i < dotXs.length; i++) {
+            const dotReveal = Math.max(0, Math.min(1, (p - 0.35 - i * 0.06) / 0.1));
+            ctx.globalAlpha = reveal * dotReveal;
+            ctx.fillStyle = dotColors[i];
+            ctx.beginPath();
+            ctx.arc(rightX + dotXs[i], rBaseY, 6, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.globalAlpha = reveal;
+
+          ctx.fillStyle = "#7a7060";
+          ctx.font = '400 16px "DM Sans"';
+          ctx.fillText("Creates linear history", rightX, topY + 220);
+          ctx.fillText("Replays commits on top", rightX, topY + 248);
+
+          ctx.globalAlpha = 1;
+        },
+
+        // Scene 2: step-by-step rebase process animation
+        process: (ctx, p, t) => {
+          const cx = VW / 2;
+          const baseY = 200;
+          const stepH = 160;
+
+          ctx.textAlign = "center";
+
+          const steps = [
+            { label: "1. Find common ancestor", icon: "?", color: "#8a9ab0", desc: "Where did the branch diverge?" },
+            { label: "2. Save patches", icon: ">", color: "#d4a054", desc: "Detach feature commits as diffs" },
+            { label: "3. Fast-forward to tip", icon: ">>", color: "#8ab060", desc: "Move branch pointer to main HEAD" },
+            { label: "4. Replay patches", icon: "+", color: "#c85a4a", desc: "Apply each patch as a new commit" },
+          ];
+
+          for (let i = 0; i < steps.length; i++) {
+            const step = steps[i];
+            const reveal = Math.max(0, Math.min(1, (p - i * 0.18) / 0.15));
+            if (reveal <= 0) continue;
+            ctx.globalAlpha = reveal;
+
+            const y = baseY + i * stepH;
+            const boxW = 600, boxH = 110;
+
+            // Step box
+            ctx.fillStyle = "#2a2724";
+            ctx.strokeStyle = step.color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(cx - boxW/2, y, boxW, boxH, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            // Step label
+            ctx.fillStyle = step.color;
+            ctx.font = '700 22px "JetBrains Mono"';
+            ctx.fillText(step.label, cx, y + 40);
+
+            // Description
+            ctx.fillStyle = "#7a7060";
+            ctx.font = '400 17px "DM Sans"';
+            ctx.fillText(step.desc, cx, y + 72);
+
+            // Arrow between steps
+            if (i < steps.length - 1 && reveal > 0.5) {
+              const arrowReveal = Math.max(0, Math.min(1, (reveal - 0.5) / 0.5));
+              ctx.globalAlpha = arrowReveal;
+              ctx.strokeStyle = "#332f2a";
+              ctx.lineWidth = 2;
+              ctx.setLineDash([4, 4]);
+              ctx.lineDashOffset = -t * 20;
+              ctx.beginPath();
+              ctx.moveTo(cx, y + boxH);
+              ctx.lineTo(cx, y + boxH + stepH - boxH);
+              ctx.stroke();
+              ctx.setLineDash([]);
+              // Arrow head
+              ctx.fillStyle = "#332f2a";
+              ctx.beginPath();
+              ctx.moveTo(cx - 6, y + boxH + stepH - boxH - 8);
+              ctx.lineTo(cx + 6, y + boxH + stepH - boxH - 8);
+              ctx.lineTo(cx, y + boxH + stepH - boxH);
+              ctx.fill();
+            }
+          }
+
+          ctx.globalAlpha = 1;
+        },
+
+        // Scene 3: SHA rewriting visualization
+        history: (ctx, p, t) => {
+          const cx = VW / 2;
+          ctx.textAlign = "center";
+
+          // Title
+          const titleReveal = Math.max(0, Math.min(1, p / 0.15));
+          ctx.globalAlpha = titleReveal;
+          ctx.fillStyle = "#d4a054";
+          ctx.font = '700 28px "JetBrains Mono"';
+          ctx.fillText("Rebase Rewrites Commit Hashes", cx, 220);
+          ctx.globalAlpha = 1;
+
+          // Before rebase - old commits
+          const beforeReveal = Math.max(0, Math.min(1, (p - 0.1) / 0.2));
+          if (beforeReveal > 0) {
+            ctx.globalAlpha = beforeReveal;
+
+            ctx.fillStyle = "#7a7060";
+            ctx.font = '500 18px "JetBrains Mono"';
+            ctx.fillText("Before rebase:", cx - 300, 300);
+
+            const oldSHAs = ["a1b2c3d", "e4f5g6h", "i7j8k9l"];
+            const startX = cx - 300;
+            for (let i = 0; i < oldSHAs.length; i++) {
+              const x = startX + i * 150;
+              const y = 340;
+              // Ghost the old commits after new ones appear
+              const ghosted = p > 0.6 ? 0.3 : 1;
+              ctx.globalAlpha = beforeReveal * ghosted;
+
+              ctx.fillStyle = "#2a2724";
+              ctx.strokeStyle = "#d4a054";
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.roundRect(x - 55, y - 20, 110, 44, 8);
+              ctx.fill();
+              ctx.stroke();
+
+              ctx.fillStyle = "#d4a054";
+              ctx.font = '400 15px "JetBrains Mono"';
+              ctx.fillText(oldSHAs[i], x, y + 6);
+
+              // Connecting line
+              if (i < oldSHAs.length - 1) {
+                ctx.strokeStyle = "#332f2a";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(x + 55, y);
+                ctx.lineTo(x + 95, y);
+                ctx.stroke();
+              }
+            }
+
+            // Strikethrough after rebase
+            if (p > 0.6) {
+              const strikeReveal = Math.max(0, Math.min(1, (p - 0.6) / 0.1));
+              ctx.globalAlpha = strikeReveal;
+              ctx.strokeStyle = "#c85a4a";
+              ctx.lineWidth = 3;
+              ctx.beginPath();
+              ctx.moveTo(startX - 60, 340);
+              ctx.lineTo(startX + 350, 340);
+              ctx.stroke();
+            }
+          }
+
+          // After rebase - new commits
+          const afterReveal = Math.max(0, Math.min(1, (p - 0.45) / 0.2));
+          if (afterReveal > 0) {
+            ctx.globalAlpha = afterReveal;
+
+            ctx.fillStyle = "#7a7060";
+            ctx.font = '500 18px "JetBrains Mono"';
+            ctx.fillText("After rebase:", cx - 300, 460);
+
+            const newSHAs = ["x9y8z7w", "v6u5t4s", "r3q2p1o"];
+            const startX = cx - 300;
+            for (let i = 0; i < newSHAs.length; i++) {
+              const dotReveal = Math.max(0, Math.min(1, (p - 0.5 - i * 0.08) / 0.12));
+              ctx.globalAlpha = afterReveal * dotReveal;
+              const x = startX + i * 150;
+              const y = 500;
+
+              ctx.fillStyle = "#2a2724";
+              ctx.strokeStyle = "#8ab060";
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.roundRect(x - 55, y - 20, 110, 44, 8);
+              ctx.fill();
+              ctx.stroke();
+
+              ctx.fillStyle = "#8ab060";
+              ctx.font = '400 15px "JetBrains Mono"';
+              ctx.fillText(newSHAs[i], x, y + 6);
+
+              if (i < newSHAs.length - 1) {
+                ctx.strokeStyle = "#332f2a";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(x + 55, y);
+                ctx.lineTo(x + 95, y);
+                ctx.stroke();
+              }
+            }
+          }
+
+          // Explanation text
+          const explainReveal = Math.max(0, Math.min(1, (p - 0.75) / 0.15));
+          if (explainReveal > 0) {
+            ctx.globalAlpha = explainReveal;
+            ctx.fillStyle = "#c85a4a";
+            ctx.font = '500 18px "DM Sans"';
+            ctx.fillText("Same code changes, but entirely different commit objects", cx, 620);
+            ctx.fillStyle = "#7a7060";
+            ctx.font = '400 16px "DM Sans"';
+            ctx.fillText("New parent = new SHA hash", cx, 654);
+          }
+
+          ctx.globalAlpha = 1;
+        },
+
+        // Scene 4: when to use each
+        whenToUse: (ctx, p, t) => {
+          const cx = VW / 2;
+          ctx.textAlign = "center";
+
+          const titleReveal = Math.max(0, Math.min(1, p / 0.12));
+          ctx.globalAlpha = titleReveal;
+          ctx.fillStyle = "#d4a054";
+          ctx.font = '700 28px "JetBrains Mono"';
+          ctx.fillText("The Golden Rule", cx, 220);
+          ctx.globalAlpha = 1;
+
+          // Rebase side
+          const leftReveal = Math.max(0, Math.min(1, (p - 0.15) / 0.2));
+          if (leftReveal > 0) {
+            ctx.globalAlpha = leftReveal;
+            const lx = VW * 0.3, ly = 280;
+            ctx.fillStyle = "#2a2724";
+            ctx.strokeStyle = "#8ab060";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(lx - 240, ly, 480, 280, 12);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = "#8ab060";
+            ctx.font = '700 24px "JetBrains Mono"';
+            ctx.fillText("Rebase", lx, ly + 40);
+
+            ctx.fillStyle = "#e8e0d0";
+            ctx.font = '400 18px "DM Sans"';
+            ctx.fillText("Local branches only", lx, ly + 80);
+
+            ctx.fillStyle = "#7a7060";
+            ctx.font = '400 16px "DM Sans"';
+            const rebaseItems = ["Clean up before sharing", "Catch up with main", "Squash WIP commits"];
+            for (let i = 0; i < rebaseItems.length; i++) {
+              const itemReveal = Math.max(0, Math.min(1, (p - 0.25 - i * 0.08) / 0.1));
+              ctx.globalAlpha = leftReveal * itemReveal;
+              ctx.fillText("  " + rebaseItems[i], lx, ly + 120 + i * 35);
+            }
+          }
+
+          // Merge side
+          const rightReveal = Math.max(0, Math.min(1, (p - 0.35) / 0.2));
+          if (rightReveal > 0) {
+            ctx.globalAlpha = rightReveal;
+            const rx = VW * 0.7, ry = 280;
+            ctx.fillStyle = "#2a2724";
+            ctx.strokeStyle = "#8a9ab0";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(rx - 240, ry, 480, 280, 12);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = "#8a9ab0";
+            ctx.font = '700 24px "JetBrains Mono"';
+            ctx.fillText("Merge", rx, ry + 40);
+
+            ctx.fillStyle = "#e8e0d0";
+            ctx.font = '400 18px "DM Sans"';
+            ctx.fillText("Shared branches", rx, ry + 80);
+
+            ctx.fillStyle = "#7a7060";
+            ctx.font = '400 16px "DM Sans"';
+            const mergeItems = ["Integrate into main", "Multi-contributor work", "Preserve full timeline"];
+            for (let i = 0; i < mergeItems.length; i++) {
+              const itemReveal = Math.max(0, Math.min(1, (p - 0.45 - i * 0.08) / 0.1));
+              ctx.globalAlpha = rightReveal * itemReveal;
+              ctx.fillText("  " + mergeItems[i], rx, ry + 120 + i * 35);
+            }
+          }
+
+          // Safe workflow box
+          const safeReveal = Math.max(0, Math.min(1, (p - 0.7) / 0.15));
+          if (safeReveal > 0) {
+            ctx.globalAlpha = safeReveal;
+            ctx.fillStyle = "#2a2724";
+            ctx.strokeStyle = "#d4a054";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(cx - 340, 620, 680, 80, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = "#d4a054";
+            ctx.font = '500 17px "JetBrains Mono"';
+            ctx.fillText("rebase locally  ->  merge into shared", cx, 665);
+          }
+
+          ctx.globalAlpha = 1;
+        },
+
+        // Scene 5: interactive rebase commands
+        interactive: (ctx, p, t) => {
+          const cx = VW / 2;
+          ctx.textAlign = "center";
+
+          const titleReveal = Math.max(0, Math.min(1, p / 0.12));
+          ctx.globalAlpha = titleReveal;
+          ctx.fillStyle = "#d4a054";
+          ctx.font = '700 28px "JetBrains Mono"';
+          ctx.fillText("git rebase -i (interactive)", cx, 210);
+          ctx.globalAlpha = 1;
+
+          // Simulated editor
+          const editorReveal = Math.max(0, Math.min(1, (p - 0.12) / 0.15));
+          if (editorReveal > 0) {
+            ctx.globalAlpha = editorReveal;
+
+            // Editor background
+            ctx.fillStyle = "#1a1816";
+            ctx.strokeStyle = "#332f2a";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(cx - 380, 250, 760, 320, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            // Title bar
+            ctx.fillStyle = "#2a2724";
+            ctx.beginPath();
+            ctx.roundRect(cx - 380, 250, 760, 32, [10, 10, 0, 0]);
+            ctx.fill();
+
+            ctx.fillStyle = "#7a7060";
+            ctx.font = '400 13px "JetBrains Mono"';
+            ctx.textAlign = "left";
+            ctx.fillText("  git-rebase-todo", cx - 370, 270);
+            ctx.textAlign = "center";
+
+            const commands = [
+              { cmd: "pick", sha: "a1b2c3d", msg: "Add login form", color: "#8ab060" },
+              { cmd: "squash", sha: "e4f5g6h", msg: "Fix typo in login", color: "#d4a054" },
+              { cmd: "reword", sha: "i7j8k9l", msg: "Add validation", color: "#8a9ab0" },
+              { cmd: "drop", sha: "m0n1o2p", msg: "Debug logging", color: "#c85a4a" },
+            ];
+
+            ctx.textAlign = "left";
+            for (let i = 0; i < commands.length; i++) {
+              const lineReveal = Math.max(0, Math.min(1, (p - 0.2 - i * 0.1) / 0.12));
+              ctx.globalAlpha = editorReveal * lineReveal;
+              const y = 310 + i * 50;
+
+              // Highlight active line
+              const isActive = Math.floor((p - 0.2) / 0.15) % commands.length === i && p > 0.2;
+              if (isActive) {
+                ctx.fillStyle = "rgba(212,160,84,0.06)";
+                ctx.fillRect(cx - 375, y - 18, 750, 40);
+              }
+
+              ctx.fillStyle = commands[i].color;
+              ctx.font = '700 16px "JetBrains Mono"';
+              ctx.fillText(commands[i].cmd, cx - 350, y);
+
+              ctx.fillStyle = "#7a7060";
+              ctx.font = '400 16px "JetBrains Mono"';
+              ctx.fillText(commands[i].sha, cx - 240, y);
+
+              ctx.fillStyle = "#e8e0d0";
+              ctx.font = '400 16px "JetBrains Mono"';
+              ctx.fillText(commands[i].msg, cx - 130, y);
+            }
+          }
+
+          // Legend
+          ctx.textAlign = "center";
+          const legendReveal = Math.max(0, Math.min(1, (p - 0.65) / 0.15));
+          if (legendReveal > 0) {
+            ctx.globalAlpha = legendReveal;
+            const legendItems = [
+              { cmd: "pick", desc: "Keep commit as-is", color: "#8ab060" },
+              { cmd: "squash", desc: "Combine with previous", color: "#d4a054" },
+              { cmd: "reword", desc: "Edit commit message", color: "#8a9ab0" },
+              { cmd: "drop", desc: "Remove commit", color: "#c85a4a" },
+            ];
+
+            const startX = cx - 340;
+            for (let i = 0; i < legendItems.length; i++) {
+              const x = startX + i * 180;
+              ctx.fillStyle = legendItems[i].color;
+              ctx.font = '700 14px "JetBrains Mono"';
+              ctx.fillText(legendItems[i].cmd, x, 630);
+              ctx.fillStyle = "#7a7060";
+              ctx.font = '400 13px "DM Sans"';
+              ctx.fillText(legendItems[i].desc, x, 652);
+            }
+          }
+
+          ctx.globalAlpha = 1;
+        },
+
+        // Scene 6: conflict resolution flow
+        conflicts: (ctx, p, t) => {
+          const cx = VW / 2;
+          ctx.textAlign = "center";
+
+          const titleReveal = Math.max(0, Math.min(1, p / 0.12));
+          ctx.globalAlpha = titleReveal;
+          ctx.fillStyle = "#d4a054";
+          ctx.font = '700 28px "JetBrains Mono"';
+          ctx.fillText("Handling Rebase Conflicts", cx, 210);
+          ctx.globalAlpha = 1;
+
+          // Flow diagram
+          const flowSteps = [
+            { label: "Conflict detected", color: "#c85a4a", x: cx, y: 300 },
+            { label: "Edit conflicted files", color: "#d4a054", x: cx - 280, y: 440 },
+            { label: "git add <files>", color: "#8a9ab0", x: cx, y: 440 },
+            { label: "git rebase --continue", color: "#8ab060", x: cx + 280, y: 440 },
+            { label: "Next commit replayed", color: "#8ab060", x: cx, y: 580 },
+          ];
+
+          // Abort option
+          const abortStep = { label: "git rebase --abort", color: "#c85a4a", x: cx + 360, y: 300 };
+
+          for (let i = 0; i < flowSteps.length; i++) {
+            const step = flowSteps[i];
+            const reveal = Math.max(0, Math.min(1, (p - i * 0.12) / 0.15));
+            if (reveal <= 0) continue;
+            ctx.globalAlpha = reveal;
+
+            ctx.fillStyle = "#2a2724";
+            ctx.strokeStyle = step.color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(step.x - 130, step.y - 22, 260, 48, 8);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = step.color;
+            ctx.font = '500 16px "JetBrains Mono"';
+            ctx.fillText(step.label, step.x, step.y + 6);
+          }
+
+          // Abort option
+          const abortReveal = Math.max(0, Math.min(1, (p - 0.3) / 0.15));
+          if (abortReveal > 0) {
+            ctx.globalAlpha = abortReveal;
+            ctx.fillStyle = "#2a2724";
+            ctx.strokeStyle = abortStep.color;
+            ctx.lineWidth = 2;
+            ctx.setLineDash([6, 4]);
+            ctx.beginPath();
+            ctx.roundRect(abortStep.x - 130, abortStep.y - 22, 260, 48, 8);
+            ctx.fill();
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.fillStyle = abortStep.color;
+            ctx.font = '500 15px "JetBrains Mono"';
+            ctx.fillText(abortStep.label, abortStep.x, abortStep.y + 6);
+
+            ctx.fillStyle = "#7a7060";
+            ctx.font = '400 13px "DM Sans"';
+            ctx.fillText("(escape hatch)", abortStep.x, abortStep.y + 40);
+          }
+
+          // Arrows connecting flow
+          const arrowReveal = Math.max(0, Math.min(1, (p - 0.4) / 0.15));
+          if (arrowReveal > 0) {
+            ctx.globalAlpha = arrowReveal;
+            ctx.strokeStyle = "#332f2a";
+            ctx.lineWidth = 2;
+            ctx.setLineDash([4, 4]);
+            ctx.lineDashOffset = -t * 20;
+
+            // Down from conflict to edit
+            ctx.beginPath();
+            ctx.moveTo(cx - 80, 326);
+            ctx.lineTo(cx - 280, 418);
+            ctx.stroke();
+
+            // Edit to add
+            ctx.beginPath();
+            ctx.moveTo(cx - 150, 440);
+            ctx.lineTo(cx - 130, 440);
+            ctx.stroke();
+
+            // Add to continue
+            ctx.beginPath();
+            ctx.moveTo(cx + 130, 440);
+            ctx.lineTo(cx + 150, 440);
+            ctx.stroke();
+
+            // Continue down to next
+            ctx.beginPath();
+            ctx.moveTo(cx + 280, 466);
+            ctx.lineTo(cx, 558);
+            ctx.stroke();
+
+            ctx.setLineDash([]);
+          }
+
+          ctx.globalAlpha = 1;
+        },
+
+        // Scene 7: summary with key points
+        summary: (ctx, p, t) => {
+          const cx = VW / 2;
+          ctx.textAlign = "center";
+
+          const points = [
+            { text: "Rebase replays commits for linear history", icon: ">", color: "#8ab060" },
+            { text: "New parent = new SHA (history is rewritten)", icon: "#", color: "#d4a054" },
+            { text: "Never rebase shared/pushed commits", icon: "!", color: "#c85a4a" },
+            { text: "Use interactive rebase to polish before PR", icon: "i", color: "#8a9ab0" },
+            { text: "Resolve conflicts: add, continue, or abort", icon: "~", color: "#d4a054" },
+          ];
+
+          for (let i = 0; i < points.length; i++) {
+            const pt = points[i];
+            const reveal = Math.max(0, Math.min(1, (p - 0.1 - i * 0.12) / 0.12));
+            if (reveal <= 0) continue;
+            ctx.globalAlpha = reveal;
+
+            const y = 340 + i * 80;
+
+            // Icon circle
+            ctx.fillStyle = pt.color;
+            ctx.beginPath();
+            ctx.arc(cx - 300, y, 18, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = "#1a1816";
+            ctx.font = '700 16px "JetBrains Mono"';
+            ctx.fillText(pt.icon, cx - 300, y + 6);
+
+            // Text
+            ctx.fillStyle = "#e8e0d0";
+            ctx.font = '400 20px "DM Sans"';
+            ctx.textAlign = "left";
+            ctx.fillText(pt.text, cx - 260, y + 7);
+            ctx.textAlign = "center";
+          }
+
+          ctx.globalAlpha = 1;
+        },
+      };
+
+      // ===== RENDERER =====
+      const renderScene = createSceneRenderer(scenes, sceneElements, {
+        bg: "#1a1816",
+        draw: customDraw,
+      });
+
+      // ===== BOOT =====
+      createLesson({
+        lessonId: "git-rebase",
+        scenes,
+        IX,
+        render: renderScene,
+      });
+    </script>
+  </body>
+</html>

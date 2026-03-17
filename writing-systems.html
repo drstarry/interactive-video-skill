@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net;
+      font-src https://fonts.gstatic.com;
+      media-src 'self';
+      img-src 'self' data:;
+    " />
+    <title>The History of Writing Systems — Interactive Tutorial</title>
+    <link rel="stylesheet" href="src/lesson.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" />
+    <style>
+      :root {
+        --bg: #faf6ee;
+        --bg-card: #f0ece4;
+        --bg-el: #e6e2da;
+        --bg-ov: rgba(250,246,238,0.96);
+        --surface: #f0ece4;
+        --border: #d8d0c4;
+        --text: #2a2420;
+        --text2: #8a8070;
+        --accent: #c0392b;
+        --acc-dim: #943020;
+        --acc-glow: rgba(192,57,43,0.06);
+        --grn: #2a7a40;
+        --warm: #c0392b;
+        --cool: #2a5a8a;
+        --red: #c0392b;
+        --sans: 'DM Sans', -apple-system, sans-serif;
+        --mono: 'JetBrains Mono', monospace;
+        --serif: 'Instrument Serif', Georgia, serif;
+      }
+    </style>
+  </head>
+  <body data-theme="notebook">
+    <!-- Navigation -->
+                <nav class="site-nav">
+      <a class="site-nav-brand" href="https://github.com/drstarry/interactive-video-skill">Interactive Video Skill</a>
+      <div class="site-nav-links">
+        <a href="skill-onboarding.html">Onboarding [theme: Chalkboard]</a>
+        <a href="git-rebase.html">Git Rebase [theme: Terminal]</a>
+        <a href="writing-systems.html" class="active">Writing [theme: Notebook]</a>
+        <a href="dns-resolution.html">DNS [theme: Blueprint]</a>
+        <a href="rust-ownership.html">Rust [theme: Clean Dark]</a>
+        <a href="vaccines.html">Vaccines [theme: Clean Light]</a>
+        <a href="sourdough.html">Sourdough [theme: Studio]</a>
+        <a href="big-o.html">Big O [theme: Focus]</a>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="wrap">
+      <div class="hdr">
+        <h1>The History of Writing Systems</h1>
+        <p class="sub">From clay tablets to modern alphabets — the journey of human communication</p>
+      </div>
+
+      <div class="vid-wrap">
+        <canvas id="cvs"></canvas>
+        <div class="scn-label" id="scn-label"></div>
+        <div class="math-layer" id="math-layer"></div>
+        <div class="ov" id="ov">
+          <div class="top-badge" id="badge"></div>
+          <div class="card" id="card"></div>
+        </div>
+      </div>
+
+      <div class="ctl">
+        <button id="btn-play">
+          <svg id="play-icon" viewBox="0 0 24 24">
+            <polygon points="5,3 19,12 5,21" />
+          </svg>
+        </button>
+        <span class="tl" id="t-cur">0:00</span>
+        <span class="sep">/</span>
+        <span class="tl" id="t-dur">0:00</span>
+        <div class="tbar" id="tbar">
+          <div class="fill" id="tprog"></div>
+          <div class="scrub" id="tscrub"></div>
+        </div>
+        <button class="mute" id="btn-mute">Narration: On</button>
+        <button class="fs" id="btn-fs">Fullscreen</button>
+      </div>
+
+      <div class="scores" id="scores"></div>
+      <div class="chapters-header">Chapters</div>
+      <div id="chapters"></div>
+    </div>
+
+    <script type="module">
+      import { createLesson } from "./src/engine/lesson.js";
+      import { createSceneRenderer } from "./src/engine/scene-renderer.js";
+      import { VW, VH } from "./src/engine/canvas.js";
+
+      // ===== SCENE DATA =====
+      const scenes = [
+        { s: 0, e: 17.78, label: "Before Writing", bg: "intro" },
+        { s: 17.78, e: 59.76, label: "Cuneiform — Wedges in Clay", bg: "cuneiform" },
+        { s: 59.76, e: 80.26, label: "Egyptian Hieroglyphs", bg: "hieroglyphs" },
+        { s: 80.26, e: 147.46, label: "The Literacy Problem & Chinese Characters", bg: "chinese" },
+        { s: 147.46, e: 185.95, label: "The Phoenician Revolution", bg: "phoenician" },
+        { s: 185.95, e: 210.53, label: "The Greek Breakthrough", bg: "greek" },
+        { s: 210.53, e: 254.21, label: "Legacy — Latin, Cyrillic & Beyond", bg: "legacy" },
+        { s: 254.21, e: 303, label: "Writing Changes Everything", bg: "conclusion" },
+      ];
+
+      const IX = [
+        {
+          id: "q-early-systems", time: 79.06, cat: "q",
+          title: "Early Writing Origins",
+          desc: "What did cuneiform symbols evolve from?",
+          options: [
+            { k: "A", c: false },
+            { k: "B", c: true },
+            { k: "C", c: false },
+          ],
+        },
+        {
+          id: "try-categorize-systems", time: 146.26, cat: "try",
+          title: "Classify Writing Systems",
+          desc: "Drag each writing system into the correct category based on how its symbols work.",
+        },
+        {
+          id: "q-greek-innovation", time: 209.33, cat: "q",
+          title: "The Greek Breakthrough",
+          desc: "What key improvement did the Greeks make to the Phoenician alphabet?",
+          options: [
+            { k: "A", c: false },
+            { k: "B", c: true },
+            { k: "C", c: false },
+          ],
+        },
+        {
+          id: "try-timeline", time: 253.01, cat: "try",
+          title: "Timeline of Writing",
+          desc: "Drag these writing milestones into chronological order, from earliest to latest.",
+        },
+        {
+          id: "q-final", time: 297.29, cat: "q",
+          title: "The Big Picture",
+          desc: "Why was the Phoenician alphabet considered revolutionary compared to earlier writing systems?",
+          options: [
+            { k: "A", c: false },
+            { k: "B", c: true },
+            { k: "C", c: false },
+          ],
+        },
+      ];
+
+      // ===== DECLARATIVE ELEMENTS =====
+      const sceneElements = {
+        intro: [
+          { type: "glow", x: 960, y: 540, radius: 420, color: "rgba(192,57,43,0.06)" },
+          {
+            type: "text", x: 960, y: 400,
+            text: "The History of Writing Systems",
+            font: 'italic 400 52px "Instrument Serif"', color: "#2a2420",
+          },
+          {
+            type: "text", x: 960, y: 470,
+            text: "From marks in clay to the words you read today",
+            font: '400 22px "DM Sans"', color: "#8a8070", revealAt: 0.2,
+          },
+          {
+            type: "rule", x1: 820, y1: 510, x2: 1100, y2: 510,
+            color: "#c0392b", revealAt: 0.35,
+          },
+          {
+            type: "text", x: 960, y: 580,
+            text: "~ 5,000 years of invention ~",
+            font: 'italic 400 18px "Instrument Serif"', color: "#8a8070", revealAt: 0.5,
+          },
+        ],
+        hieroglyphs: [
+          { type: "glow", x: 960, y: 300, radius: 350, color: "rgba(192,57,43,0.04)" },
+          {
+            type: "text", x: 960, y: 240,
+            text: "Egyptian Hieroglyphs",
+            font: 'italic 400 42px "Instrument Serif"', color: "#2a2420",
+          },
+          {
+            type: "text", x: 960, y: 290,
+            text: "~ 3200 BCE",
+            font: '400 18px "DM Sans"', color: "#8a8070", revealAt: 0.15,
+          },
+          {
+            type: "rule", x1: 880, y1: 310, x2: 1040, y2: 310,
+            color: "#c0392b", revealAt: 0.2,
+          },
+          {
+            type: "rect", x: 560, y: 350, w: 800, h: 300,
+            fill: "rgba(192,57,43,0.04)", stroke: "#d8d0c4",
+          },
+          {
+            type: "text", x: 960, y: 420,
+            text: "Pictorial beauty preserved for millennia",
+            font: '500 24px "DM Sans"', color: "#2a2420", revealAt: 0.3,
+          },
+          {
+            type: "text", x: 960, y: 470,
+            text: "Used on temple walls and monuments",
+            font: '400 20px "DM Sans"', color: "#8a8070", revealAt: 0.45,
+          },
+          {
+            type: "text", x: 960, y: 520,
+            text: "Meant to last for eternity",
+            font: 'italic 400 20px "Instrument Serif"', color: "#943020", revealAt: 0.6,
+          },
+          {
+            type: "text", x: 960, y: 750,
+            text: "Unlike cuneiform, hieroglyphs retained their pictorial form",
+            font: 'italic 400 18px "Instrument Serif"', color: "#8a8070", revealAt: 0.75,
+          },
+        ],
+        phoenician: [
+          { type: "glow", x: 960, y: 350, radius: 380, color: "rgba(192,57,43,0.05)" },
+          {
+            type: "text", x: 960, y: 220,
+            text: "The Phoenician Revolution",
+            font: 'italic 400 44px "Instrument Serif"', color: "#2a2420",
+          },
+          {
+            type: "text", x: 960, y: 272,
+            text: "~ 1050 BCE — Coast of modern Lebanon",
+            font: '400 18px "DM Sans"', color: "#8a8070", revealAt: 0.1,
+          },
+          {
+            type: "rule", x1: 840, y1: 296, x2: 1080, y2: 296,
+            color: "#c0392b", revealAt: 0.15,
+          },
+          {
+            type: "rect", x: 360, y: 340, w: 500, h: 280,
+            fill: "rgba(42,90,138,0.06)", stroke: "#d8d0c4",
+            label: "Before", revealAt: 0.2,
+          },
+          {
+            type: "text", x: 610, y: 410,
+            text: "Hundreds of symbols",
+            font: '500 22px "DM Sans"', color: "#2a2420", revealAt: 0.25,
+          },
+          {
+            type: "text", x: 610, y: 450,
+            text: "Years to learn",
+            font: '400 18px "DM Sans"', color: "#8a8070", revealAt: 0.3,
+          },
+          {
+            type: "text", x: 610, y: 490,
+            text: "Elite scribes only",
+            font: '400 18px "DM Sans"', color: "#8a8070", revealAt: 0.35,
+          },
+          {
+            type: "rect", x: 1060, y: 340, w: 500, h: 280,
+            fill: "rgba(192,57,43,0.06)", stroke: "#c0392b",
+            label: "After", revealAt: 0.4,
+          },
+          {
+            type: "text", x: 1310, y: 410,
+            text: "Just 22 letters",
+            font: '500 22px "DM Sans"', color: "#c0392b", revealAt: 0.45,
+          },
+          {
+            type: "text", x: 1310, y: 450,
+            text: "Weeks to learn",
+            font: '400 18px "DM Sans"', color: "#2a2420", revealAt: 0.5,
+          },
+          {
+            type: "text", x: 1310, y: 490,
+            text: "Ordinary people literate",
+            font: '400 18px "DM Sans"', color: "#2a2420", revealAt: 0.55,
+          },
+          {
+            type: "text", x: 960, y: 720,
+            text: "Spread along Mediterranean trade routes, port to port",
+            font: 'italic 400 20px "Instrument Serif"', color: "#8a8070", revealAt: 0.7,
+          },
+        ],
+        greek: [
+          { type: "glow", x: 960, y: 400, radius: 360, color: "rgba(42,90,138,0.06)" },
+          {
+            type: "text", x: 960, y: 230,
+            text: "The Greek Breakthrough",
+            font: 'italic 400 44px "Instrument Serif"', color: "#2a2420",
+          },
+          {
+            type: "text", x: 960, y: 280,
+            text: "~ 800 BCE — Adding what was missing",
+            font: '400 18px "DM Sans"', color: "#8a8070", revealAt: 0.1,
+          },
+          {
+            type: "rule", x1: 860, y1: 304, x2: 1060, y2: 304,
+            color: "#2a5a8a", revealAt: 0.15,
+          },
+          {
+            type: "rect", x: 360, y: 340, w: 500, h: 240,
+            fill: "rgba(192,57,43,0.04)", stroke: "#d8d0c4",
+            label: "Phoenician", revealAt: 0.2,
+          },
+          {
+            type: "text", x: 610, y: 410,
+            text: "22 consonant letters",
+            font: '500 22px "DM Sans"', color: "#2a2420", revealAt: 0.25,
+          },
+          {
+            type: "text", x: 610, y: 450,
+            text: "No vowels written",
+            font: '400 18px "DM Sans"', color: "#943020", revealAt: 0.3,
+          },
+          {
+            type: "text", x: 610, y: 486,
+            text: "Readers guess from context",
+            font: '400 18px "DM Sans"', color: "#8a8070", revealAt: 0.35,
+          },
+          {
+            type: "rect", x: 1060, y: 340, w: 500, h: 240,
+            fill: "rgba(42,90,138,0.06)", stroke: "#2a5a8a",
+            label: "Greek", revealAt: 0.4,
+          },
+          {
+            type: "text", x: 1310, y: 410,
+            text: "Consonants + Vowels",
+            font: '500 22px "DM Sans"', color: "#2a5a8a", revealAt: 0.45,
+          },
+          {
+            type: "text", x: 1310, y: 450,
+            text: "First true alphabet",
+            font: '400 18px "DM Sans"', color: "#2a2420", revealAt: 0.5,
+          },
+          {
+            type: "text", x: 1310, y: 486,
+            text: "Fully explicit pronunciation",
+            font: '400 18px "DM Sans"', color: "#8a8070", revealAt: 0.55,
+          },
+          {
+            type: "text", x: 960, y: 700,
+            text: "Unused Phoenician consonants repurposed as vowel markers",
+            font: 'italic 400 18px "Instrument Serif"', color: "#8a8070", revealAt: 0.7,
+          },
+        ],
+        legacy: [
+          { type: "glow", x: 960, y: 400, radius: 380, color: "rgba(192,57,43,0.04)" },
+          {
+            type: "text", x: 960, y: 220,
+            text: "The Alphabet's Legacy",
+            font: 'italic 400 44px "Instrument Serif"', color: "#2a2420",
+          },
+          {
+            type: "rule", x1: 870, y1: 256, x2: 1050, y2: 256,
+            color: "#c0392b", revealAt: 0.1,
+          },
+          {
+            type: "rect", x: 660, y: 310, w: 600, h: 80,
+            fill: "rgba(192,57,43,0.08)", stroke: "#c0392b",
+            label: "Greek Alphabet", revealAt: 0.15,
+          },
+          {
+            type: "rect", x: 360, y: 460, w: 440, h: 80,
+            fill: "rgba(42,90,138,0.06)", stroke: "#2a5a8a",
+            label: "Latin Alphabet", revealAt: 0.35,
+          },
+          {
+            type: "text", x: 580, y: 580,
+            text: "English, French, Spanish, German...",
+            font: '400 17px "DM Sans"', color: "#8a8070", revealAt: 0.4,
+          },
+          {
+            type: "rect", x: 1120, y: 460, w: 440, h: 80,
+            fill: "rgba(42,122,64,0.06)", stroke: "#2a7a40",
+            label: "Cyrillic Alphabet", revealAt: 0.5,
+          },
+          {
+            type: "text", x: 1340, y: 580,
+            text: "Russian, Ukrainian, Serbian, Bulgarian...",
+            font: '400 17px "DM Sans"', color: "#8a8070", revealAt: 0.55,
+          },
+          {
+            type: "text", x: 960, y: 720,
+            text: "One Phoenician idea rippled outward for three thousand years",
+            font: 'italic 400 20px "Instrument Serif"', color: "#943020", revealAt: 0.7,
+          },
+        ],
+        conclusion: [
+          { type: "glow", x: 960, y: 480, radius: 450, color: "rgba(192,57,43,0.06)" },
+          {
+            type: "text", x: 960, y: 360,
+            text: "Writing Changed Everything",
+            font: 'italic 400 48px "Instrument Serif"', color: "#2a2420",
+          },
+          {
+            type: "rule", x1: 830, y1: 400, x2: 1090, y2: 400,
+            color: "#c0392b", revealAt: 0.15,
+          },
+          {
+            type: "text", x: 960, y: 460,
+            text: "Laws recorded. Stories preserved. Knowledge accumulated.",
+            font: '400 22px "DM Sans"', color: "#2a2420", revealAt: 0.25,
+          },
+          {
+            type: "text", x: 960, y: 520,
+            text: "Every alphabet descends from one Mediterranean innovation.",
+            font: '400 20px "DM Sans"', color: "#8a8070", revealAt: 0.4,
+          },
+          {
+            type: "text", x: 960, y: 600,
+            text: "The history of writing is the history of human progress.",
+            font: 'italic 400 24px "Instrument Serif"', color: "#943020", revealAt: 0.6,
+          },
+        ],
+      };
+
+      // ===== CUSTOM DRAW =====
+      const customDraw = {
+        cuneiform: (ctx, p, t) => {
+          // Title
+          const titleReveal = Math.max(0, Math.min(1, p / 0.15));
+          ctx.globalAlpha = titleReveal;
+          ctx.font = 'italic 400 42px "Instrument Serif"';
+          ctx.fillStyle = "#2a2420";
+          ctx.textAlign = "center";
+          ctx.fillText("Cuneiform", 960, 220);
+
+          ctx.font = '400 18px "DM Sans"';
+          ctx.fillStyle = "#8a8070";
+          ctx.fillText("Sumer, ~3400 BCE", 960, 260);
+          ctx.globalAlpha = 1;
+
+          // Divider
+          const ruleReveal = Math.max(0, Math.min(1, (p - 0.1) / 0.15));
+          ctx.globalAlpha = ruleReveal;
+          ctx.strokeStyle = "#c0392b";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(890, 280);
+          ctx.lineTo(1030, 280);
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+
+          // Evolution: pictograph -> abstract wedge
+          // Left box: pictograph stage
+          const leftReveal = Math.max(0, Math.min(1, (p - 0.15) / 0.2));
+          ctx.globalAlpha = leftReveal;
+
+          ctx.fillStyle = "rgba(192,57,43,0.04)";
+          ctx.strokeStyle = "#d8d0c4";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.roundRect(280, 320, 380, 340, 8);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.font = '500 16px "DM Sans"';
+          ctx.fillStyle = "#8a8070";
+          ctx.fillText("Pictographs", 470, 350);
+
+          // Simple pictograph symbols
+          ctx.font = '400 40px "DM Sans"';
+          ctx.fillStyle = "#2a2420";
+          const symbols = ["\u2600", "\u2602", "\u2605", "\u263A"];
+          const labels = ["sun", "rain", "star", "person"];
+          symbols.forEach((sym, i) => {
+            const yPos = 400 + i * 60;
+            const symReveal = Math.max(0, Math.min(1, (p - 0.2 - i * 0.05) / 0.1));
+            ctx.globalAlpha = leftReveal * symReveal;
+            ctx.font = '400 32px "DM Sans"';
+            ctx.fillStyle = "#2a2420";
+            ctx.fillText(sym, 420, yPos);
+            ctx.font = '400 16px "DM Sans"';
+            ctx.fillStyle = "#8a8070";
+            ctx.fillText(labels[i], 520, yPos);
+          });
+          ctx.globalAlpha = 1;
+
+          // Arrow
+          const arrowReveal = Math.max(0, Math.min(1, (p - 0.45) / 0.1));
+          ctx.globalAlpha = arrowReveal;
+          ctx.strokeStyle = "#c0392b";
+          ctx.lineWidth = 2;
+          ctx.setLineDash([6, 4]);
+          ctx.lineDashOffset = -t * 25;
+          ctx.beginPath();
+          ctx.moveTo(680, 490);
+          ctx.lineTo(780, 490);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          // arrowhead
+          ctx.fillStyle = "#c0392b";
+          ctx.beginPath();
+          ctx.moveTo(780, 485);
+          ctx.lineTo(795, 490);
+          ctx.lineTo(780, 495);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+
+          // Right box: wedge marks
+          const rightReveal = Math.max(0, Math.min(1, (p - 0.5) / 0.2));
+          ctx.globalAlpha = rightReveal;
+
+          ctx.fillStyle = "rgba(42,90,138,0.04)";
+          ctx.strokeStyle = "#d8d0c4";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.roundRect(820, 320, 380, 340, 8);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.font = '500 16px "DM Sans"';
+          ctx.fillStyle = "#8a8070";
+          ctx.fillText("Wedge Marks", 1010, 350);
+
+          // Abstract wedge patterns
+          ctx.strokeStyle = "#2a2420";
+          ctx.lineWidth = 3;
+          for (let i = 0; i < 4; i++) {
+            const yPos = 400 + i * 60;
+            const wedgeReveal = Math.max(0, Math.min(1, (p - 0.55 - i * 0.05) / 0.1));
+            ctx.globalAlpha = rightReveal * wedgeReveal;
+            // Draw wedge-like marks
+            for (let j = 0; j < 3 + i; j++) {
+              const wx = 920 + j * 30;
+              ctx.beginPath();
+              ctx.moveTo(wx, yPos - 8);
+              ctx.lineTo(wx + 12, yPos);
+              ctx.lineTo(wx, yPos + 8);
+              ctx.stroke();
+            }
+          }
+          ctx.globalAlpha = 1;
+
+          // Bottom caption
+          const capReveal = Math.max(0, Math.min(1, (p - 0.8) / 0.15));
+          ctx.globalAlpha = capReveal;
+          ctx.font = 'italic 400 18px "Instrument Serif"';
+          ctx.fillStyle = "#8a8070";
+          ctx.fillText("From pictures to patterns — the wedge-shaped stylus changed everything", 960, 740);
+          ctx.globalAlpha = 1;
+        },
+        chinese: (ctx, p, t) => {
+          // Title
+          const titleReveal = Math.max(0, Math.min(1, p / 0.1));
+          ctx.globalAlpha = titleReveal;
+          ctx.font = 'italic 400 40px "Instrument Serif"';
+          ctx.fillStyle = "#2a2420";
+          ctx.textAlign = "center";
+          ctx.fillText("The Literacy Problem & Chinese Writing", 960, 220);
+
+          ctx.font = '400 18px "DM Sans"';
+          ctx.fillStyle = "#8a8070";
+          ctx.fillText("Thousands of symbols — years of training — elite access only", 960, 260);
+          ctx.globalAlpha = 1;
+
+          // Divider
+          const ruleReveal = Math.max(0, Math.min(1, (p - 0.05) / 0.1));
+          ctx.globalAlpha = ruleReveal;
+          ctx.strokeStyle = "#c0392b";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(850, 280);
+          ctx.lineTo(1070, 280);
+          ctx.stroke();
+          ctx.globalAlpha = 1;
+
+          // Symbol count comparison bars
+          const barReveal = Math.max(0, Math.min(1, (p - 0.12) / 0.15));
+          ctx.globalAlpha = barReveal;
+
+          const systems = [
+            { name: "Cuneiform", count: "600+", width: 400, color: "#943020" },
+            { name: "Hieroglyphs", count: "700+", width: 440, color: "#c0392b" },
+            { name: "Chinese", count: "3,000+", width: 580, color: "#2a5a8a" },
+          ];
+
+          systems.forEach((sys, i) => {
+            const yPos = 340 + i * 80;
+            const sysReveal = Math.max(0, Math.min(1, (p - 0.15 - i * 0.06) / 0.12));
+            ctx.globalAlpha = barReveal * sysReveal;
+
+            // Bar
+            ctx.fillStyle = sys.color + "18";
+            ctx.strokeStyle = sys.color;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.roundRect(480, yPos, sys.width * sysReveal, 50, 4);
+            ctx.fill();
+            ctx.stroke();
+
+            // Label
+            ctx.font = '500 18px "DM Sans"';
+            ctx.fillStyle = "#2a2420";
+            ctx.textAlign = "right";
+            ctx.fillText(sys.name, 460, yPos + 30);
+
+            // Count
+            ctx.font = '600 16px "DM Sans"';
+            ctx.fillStyle = sys.color;
+            ctx.textAlign = "left";
+            ctx.fillText(sys.count + " symbols", 490 + sys.width * sysReveal + 10, yPos + 30);
+          });
+
+          ctx.textAlign = "center";
+          ctx.globalAlpha = 1;
+
+          // Oracle bones section
+          const oracleReveal = Math.max(0, Math.min(1, (p - 0.5) / 0.15));
+          ctx.globalAlpha = oracleReveal;
+
+          ctx.fillStyle = "rgba(42,90,138,0.04)";
+          ctx.strokeStyle = "#d8d0c4";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.roundRect(560, 580, 800, 120, 8);
+          ctx.fill();
+          ctx.stroke();
+
+          ctx.font = '500 20px "DM Sans"';
+          ctx.fillStyle = "#2a5a8a";
+          ctx.fillText("Oracle Bone Script — Shang Dynasty, ~1200 BCE", 960, 620);
+
+          ctx.font = '400 17px "DM Sans"';
+          ctx.fillStyle = "#8a8070";
+          ctx.fillText("Questions carved on turtle shells and bones, heated until cracked", 960, 660);
+          ctx.globalAlpha = 1;
+
+          // Bottom note
+          const noteReveal = Math.max(0, Math.min(1, (p - 0.75) / 0.15));
+          ctx.globalAlpha = noteReveal;
+          ctx.font = 'italic 400 18px "Instrument Serif"';
+          ctx.fillStyle = "#943020";
+          ctx.fillText("The longest continuously used writing system — over 3,000 years", 960, 770);
+          ctx.globalAlpha = 1;
+        },
+      };
+
+      // ===== RENDERER =====
+      const renderScene = createSceneRenderer(scenes, sceneElements, {
+        bg: "#faf6ee",
+        paperGrain: 0.012,
+        draw: customDraw,
+      });
+
+      // ===== BOOT =====
+      createLesson({
+        lessonId: "writing-systems",
+        scenes,
+        IX,
+        render: renderScene,
+      });
+    </script>
+  </body>
+</html>

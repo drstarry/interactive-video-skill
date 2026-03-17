@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "lessonId": "vaccines",
+    "voice": "en-US-AndrewNeural",
+    "rate": "+5%",
+    "gap": 1.2,
+    "duration": 234,
+    "audioGenerated": true
+  },
+  "narration": [
+    {
+      "t": 1.2,
+      "text": "Your body is under constant attack. Every day, bacteria, viruses, and other pathogens try to invade. But you have a built-in defense system that's been evolving for millions of years: your immune system."
+    },
+    {
+      "t": 14.81,
+      "text": "Your immune system has two layers. The first is your innate immune system. It's fast, non-specific, and always on patrol. Think of it as the front-line guards. Skin, mucus, fever, and inflammation are all part of this innate response."
+    },
+    {
+      "t": 30.84,
+      "text": "The second layer is your adaptive immune system. It's slower to respond the first time, but incredibly precise. It learns to recognize specific invaders and remembers them for years, sometimes for life."
+    },
+    {
+      "t": 44.06,
+      "text": "Here's how the adaptive response works. When a pathogen enters your body, it carries unique molecules on its surface called antigens. These antigens are like a fingerprint that identifies the invader."
+    },
+    {
+      "t": 56.59,
+      "text": "Special cells called antigen-presenting cells capture the pathogen and display fragments of its antigens. This activates two key players: B cells, which produce antibodies, and T cells, which coordinate the attack and destroy infected cells."
+    },
+    {
+      "t": 73.06,
+      "text": "Let's explore the key components of your adaptive immune system and what each one does.",
+      "endsBeforeIx": "try-immune-components"
+    },
+    {
+      "t": 78.96,
+      "text": "After the infection is cleared, most of those B cells and T cells die off. But a small group survives as memory cells. These memory cells patrol your body for years, ready to launch a rapid response if the same pathogen ever returns."
+    },
+    {
+      "t": 94.56,
+      "text": "This is the key insight: the first time you encounter a pathogen, it takes your immune system one to two weeks to mount a full response. But with memory cells already in place, the second encounter triggers a response in just hours. The infection is crushed before you even feel sick."
+    },
+    {
+      "t": 112.39,
+      "text": "Now let's put the full immune response in order, from initial infection to long-term protection.",
+      "endsBeforeIx": "try-response-order"
+    },
+    {
+      "t": 119.14,
+      "text": "Vaccines exploit this memory mechanism. Instead of waiting for a real infection, a vaccine introduces a harmless version of the antigen into your body. Your immune system mounts a response, creates memory cells, and you gain protection without ever getting sick."
+    },
+    {
+      "t": 135.86,
+      "text": "There are several types of vaccines, and they differ in how they present the antigen to your immune system. Live attenuated vaccines use a weakened form of the actual virus. Inactivated vaccines use a killed version of the pathogen. Subunit vaccines use just a piece of the pathogen, like a surface protein. And mRNA vaccines give your cells instructions to build the antigen protein themselves."
+    },
+    {
+      "t": 160.25,
+      "text": "Each type has trade-offs in terms of strength of immune response, storage requirements, and how quickly they can be developed. Let's sort these vaccine types into their correct categories.",
+      "endsBeforeIx": "try-vaccine-types"
+    },
+    {
+      "t": 171.43,
+      "text": "So why do some vaccines need boosters? Over time, memory cell populations can decline. A booster shot re-exposes your immune system to the antigen, refreshing and expanding the pool of memory cells. Think of it as a training drill that keeps your defenses sharp."
+    },
+    {
+      "t": 188.14,
+      "text": "Here's a question to test your understanding of how vaccines create immunity.",
+      "endsBeforeIx": "q-mechanism"
+    },
+    {
+      "t": 193.39,
+      "text": "Let's bring it all together. Vaccines work because your adaptive immune system can learn and remember. By introducing a harmless antigen, vaccines train your B cells and T cells to recognize a threat before it arrives. The result is immunological memory: a rapid, powerful response that stops disease before it starts."
+    },
+    {
+      "t": 213.82,
+      "text": "This principle has eradicated smallpox, nearly eliminated polio, and continues to protect billions of people worldwide. Understanding how vaccines train your immune system is one of the most important pieces of health literacy you can have."
+    }
+  ],
+  "interactions": {
+    "try-immune-components": {
+      "time": 77.76,
+      "title": "Immune System Components",
+      "desc": "Tap each component to learn what it does in the adaptive immune response.",
+      "widget": "hotspot",
+      "hotspots": [
+        {
+          "label": "B Cells",
+          "icon": "B",
+          "explanation": "B cells produce antibodies — Y-shaped proteins that bind to specific antigens and neutralize pathogens or tag them for destruction."
+        },
+        {
+          "label": "T Helper Cells",
+          "icon": "Th",
+          "explanation": "T helper cells coordinate the immune response by releasing chemical signals called cytokines that activate B cells and killer T cells."
+        },
+        {
+          "label": "Killer T Cells",
+          "icon": "Tk",
+          "explanation": "Killer T cells (cytotoxic T cells) directly destroy cells that have been infected by a virus, preventing the pathogen from replicating."
+        },
+        {
+          "label": "Memory Cells",
+          "icon": "M",
+          "explanation": "Memory B and T cells persist after infection is cleared. They enable a faster, stronger response if the same pathogen is encountered again."
+        }
+      ],
+      "feedback": {
+        "correct": {
+          "body": "These four components work together to identify, attack, and remember specific pathogens."
+        },
+        "wrong": {
+          "body": "Explore all components to continue."
+        }
+      }
+    },
+    "try-response-order": {
+      "time": 117.93,
+      "title": "Order the Immune Response",
+      "desc": "Drag to arrange the steps from initial infection to long-term immunity.",
+      "widget": "sort",
+      "sortItems": [
+        "Pathogen enters the body",
+        "Innate immune system responds (inflammation, fever)",
+        "Antigen-presenting cells capture and display antigens",
+        "B cells and T cells are activated",
+        "Antibodies neutralize the pathogen",
+        "Memory cells form for future protection"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Correct",
+          "body": "That's the complete cascade from infection to lasting immunity."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "Remember: innate response comes first, then antigen presentation activates adaptive immunity, and memory cells form last."
+        }
+      }
+    },
+    "try-vaccine-types": {
+      "time": 170.23,
+      "title": "Classify Vaccine Types",
+      "desc": "Drag each vaccine into the correct category based on what it contains.",
+      "widget": "categorize",
+      "categories": [
+        {
+          "label": "Contains whole pathogen",
+          "items": [
+            "MMR (live attenuated)",
+            "Flu shot (inactivated)",
+            "Oral polio (live attenuated)"
+          ]
+        },
+        {
+          "label": "Contains partial pathogen",
+          "items": [
+            "Hepatitis B (subunit)",
+            "HPV vaccine (subunit)",
+            "Shingles (subunit)"
+          ]
+        },
+        {
+          "label": "Contains genetic instructions",
+          "items": [
+            "Pfizer COVID (mRNA)",
+            "Moderna COVID (mRNA)"
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Correct",
+          "body": "Live attenuated and inactivated vaccines use whole pathogens. Subunit vaccines use just a piece. mRNA vaccines deliver genetic instructions for your cells to make the antigen."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "Think about what's actually in each vaccine: the whole virus, a protein fragment, or instructions to build a protein."
+        }
+      }
+    },
+    "q-mechanism": {
+      "time": 192.2,
+      "title": "Vaccine Mechanism",
+      "desc": "What is the primary way vaccines protect you from future infections?",
+      "options": [
+        "They kill pathogens directly when injected",
+        "They train memory cells to recognize specific antigens",
+        "They permanently boost your innate immune system"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Correct",
+          "body": "Vaccines introduce antigens that trigger the adaptive immune system to create memory B and T cells. These memory cells enable a rapid response to future encounters with the real pathogen."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "Vaccines don't kill pathogens directly or permanently change innate immunity. They work by training the adaptive immune system to create memory cells that recognize specific antigens."
+        }
+      }
+    }
+  }
+}

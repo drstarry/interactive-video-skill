@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net;
+      font-src https://fonts.gstatic.com;
+      media-src 'self';
+      img-src 'self' data:;
+    " />
+    <title>How DNS Resolution Works — Interactive Tutorial</title>
+    <link rel="stylesheet" href="src/lesson.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" />
+    <style>
+      :root {
+        --bg: #0c1824;
+        --bg-card: #10202e;
+        --bg-el: #182838;
+        --bg-ov: rgba(12,24,36,0.95);
+        --surface: #10202e;
+        --border: #1e3448;
+        --text: #b0c8d8;
+        --text2: #4a6878;
+        --accent: #5a90b8;
+        --acc-dim: #3a6888;
+        --acc-glow: rgba(90,144,184,0.08);
+        --grn: #60a088;
+        --warm: #b08a50;
+        --cool: #5a90b8;
+        --red: #c06050;
+        --sans: 'DM Sans', -apple-system, sans-serif;
+        --mono: 'JetBrains Mono', monospace;
+        --serif: 'DM Sans', -apple-system, sans-serif;
+      }
+    </style>
+  </head>
+  <body data-theme="blueprint">
+    <!-- Navigation -->
+                <nav class="site-nav">
+      <a class="site-nav-brand" href="https://github.com/drstarry/interactive-video-skill">Interactive Video Skill</a>
+      <div class="site-nav-links">
+        <a href="skill-onboarding.html">Onboarding [theme: Chalkboard]</a>
+        <a href="git-rebase.html">Git Rebase [theme: Terminal]</a>
+        <a href="writing-systems.html">Writing [theme: Notebook]</a>
+        <a href="dns-resolution.html" class="active">DNS [theme: Blueprint]</a>
+        <a href="rust-ownership.html">Rust [theme: Clean Dark]</a>
+        <a href="vaccines.html">Vaccines [theme: Clean Light]</a>
+        <a href="sourdough.html">Sourdough [theme: Studio]</a>
+        <a href="big-o.html">Big O [theme: Focus]</a>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="wrap">
+      <div class="hdr">
+        <h1>How DNS Resolution Works</h1>
+        <p class="sub">From domain name to IP address — the internet's lookup system</p>
+      </div>
+
+      <div class="vid-wrap">
+        <canvas id="cvs"></canvas>
+        <div class="scn-label" id="scn-label"></div>
+        <div class="math-layer" id="math-layer"></div>
+        <div class="ov" id="ov">
+          <div class="top-badge" id="badge"></div>
+          <div class="card" id="card"></div>
+        </div>
+      </div>
+
+      <div class="ctl">
+        <button id="btn-play">
+          <svg id="play-icon" viewBox="0 0 24 24">
+            <polygon points="5,3 19,12 5,21" />
+          </svg>
+        </button>
+        <span class="tl" id="t-cur">0:00</span>
+        <span class="sep">/</span>
+        <span class="tl" id="t-dur">0:00</span>
+        <div class="tbar" id="tbar">
+          <div class="fill" id="tprog"></div>
+          <div class="scrub" id="tscrub"></div>
+        </div>
+        <button class="mute" id="btn-mute">Narration: On</button>
+        <button class="fs" id="btn-fs">Fullscreen</button>
+      </div>
+
+      <div class="scores" id="scores"></div>
+      <div class="chapters-header">Chapters</div>
+      <div id="chapters"></div>
+    </div>
+
+    <script type="module">
+      import { createLesson } from "./src/engine/lesson.js";
+      import { createSceneRenderer } from "./src/engine/scene-renderer.js";
+      import { VW, VH } from "./src/engine/canvas.js";
+
+      // ===== SCENE DATA =====
+      const scenes = [
+        { s: 0, e: 36.24, label: "What Is DNS?", bg: "intro" },
+        { s: 36.24, e: 86.06, label: "The Key Players", bg: "players" },
+        { s: 86.06, e: 134.79, label: "The Query Flow", bg: "queryflow" },
+        { s: 134.79, e: 162.38, label: "Recursive vs Iterative", bg: "querytypes" },
+        { s: 162.38, e: 207.63, label: "Caching & TTL", bg: "caching" },
+        { s: 207.63, e: 246, label: "Putting It Together", bg: "summary" },
+      ];
+
+      const IX = [
+        {
+          id: "try-dns-components",
+          time: 86.06,
+          cat: "try",
+          title: "DNS Architecture",
+          desc: "Tap each component to learn its role in DNS resolution.",
+        },
+        {
+          id: "try-query-order",
+          time: 134.79,
+          cat: "try",
+          title: "Order the DNS Query Steps",
+          desc: "Drag to arrange the steps of a DNS lookup in the correct order.",
+        },
+        {
+          id: "q-query-types",
+          time: 162.38,
+          cat: "q",
+          title: "Recursive vs Iterative",
+          desc: "When a recursive resolver contacts a root server, what type of query does it send?",
+          options: [
+            { k: "A", c: false },
+            { k: "B", c: true },
+            { k: "C", c: false },
+          ],
+        },
+        {
+          id: "q-ttl",
+          time: 207.63,
+          cat: "q",
+          title: "TTL Trade-offs",
+          desc: "A company changes their server IP address but users still reach the old server for hours. What is the most likely cause?",
+          options: [
+            { k: "A", c: false },
+            { k: "B", c: true },
+            { k: "C", c: false },
+          ],
+        },
+      ];
+
+      // ===== DECLARATIVE ELEMENTS =====
+      const sceneElements = {
+        intro: [
+          { type: "glow", x: 960, y: 480, radius: 420, color: "rgba(90,144,184,0.06)" },
+          {
+            type: "text", x: 960, y: 340,
+            text: "How DNS Resolution Works",
+            font: '700 46px "DM Sans"', color: "#b0c8d8",
+          },
+          {
+            type: "text", x: 960, y: 400,
+            text: "The Internet's Phone Book",
+            font: '300 22px "DM Sans"', color: "#4a6878",
+            revealAt: 0.15,
+          },
+          {
+            type: "rule", x1: 860, y1: 440, x2: 1060, y2: 440,
+            color: "#5a90b8", revealAt: 0.25,
+          },
+          {
+            type: "text", x: 960, y: 520,
+            text: "example.com  \u2192  93.184.216.34",
+            font: '500 28px "JetBrains Mono"', color: "#5a90b8",
+            revealAt: 0.35,
+          },
+          {
+            type: "text", x: 960, y: 600,
+            text: "Billions of lookups every day",
+            font: '400 18px "DM Sans"', color: "#4a6878",
+            revealAt: 0.55,
+          },
+        ],
+        summary: [
+          { type: "glow", x: 960, y: 480, radius: 400, color: "rgba(90,144,184,0.06)" },
+          {
+            type: "text", x: 960, y: 320,
+            text: "DNS Resolution",
+            font: '700 42px "DM Sans"', color: "#b0c8d8",
+          },
+          {
+            type: "text", x: 960, y: 390,
+            text: "Hierarchical \u2022 Distributed \u2022 Cached",
+            font: '500 22px "JetBrains Mono"', color: "#5a90b8",
+            revealAt: 0.15,
+          },
+          {
+            type: "rule", x1: 760, y1: 430, x2: 1160, y2: 430,
+            color: "#3a6888", revealAt: 0.25,
+          },
+          {
+            type: "text", x: 960, y: 500,
+            text: "Browser \u2192 Resolver \u2192 Root \u2192 TLD \u2192 Authoritative",
+            font: '400 20px "JetBrains Mono"', color: "#60a088",
+            revealAt: 0.35,
+          },
+          {
+            type: "text", x: 960, y: 560,
+            text: "TTL controls freshness vs speed",
+            font: '400 18px "DM Sans"', color: "#4a6878",
+            revealAt: 0.5,
+          },
+          {
+            type: "text", x: 960, y: 640,
+            text: "Before a single byte of HTML arrives, DNS does its job first.",
+            font: '500 20px "DM Sans"', color: "#b08a50",
+            revealAt: 0.65,
+          },
+        ],
+      };
+
+      // ===== CUSTOM DRAW =====
+      const customDraw = {
+        players: (ctx, p, t) => {
+          const cx = VW / 2;
+          const layers = [
+            { label: "Authoritative Nameserver", y: 200, color: "#60a088", sub: "Holds the actual records" },
+            { label: "TLD Servers (.com, .org, .net)", y: 330, color: "#5a90b8", sub: "One per top-level domain" },
+            { label: "Root Servers (A\u2013M)", y: 460, color: "#b08a50", sub: "13 clusters worldwide" },
+            { label: "Recursive Resolver", y: 590, color: "#5a90b8", sub: "Does the heavy lifting" },
+            { label: "Your Computer (Local Cache)", y: 720, color: "#4a6878", sub: "Checks here first" },
+          ];
+          layers.forEach((layer, i) => {
+            const delay = i * 0.12;
+            const reveal = Math.max(0, Math.min(1, (p - delay) / 0.15));
+            if (reveal <= 0) return;
+            ctx.globalAlpha = reveal;
+
+            // Box
+            const bw = 520, bh = 80;
+            const bx = cx - bw / 2, by = layer.y - bh / 2;
+            ctx.fillStyle = "#10202e";
+            ctx.strokeStyle = layer.color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(bx, by, bw, bh, 8);
+            ctx.fill();
+            ctx.stroke();
+
+            // Label
+            ctx.fillStyle = layer.color;
+            ctx.font = '500 20px "DM Sans"';
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(layer.label, cx, layer.y - 10);
+
+            // Sub
+            ctx.fillStyle = "#4a6878";
+            ctx.font = '300 14px "DM Sans"';
+            ctx.fillText(layer.sub, cx, layer.y + 16);
+
+            // Arrow to next
+            if (i < layers.length - 1 && reveal > 0.5) {
+              const nextY = layers[i + 1].y - 40;
+              ctx.strokeStyle = layer.color;
+              ctx.lineWidth = 1.5;
+              ctx.setLineDash([6, 4]);
+              ctx.lineDashOffset = -t * 25;
+              ctx.beginPath();
+              ctx.moveTo(cx, layer.y + 40);
+              ctx.lineTo(cx, nextY);
+              ctx.stroke();
+              ctx.setLineDash([]);
+
+              // arrowhead
+              ctx.fillStyle = layer.color;
+              ctx.beginPath();
+              ctx.moveTo(cx - 6, nextY - 6);
+              ctx.lineTo(cx, nextY + 2);
+              ctx.lineTo(cx + 6, nextY - 6);
+              ctx.fill();
+            }
+          });
+          ctx.globalAlpha = 1;
+
+          // Title
+          const titleReveal = Math.max(0, Math.min(1, p / 0.08));
+          ctx.globalAlpha = titleReveal;
+          ctx.fillStyle = "#b0c8d8";
+          ctx.font = '700 28px "DM Sans"';
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("DNS Hierarchy", cx, 100);
+          ctx.globalAlpha = 1;
+        },
+
+        queryflow: (ctx, p, t) => {
+          const steps = [
+            { label: "Browser", x: 140, color: "#4a6878" },
+            { label: "Local Cache", x: 320, color: "#4a6878" },
+            { label: "Resolver", x: 520, color: "#5a90b8" },
+            { label: "Root", x: 740, color: "#b08a50" },
+            { label: "TLD", x: 960, color: "#5a90b8" },
+            { label: "Auth NS", x: 1180, color: "#60a088" },
+            { label: "IP!", x: 1400, color: "#60a088" },
+          ];
+
+          // Title
+          const titleR = Math.max(0, Math.min(1, p / 0.08));
+          ctx.globalAlpha = titleR;
+          ctx.fillStyle = "#b0c8d8";
+          ctx.font = '700 28px "DM Sans"';
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("DNS Query Flow", VW / 2, 160);
+          ctx.globalAlpha = 1;
+
+          const baseY = 440;
+
+          steps.forEach((step, i) => {
+            const delay = 0.05 + i * 0.1;
+            const reveal = Math.max(0, Math.min(1, (p - delay) / 0.12));
+            if (reveal <= 0) return;
+            ctx.globalAlpha = reveal;
+
+            // Circle node
+            const radius = 40;
+            ctx.fillStyle = "#10202e";
+            ctx.strokeStyle = step.color;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.arc(step.x, baseY, radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Label below
+            ctx.fillStyle = step.color;
+            ctx.font = '500 16px "DM Sans"';
+            ctx.textAlign = "center";
+            ctx.textBaseline = "top";
+            ctx.fillText(step.label, step.x, baseY + 55);
+
+            // Step number inside circle
+            ctx.fillStyle = step.color;
+            ctx.font = '700 22px "JetBrains Mono"';
+            ctx.textBaseline = "middle";
+            ctx.fillText(String(i + 1), step.x, baseY);
+
+            // Arrow to next
+            if (i < steps.length - 1) {
+              const nextX = steps[i + 1].x;
+              const arrowReveal = Math.max(0, Math.min(1, (p - delay - 0.06) / 0.1));
+              if (arrowReveal > 0) {
+                ctx.globalAlpha = arrowReveal;
+                ctx.strokeStyle = step.color;
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 4]);
+                ctx.lineDashOffset = -t * 30;
+                ctx.beginPath();
+                ctx.moveTo(step.x + radius + 4, baseY);
+                ctx.lineTo(nextX - radius - 10, baseY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                // arrowhead
+                ctx.fillStyle = step.color;
+                ctx.beginPath();
+                const ax = nextX - radius - 6;
+                ctx.moveTo(ax - 6, baseY - 5);
+                ctx.lineTo(ax + 2, baseY);
+                ctx.lineTo(ax - 6, baseY + 5);
+                ctx.fill();
+              }
+            }
+          });
+
+          // "example.com" query text
+          const qReveal = Math.max(0, Math.min(1, (p - 0.15) / 0.15));
+          if (qReveal > 0) {
+            ctx.globalAlpha = qReveal;
+            ctx.fillStyle = "#b08a50";
+            ctx.font = '400 18px "JetBrains Mono"';
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText('"Where is example.com?"', VW / 2, baseY - 100);
+          }
+
+          // Return path label
+          const retReveal = Math.max(0, Math.min(1, (p - 0.7) / 0.15));
+          if (retReveal > 0) {
+            ctx.globalAlpha = retReveal;
+            ctx.fillStyle = "#60a088";
+            ctx.font = '400 18px "JetBrains Mono"';
+            ctx.textAlign = "center";
+            ctx.fillText('"93.184.216.34"', VW / 2, baseY + 110);
+
+            // return arrow
+            ctx.strokeStyle = "#60a088";
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([4, 4]);
+            ctx.lineDashOffset = t * 20;
+            ctx.beginPath();
+            ctx.moveTo(1180, baseY + 85);
+            ctx.lineTo(140, baseY + 85);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+
+          ctx.globalAlpha = 1;
+        },
+
+        querytypes: (ctx, p, t) => {
+          const cx = VW / 2;
+
+          // Title
+          const titleR = Math.max(0, Math.min(1, p / 0.08));
+          ctx.globalAlpha = titleR;
+          ctx.fillStyle = "#b0c8d8";
+          ctx.font = '700 28px "DM Sans"';
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("Two Types of DNS Queries", cx, 140);
+          ctx.globalAlpha = 1;
+
+          // Left: Recursive
+          const leftX = cx - 280;
+          const rReveal = Math.max(0, Math.min(1, (p - 0.1) / 0.15));
+          if (rReveal > 0) {
+            ctx.globalAlpha = rReveal;
+            const bw = 440, bh = 340;
+            ctx.fillStyle = "#10202e";
+            ctx.strokeStyle = "#5a90b8";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(leftX - bw / 2, 220, bw, bh, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = "#5a90b8";
+            ctx.font = '700 24px "DM Sans"';
+            ctx.fillText("Recursive Query", leftX, 270);
+
+            ctx.fillStyle = "#b0c8d8";
+            ctx.font = '400 17px "DM Sans"';
+            const lines = [
+              "Client \u2192 Resolver",
+              '"Get me the answer!"',
+              "",
+              "Resolver MUST return:",
+              "\u2022 The final IP address",
+              "\u2022 Or an error (NXDOMAIN)",
+            ];
+            lines.forEach((line, i) => {
+              ctx.fillStyle = i === 1 ? "#b08a50" : "#b0c8d8";
+              if (i === 1) ctx.font = '400 17px "JetBrains Mono"';
+              else ctx.font = '400 17px "DM Sans"';
+              ctx.fillText(line, leftX, 320 + i * 30);
+            });
+          }
+
+          // Right: Iterative
+          const rightX = cx + 280;
+          const iReveal = Math.max(0, Math.min(1, (p - 0.3) / 0.15));
+          if (iReveal > 0) {
+            ctx.globalAlpha = iReveal;
+            const bw = 440, bh = 340;
+            ctx.fillStyle = "#10202e";
+            ctx.strokeStyle = "#60a088";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(rightX - bw / 2, 220, bw, bh, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = "#60a088";
+            ctx.font = '700 24px "DM Sans"';
+            ctx.fillText("Iterative Query", rightX, 270);
+
+            ctx.fillStyle = "#b0c8d8";
+            ctx.font = '400 17px "DM Sans"';
+            const lines = [
+              "Resolver \u2192 Auth Servers",
+              '"Best answer you have?"',
+              "",
+              "Server responds with:",
+              "\u2022 A referral to next server",
+              "\u2022 Or the final answer",
+            ];
+            lines.forEach((line, i) => {
+              ctx.fillStyle = i === 1 ? "#b08a50" : "#b0c8d8";
+              if (i === 1) ctx.font = '400 17px "JetBrains Mono"';
+              else ctx.font = '400 17px "DM Sans"';
+              ctx.fillText(line, rightX, 320 + i * 30);
+            });
+          }
+
+          // VS divider
+          const vsReveal = Math.max(0, Math.min(1, (p - 0.25) / 0.1));
+          if (vsReveal > 0) {
+            ctx.globalAlpha = vsReveal;
+            ctx.fillStyle = "#4a6878";
+            ctx.font = '700 22px "DM Sans"';
+            ctx.fillText("vs", cx, 390);
+          }
+
+          ctx.globalAlpha = 1;
+        },
+
+        caching: (ctx, p, t) => {
+          const cx = VW / 2;
+
+          // Title
+          const titleR = Math.max(0, Math.min(1, p / 0.08));
+          ctx.globalAlpha = titleR;
+          ctx.fillStyle = "#b0c8d8";
+          ctx.font = '700 28px "DM Sans"';
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("DNS Caching & TTL", cx, 140);
+          ctx.globalAlpha = 1;
+
+          // TTL timeline visualization
+          const tlY = 400;
+          const tlLeft = 240;
+          const tlRight = 1680;
+          const tlWidth = tlRight - tlLeft;
+
+          const tlReveal = Math.max(0, Math.min(1, (p - 0.1) / 0.15));
+          if (tlReveal > 0) {
+            ctx.globalAlpha = tlReveal;
+
+            // Timeline bar
+            ctx.strokeStyle = "#1e3448";
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(tlLeft, tlY);
+            ctx.lineTo(tlRight, tlY);
+            ctx.stroke();
+
+            // TTL window (green zone)
+            const ttlEnd = tlLeft + tlWidth * 0.6;
+            ctx.fillStyle = "rgba(96,160,136,0.15)";
+            ctx.fillRect(tlLeft, tlY - 50, ttlEnd - tlLeft, 100);
+            ctx.strokeStyle = "#60a088";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(tlLeft, tlY - 50, ttlEnd - tlLeft, 100);
+
+            ctx.fillStyle = "#60a088";
+            ctx.font = '500 18px "DM Sans"';
+            ctx.fillText("TTL Window (cached)", (tlLeft + ttlEnd) / 2, tlY - 70);
+
+            // Expired zone
+            ctx.fillStyle = "rgba(192,96,80,0.1)";
+            ctx.fillRect(ttlEnd, tlY - 50, tlRight - ttlEnd, 100);
+            ctx.strokeStyle = "#c06050";
+            ctx.lineWidth = 2;
+            ctx.strokeRect(ttlEnd, tlY - 50, tlRight - ttlEnd, 100);
+
+            ctx.fillStyle = "#c06050";
+            ctx.font = '500 18px "DM Sans"';
+            ctx.fillText("Expired \u2014 re-query needed", (ttlEnd + tlRight) / 2, tlY - 70);
+
+            // TTL label
+            ctx.fillStyle = "#b08a50";
+            ctx.font = '500 16px "JetBrains Mono"';
+            ctx.fillText("TTL = 300s (5 min)", ttlEnd, tlY + 80);
+
+            // Instant response icons in TTL window
+            const checkReveal = Math.max(0, Math.min(1, (p - 0.3) / 0.15));
+            if (checkReveal > 0) {
+              ctx.globalAlpha = checkReveal;
+              const checks = [0.15, 0.3, 0.45];
+              checks.forEach((frac) => {
+                const px = tlLeft + (ttlEnd - tlLeft) * frac;
+                ctx.fillStyle = "#60a088";
+                ctx.font = '400 14px "JetBrains Mono"';
+                ctx.fillText("instant", px, tlY + 30);
+                // small dot
+                ctx.beginPath();
+                ctx.arc(px, tlY, 5, 0, Math.PI * 2);
+                ctx.fill();
+              });
+            }
+
+            // Fresh lookup marker in expired zone
+            const freshReveal = Math.max(0, Math.min(1, (p - 0.55) / 0.15));
+            if (freshReveal > 0) {
+              ctx.globalAlpha = freshReveal;
+              const fx = ttlEnd + (tlRight - ttlEnd) * 0.35;
+              ctx.fillStyle = "#c06050";
+              ctx.font = '400 14px "JetBrains Mono"';
+              ctx.fillText("fresh lookup", fx, tlY + 30);
+              ctx.beginPath();
+              ctx.arc(fx, tlY, 5, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+
+          // Trade-off boxes
+          const tradeReveal = Math.max(0, Math.min(1, (p - 0.65) / 0.15));
+          if (tradeReveal > 0) {
+            ctx.globalAlpha = tradeReveal;
+            const bw = 380, bh = 100;
+
+            // Too low
+            ctx.fillStyle = "#10202e";
+            ctx.strokeStyle = "#c06050";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(cx - 420, 570, bw, bh, 8);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = "#c06050";
+            ctx.font = '500 18px "DM Sans"';
+            ctx.fillText("TTL Too Low", cx - 230, 610);
+            ctx.fillStyle = "#4a6878";
+            ctx.font = '400 15px "DM Sans"';
+            ctx.fillText("Overloads DNS servers", cx - 230, 640);
+
+            // Too high
+            ctx.fillStyle = "#10202e";
+            ctx.strokeStyle = "#b08a50";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(cx + 40, 570, bw, bh, 8);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = "#b08a50";
+            ctx.font = '500 18px "DM Sans"';
+            ctx.fillText("TTL Too High", cx + 230, 610);
+            ctx.fillStyle = "#4a6878";
+            ctx.font = '400 15px "DM Sans"';
+            ctx.fillText("Slow propagation of changes", cx + 230, 640);
+          }
+
+          ctx.globalAlpha = 1;
+        },
+      };
+
+      // ===== RENDERER =====
+      const renderScene = createSceneRenderer(scenes, sceneElements, {
+        bg: "#0c1824",
+        draw: customDraw,
+      });
+
+      // ===== BOOT =====
+      createLesson({
+        lessonId: "dns-resolution",
+        scenes,
+        IX,
+        render: renderScene,
+      });
+    </script>
+  </body>
+</html>

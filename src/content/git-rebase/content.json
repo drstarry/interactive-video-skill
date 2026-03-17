@@ -1,0 +1,220 @@
+{
+  "meta": {
+    "lessonId": "git-rebase",
+    "voice": "en-US-AndrewNeural",
+    "rate": "+5%",
+    "gap": 1.2,
+    "duration": 235,
+    "audioGenerated": true
+  },
+  "narration": [
+    {
+      "t": 1.2,
+      "text": "When you work with Git, your commit history can get messy fast. You create a feature branch, make some commits, and meanwhile your teammates push changes to the main branch. Now your branches have diverged. How do you bring them back together?"
+    },
+    {
+      "t": 15.38,
+      "text": "There are two main strategies: merge and rebase. A merge creates a new commit that ties the two branches together, preserving all the original history, including the divergence. A rebase, on the other hand, replays your commits on top of the updated base branch, as if you had started your work from the latest version all along."
+    },
+    {
+      "t": 36.34,
+      "text": "Think of it this way. Merge says: these two paths happened in parallel, here is where they joined. Rebase says: let me rewrite history so it looks like everything happened in a straight line.",
+      "endsBeforeIx": "q-merge-vs-rebase"
+    },
+    {
+      "t": 48.17,
+      "text": "Now let's walk through exactly what happens when you run git rebase. Say you're on a feature branch with three commits, and the main branch has moved ahead by two commits since you branched off."
+    },
+    {
+      "t": 59.11,
+      "text": "Step one: Git finds the common ancestor, the commit where your branch originally diverged from main. Step two: Git temporarily removes your three feature commits, saving the changes as patches. Step three: Git fast-forwards your branch pointer to the tip of main. Step four: Git replays each of your patches, one by one, creating brand new commits on top of main.",
+      "endsBeforeIx": "try-rebase-steps"
+    },
+    {
+      "t": 82.99,
+      "text": "Here is a critical detail that surprises many beginners: rebase creates entirely new commits. Even though the code changes are the same, the new commits have different SHA hashes. The original commits are abandoned. This is what people mean when they say rebase rewrites history."
+    },
+    {
+      "t": 100.46,
+      "text": "This has a big implication. If you have already pushed your commits to a shared branch and other people are working off of them, rebasing will cause chaos. Their local copies still reference the old commit hashes, and when you force push the rewritten history, Git cannot reconcile the two versions cleanly.",
+      "endsBeforeIx": "q-why-new-sha"
+    },
+    {
+      "t": 118.13,
+      "text": "So when should you use rebase versus merge? Use rebase for local cleanup, when you want a clean linear history before sharing your work. Use merge for shared branches, when you need to preserve the full record of how work happened in parallel."
+    },
+    {
+      "t": 132.58,
+      "text": "A common and safe workflow is: rebase your feature branch onto main to catch up with the latest changes, then merge your feature branch into main with a merge commit. This gives you the best of both worlds: a clean feature branch history, plus a clear record of when the feature was integrated.",
+      "endsBeforeIx": "try-when-to-use"
+    },
+    {
+      "t": 149.57,
+      "text": "Git also offers interactive rebase, which is one of the most powerful history editing tools available. When you run git rebase dash i, Git opens an editor showing each commit as a line. You can reorder commits, squash multiple commits into one, edit commit messages, or drop commits entirely."
+    },
+    {
+      "t": 168.72,
+      "text": "Interactive rebase is especially useful before opening a pull request. You can clean up your work in progress commits, combine related changes, and write clear commit messages that tell a coherent story. Your reviewers will thank you.",
+      "endsBeforeIx": "q-interactive-rebase"
+    },
+    {
+      "t": 183.19,
+      "text": "One more thing you should know: what to do when a rebase hits a conflict. When Git tries to replay one of your patches and it overlaps with changes on main, it pauses and asks you to resolve the conflict. After you fix it, you run git add on the resolved files and then git rebase dash dash continue. If things go sideways, git rebase dash dash abort takes you back to where you started. No damage done.",
+      "endsBeforeIx": "try-conflict-explorer"
+    },
+    {
+      "t": 207.6,
+      "text": "Let's put it all together. Rebase replays commits to create a linear history. It rewrites SHAs, so never rebase shared commits. Use interactive rebase to polish your work before sharing. And if conflicts arise during a rebase, resolve them one commit at a time. With these principles, you can keep your Git history clean and your collaborators happy."
+    }
+  ],
+  "interactions": {
+    "q-merge-vs-rebase": {
+      "time": 46.97,
+      "title": "Merge vs Rebase",
+      "desc": "What is the key difference in the resulting commit history?",
+      "options": [
+        "Merge creates a linear history; rebase preserves branch structure",
+        "Rebase creates a linear history; merge preserves branch structure",
+        "Both produce identical histories, just with different commands"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Correct!",
+          "body": "Rebase replays commits to form a straight line, while merge preserves the branching structure with a merge commit."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "A common mix-up! Rebase is the one that straightens history into a line. Merge keeps the fork-and-join shape intact."
+        }
+      }
+    },
+    "try-rebase-steps": {
+      "time": 81.79,
+      "title": "Order the Rebase Steps",
+      "desc": "Drag these into the correct order that Git performs during a rebase.",
+      "widget": "sort",
+      "sortItems": [
+        "Find the common ancestor commit",
+        "Save feature commits as patches",
+        "Fast-forward branch to tip of main",
+        "Replay patches one by one as new commits"
+      ],
+      "feedback": {
+        "correct": {
+          "body": "Exactly right! Git finds the base, saves your work as patches, moves the pointer forward, then replays each patch."
+        },
+        "wrong": {
+          "body": "Not quite. The correct order starts with finding the ancestor, then saving patches, then fast-forwarding, then replaying."
+        }
+      }
+    },
+    "q-why-new-sha": {
+      "time": 116.92,
+      "title": "Rewritten History",
+      "desc": "After rebasing, your commits have new SHA hashes. Why?",
+      "options": [
+        "Git increments the hash counter for each rebase operation",
+        "The commits have a new parent, so the hash changes",
+        "Git adds a rebase tag to the hash to track the operation"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Correct!",
+          "body": "A commit's SHA is computed from its content, parent, author, and timestamp. New parent means new hash, even if the code diff is identical."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "SHA hashes are not sequential counters or tagged versions. They are computed from the commit's data, including its parent commit. A new parent automatically means a new SHA."
+        }
+      }
+    },
+    "try-when-to-use": {
+      "time": 148.37,
+      "title": "Rebase or Merge?",
+      "desc": "Drag each scenario into the right strategy.",
+      "widget": "categorize",
+      "categories": [
+        {
+          "label": "Rebase",
+          "items": [
+            "Cleaning up local commits before a PR",
+            "Catching up your feature branch with main",
+            "Squashing WIP commits into logical units"
+          ]
+        },
+        {
+          "label": "Merge",
+          "items": [
+            "Integrating a finished feature into main",
+            "Combining work from multiple contributors",
+            "Preserving the timeline of parallel work"
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": {
+          "body": "Perfect! Rebase for local cleanup, merge for shared integration."
+        },
+        "wrong": {
+          "body": "Remember the rule: rebase your own local work, merge when integrating shared branches."
+        }
+      }
+    },
+    "q-interactive-rebase": {
+      "time": 181.99,
+      "title": "Interactive Rebase",
+      "desc": "Which task can you NOT do with interactive rebase?",
+      "options": [
+        "Squash multiple commits into one",
+        "Change which branch a commit was originally made on",
+        "Reorder commits within your branch"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Correct!",
+          "body": "Interactive rebase lets you squash, reorder, edit, and drop commits, but it cannot change the original branch context of a commit. It replays commits on the current base."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "Squashing and reordering are both core features of interactive rebase. The one thing it cannot do is retroactively change which branch a commit was originally created on."
+        }
+      }
+    },
+    "try-conflict-explorer": {
+      "time": 206.4,
+      "title": "Rebase Conflict Commands",
+      "desc": "Tap each command to learn what it does during a rebase conflict.",
+      "widget": "hotspot",
+      "hotspots": [
+        {
+          "label": "git add <file>",
+          "icon": "+",
+          "explanation": "Marks a conflicted file as resolved after you manually fix the conflict markers."
+        },
+        {
+          "label": "git rebase --continue",
+          "icon": ">",
+          "explanation": "Tells Git to proceed with replaying the next patch after you have resolved the current conflict."
+        },
+        {
+          "label": "git rebase --abort",
+          "icon": "x",
+          "explanation": "Cancels the entire rebase and restores your branch to exactly where it was before you started."
+        },
+        {
+          "label": "git rebase --skip",
+          "icon": "-",
+          "explanation": "Skips the current commit entirely. Useful if the commit is no longer needed after resolving conflicts."
+        }
+      ],
+      "feedback": {
+        "correct": {
+          "body": "Now you know the full toolkit for handling rebase conflicts."
+        },
+        "wrong": {
+          "body": "Explore all the commands to continue."
+        }
+      }
+    }
+  }
+}

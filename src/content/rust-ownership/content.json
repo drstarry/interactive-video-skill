@@ -1,0 +1,157 @@
+{
+  "meta": {
+    "lessonId": "rust-ownership",
+    "voice": "en-US-AndrewNeural",
+    "rate": "+5%",
+    "gap": 1.2,
+    "duration": 209,
+    "audioGenerated": true
+  },
+  "narration": [
+    {
+      "t": 1.2,
+      "text": "In most programming languages, you either manage memory yourself, like in C, or you rely on a garbage collector, like in Java or Python. Rust takes a third path. It enforces memory safety at compile time through a system called ownership. No garbage collector, no manual free. Just rules the compiler checks before your code ever runs."
+    },
+    {
+      "t": 22.99,
+      "text": "Here's the core idea. Every value in Rust has exactly one owner, the variable that holds it. When that owner goes out of scope, Rust automatically drops the value and frees the memory. This is deterministic. You always know exactly when cleanup happens."
+    },
+    {
+      "t": 39.05,
+      "text": "Now let's see what makes ownership different from what you're used to. When you assign a String to a new variable, like writing let s2 equals s1, Rust doesn't copy the data. It moves it. After the move, s1 is no longer valid. If you try to use s1, the compiler will reject your code. This prevents two variables from trying to free the same memory, which would be a double-free bug."
+    },
+    {
+      "t": 62.06,
+      "text": "Let me show you the three ownership rules. Rule one: each value has exactly one owner. Rule two: there can only be one owner at a time. Rule three: when the owner goes out of scope, the value is dropped. These three rules are the foundation of everything Rust does with memory.",
+      "endsBeforeIx": "try-ownership-rules"
+    },
+    {
+      "t": 79.75,
+      "text": "Move semantics also apply when you pass a value to a function. If you pass a String to a function, ownership transfers to that function's parameter. After the call, the original variable is gone. The function now owns the value and will drop it when it returns, unless it passes ownership back."
+    },
+    {
+      "t": 98.23,
+      "text": "But what if you want to let a function read a value without taking ownership? That's where borrowing comes in. You create a reference using the ampersand symbol. A shared reference, ampersand T, lets you read the data but not modify it. You can have as many shared references as you want at the same time.",
+      "endsBeforeIx": "q-borrowing"
+    },
+    {
+      "t": 115.32,
+      "text": "Sometimes you need to modify borrowed data. For that, Rust has mutable references, written as ampersand mut. But here's the critical rule: you can have either one mutable reference, or any number of shared references, but never both at the same time. This prevents data races at compile time. No locks needed."
+    },
+    {
+      "t": 134.76,
+      "text": "Let's think about why this rule matters. Imagine two threads both have mutable access to the same data. One writes while the other reads. That's a data race, undefined behavior in C or C plus plus. Rust makes this impossible. The compiler enforces exclusive access for mutation.",
+      "endsBeforeIx": "try-valid-code"
+    },
+    {
+      "t": 153.14,
+      "text": "References also have lifetimes. A lifetime is how long a reference is valid. Most of the time, Rust figures out lifetimes automatically. But the compiler will reject code where a reference outlives the data it points to. This eliminates dangling pointers entirely."
+    },
+    {
+      "t": 169.27,
+      "text": "Here's a classic example. If you create a reference to a local variable inside a function and try to return that reference, the compiler stops you. The local variable will be dropped when the function ends, so the reference would point to freed memory. Rust catches this at compile time.",
+      "endsBeforeIx": "q-lifetimes"
+    },
+    {
+      "t": 185.66,
+      "text": "Let's bring it all together. Ownership gives you deterministic cleanup. Move semantics prevent double frees. Borrowing rules prevent data races. And lifetimes prevent dangling pointers. All checked at compile time, with zero runtime cost. This is why Rust can be both safe and fast."
+    }
+  ],
+  "interactions": {
+    "try-ownership-rules": {
+      "time": 78.55,
+      "title": "Order the Ownership Rules",
+      "desc": "Arrange Rust's three ownership rules in the correct order.",
+      "widget": "sort",
+      "sortItems": [
+        "Each value has exactly one owner",
+        "There can only be one owner at a time",
+        "When the owner goes out of scope, the value is dropped"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Correct!",
+          "body": "These three rules form the foundation of Rust's memory model. The compiler enforces all of them."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "The rules build on each other: first a value gets an owner, then only one owner exists at a time, and finally scope determines when the value is freed."
+        }
+      }
+    },
+    "q-borrowing": {
+      "time": 114.12,
+      "title": "Borrowing Check",
+      "desc": "What does a shared reference (&T) allow you to do?",
+      "options": [
+        "Read the data and modify it freely",
+        "Read the data but not modify it",
+        "Take ownership of the data"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Correct!",
+          "body": "A shared reference gives read-only access. You need &mut T to modify borrowed data."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "A shared reference (&T) only grants read access. Modifying requires a mutable reference (&mut T), and taking ownership requires a move, not a borrow."
+        }
+      }
+    },
+    "try-valid-code": {
+      "time": 151.94,
+      "title": "Valid or Invalid?",
+      "desc": "Categorize each Rust code snippet as valid or invalid.",
+      "widget": "categorize",
+      "categories": [
+        {
+          "label": "Valid",
+          "items": [
+            "let r1 = &s; let r2 = &s;",
+            "let r1 = &mut s; *r1 += 1;",
+            "let s2 = s1.clone();"
+          ]
+        },
+        {
+          "label": "Invalid",
+          "items": [
+            "let r1 = &s; let r2 = &mut s;",
+            "let r1 = &mut s; let r2 = &mut s;",
+            "println!(\"{}\", s1); // after let s2 = s1;"
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Perfect!",
+          "body": "You can have multiple shared references, or one mutable reference, but not both. Moved values can't be used, and clone creates a separate copy."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "Remember: multiple &T is fine, one &mut T is fine, but mixing &T and &mut T or having two &mut T is invalid. After a move, the original is gone."
+        }
+      }
+    },
+    "q-lifetimes": {
+      "time": 184.46,
+      "title": "Lifetime Check",
+      "desc": "Why does Rust reject a function that returns a reference to a local variable?",
+      "options": [
+        "The reference would point to freed memory after the function returns",
+        "Rust doesn't allow returning references from functions",
+        "Local variables are always copied, not referenced"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Correct!",
+          "body": "The local variable is dropped when the function scope ends. A reference to it would dangle. Rust's lifetime system catches this at compile time."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "Rust can return references, but only if the referenced data lives long enough. A local variable dies at the end of the function, making any reference to it a dangling pointer."
+        }
+      }
+    }
+  }
+}

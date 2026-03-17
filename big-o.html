@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net;
+      font-src https://fonts.gstatic.com;
+      media-src 'self';
+      img-src 'self' data:;
+    " />
+    <title>Big O Notation in 5 Minutes — Interactive Tutorial</title>
+    <link rel="stylesheet" href="src/lesson.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <style>
+      :root {
+        --bg: #0e0e0e;
+        --bg-card: #161616;
+        --bg-el: #1e1e1e;
+        --bg-ov: rgba(14,14,14,0.95);
+        --surface: #161616;
+        --border: #282828;
+        --text: #d0d0d0;
+        --text2: #606060;
+        --accent: #cc4444;
+        --acc-dim: #992222;
+        --acc-glow: rgba(204,68,68,0.08);
+        --grn: #70a060;
+        --warm: #cc8844;
+        --cool: #6688aa;
+        --red: #cc4444;
+        --sans: 'DM Sans', -apple-system, sans-serif;
+        --mono: 'JetBrains Mono', monospace;
+        --serif: 'DM Sans', -apple-system, sans-serif;
+      }
+    </style>
+  </head>
+  <body data-theme="focus">
+    <!-- Navigation -->
+                <nav class="site-nav">
+      <a class="site-nav-brand" href="https://github.com/drstarry/interactive-video-skill">Interactive Video Skill</a>
+      <div class="site-nav-links">
+        <a href="skill-onboarding.html">Onboarding [theme: Chalkboard]</a>
+        <a href="git-rebase.html">Git Rebase [theme: Terminal]</a>
+        <a href="writing-systems.html">Writing [theme: Notebook]</a>
+        <a href="dns-resolution.html">DNS [theme: Blueprint]</a>
+        <a href="rust-ownership.html">Rust [theme: Clean Dark]</a>
+        <a href="vaccines.html">Vaccines [theme: Clean Light]</a>
+        <a href="sourdough.html">Sourdough [theme: Studio]</a>
+        <a href="big-o.html" class="active">Big O [theme: Focus]</a>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="wrap">
+      <div class="hdr">
+        <h1>Big O Notation in 5 Minutes</h1>
+        <p class="sub">How algorithms scale — from instant to impossible</p>
+      </div>
+
+      <div class="vid-wrap">
+        <canvas id="cvs"></canvas>
+        <div class="scn-label" id="scn-label"></div>
+        <div class="math-layer" id="math-layer"></div>
+        <div class="ov" id="ov">
+          <div class="top-badge" id="badge"></div>
+          <div class="card" id="card"></div>
+        </div>
+      </div>
+
+      <div class="ctl">
+        <button id="btn-play">
+          <svg id="play-icon" viewBox="0 0 24 24">
+            <polygon points="5,3 19,12 5,21" />
+          </svg>
+        </button>
+        <span class="tl" id="t-cur">0:00</span>
+        <span class="sep">/</span>
+        <span class="tl" id="t-dur">0:00</span>
+        <div class="tbar" id="tbar">
+          <div class="fill" id="tprog"></div>
+          <div class="scrub" id="tscrub"></div>
+        </div>
+        <button class="mute" id="btn-mute">Narration: On</button>
+        <button class="fs" id="btn-fs">Fullscreen</button>
+      </div>
+
+      <div class="scores" id="scores"></div>
+      <div class="chapters-header">Chapters</div>
+      <div id="chapters"></div>
+    </div>
+
+    <script type="module">
+      import { createLesson } from "./src/engine/lesson.js";
+      import { createSceneRenderer } from "./src/engine/scene-renderer.js";
+      import { VW, VH } from "./src/engine/canvas.js";
+
+      // ===== SCENE DATA =====
+      const scenes = [
+        { s: 0,      e: 21.84,  label: "The Dictionary Problem",  bg: "intro" },
+        { s: 21.84,  e: 37.06,  label: "What Big O Measures",     bg: "what-is" },
+        { s: 37.06,  e: 59.21,  label: "O(1) — Constant Time",    bg: "o1" },
+        { s: 59.21,  e: 79.22,  label: "O(log n) — Logarithmic",  bg: "ologn" },
+        { s: 79.22,  e: 98.88,  label: "O(n) — Linear Time",      bg: "on" },
+        { s: 98.88,  e: 117.86, label: "O(n log n) — Sorting",    bg: "onlogn" },
+        { s: 117.86, e: 137.69, label: "O(n²) — Quadratic",       bg: "on2" },
+        { s: 137.69, e: 169.66, label: "O(2ⁿ) — Exponential",    bg: "o2n" },
+        { s: 169.66, e: 202,    label: "Summary",                  bg: "summary" },
+      ];
+
+      const IX = [
+        {
+          id: "q-lookup", time: 98.88, cat: "q",
+          title: "Array Access",
+          desc: "You have a sorted array of 1 million names. What's the Big O of finding a name by its exact index position?",
+          options: [
+            { k: "A", c: false },
+            { k: "B", c: true },
+            { k: "C", c: false },
+          ],
+        },
+        {
+          id: "try-sort-complexities", time: 136.48, cat: "try",
+          title: "Order the Complexities",
+          desc: "Drag to arrange from fastest to slowest growth rate.",
+        },
+        {
+          id: "try-categorize-algos", time: 157.97, cat: "try",
+          title: "Match Algorithm to Complexity",
+          desc: "Drag each algorithm into its Big O category.",
+        },
+        {
+          id: "try-slider-scale", time: 164.52, cat: "try",
+          title: "How Fast Does It Grow?",
+          desc: "Slide to change the input size and see how many operations each complexity requires.",
+        },
+        {
+          id: "q-practical", time: 168.46, cat: "q",
+          title: "Real-World Choice",
+          desc: "You need to find duplicates in a list of 10 million user IDs. Which approach will finish in reasonable time?",
+          options: [
+            { k: "A", c: false },
+            { k: "B", c: true },
+            { k: "C", c: false },
+          ],
+        },
+      ];
+
+      // ===== DECLARATIVE ELEMENTS =====
+      const sceneElements = {
+        intro: [
+          { type: "glow", x: 960, y: 540, radius: 450, color: "rgba(204,68,68,0.04)" },
+          { type: "text", x: 960, y: 380, text: "Big O Notation", font: '700 56px "DM Sans"', color: "#d0d0d0" },
+          { type: "text", x: 960, y: 450, text: "How algorithms scale", font: '300 24px "DM Sans"', color: "#606060", revealAt: 0.15 },
+          { type: "rule", x1: 860, y1: 490, x2: 1060, y2: 490, color: "#cc4444", revealAt: 0.25 },
+          { type: "text", x: 960, y: 560, text: "📖  Dictionary lookup: scan every page?", font: '400 20px "DM Sans"', color: "#999", revealAt: 0.35 },
+          { type: "text", x: 960, y: 600, text: "📖  Or flip to the middle and halve it?", font: '400 20px "DM Sans"', color: "#999", revealAt: 0.5 },
+        ],
+        "what-is": [
+          { type: "text", x: 960, y: 300, text: "What does Big O measure?", font: '600 36px "DM Sans"', color: "#d0d0d0" },
+          { type: "rule", x1: 800, y1: 340, x2: 1120, y2: 340, color: "#cc4444", revealAt: 0.1 },
+          { type: "text", x: 960, y: 420, text: '"If I double the data,', font: '400 24px "DM Sans"', color: "#aaa", revealAt: 0.2 },
+          { type: "text", x: 960, y: 460, text: 'how much longer will this take?"', font: '400 24px "DM Sans"', color: "#aaa", revealAt: 0.25 },
+          { type: "rect", x: 360, y: 530, w: 1200, h: 200, fill: "rgba(204,68,68,0.05)", stroke: "#282828", revealAt: 0.4 },
+          { type: "text", x: 960, y: 600, text: "Fastest                                                                    Slowest", font: '500 16px "JetBrains Mono"', color: "#606060", revealAt: 0.5 },
+          { type: "text", x: 960, y: 650, text: "O(1)    O(log n)    O(n)    O(n log n)    O(n²)    O(2ⁿ)", font: '500 20px "JetBrains Mono"', color: "#cc4444", revealAt: 0.6 },
+        ],
+        summary: [
+          { type: "glow", x: 960, y: 540, radius: 500, color: "rgba(204,68,68,0.04)" },
+          { type: "text", x: 960, y: 260, text: "Big O Cheat Sheet", font: '700 40px "DM Sans"', color: "#d0d0d0" },
+          { type: "rule", x1: 830, y1: 300, x2: 1090, y2: 300, color: "#cc4444", revealAt: 0.05 },
+        ],
+      };
+
+      // ===== CUSTOM DRAW =====
+      const customDraw = {
+        o1: (ctx, p, t) => {
+          const cx = VW / 2, cy = VH / 2;
+          // Array visualization
+          const boxW = 70, boxH = 50, gap = 8;
+          const count = 10;
+          const startX = cx - (count * (boxW + gap)) / 2;
+          const startY = cy - 60;
+
+          const r = Math.max(0, Math.min(1, p / 0.3));
+          ctx.globalAlpha = r;
+
+          ctx.font = '600 28px "DM Sans"';
+          ctx.fillStyle = "#d0d0d0";
+          ctx.textAlign = "center";
+          ctx.fillText("O(1) — Constant Time", cx, 280);
+
+          ctx.font = '400 16px "JetBrains Mono"';
+          for (let i = 0; i < count; i++) {
+            const x = startX + i * (boxW + gap);
+            const itemReveal = Math.max(0, Math.min(1, (p - 0.1 - i * 0.03) / 0.15));
+            ctx.globalAlpha = r * itemReveal;
+
+            const isTarget = i === 4;
+            ctx.fillStyle = isTarget ? "rgba(204,68,68,0.15)" : "rgba(30,30,30,0.8)";
+            ctx.strokeStyle = isTarget ? "#cc4444" : "#282828";
+            ctx.lineWidth = isTarget ? 2 : 1;
+            ctx.beginPath();
+            ctx.roundRect(x, startY, boxW, boxH, 6);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = isTarget ? "#cc4444" : "#888";
+            ctx.textAlign = "center";
+            ctx.fillText(`[${i}]`, x + boxW / 2, startY + 32);
+          }
+
+          // Arrow pointing to index 4
+          const arrowReveal = Math.max(0, Math.min(1, (p - 0.5) / 0.2));
+          ctx.globalAlpha = r * arrowReveal;
+          const targetX = startX + 4 * (boxW + gap) + boxW / 2;
+          ctx.strokeStyle = "#cc4444";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(targetX, startY + boxH + 15);
+          ctx.lineTo(targetX, startY + boxH + 50);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(targetX - 8, startY + boxH + 25);
+          ctx.lineTo(targetX, startY + boxH + 15);
+          ctx.lineTo(targetX + 8, startY + boxH + 25);
+          ctx.fill();
+
+          ctx.font = '400 18px "DM Sans"';
+          ctx.fillStyle = "#cc4444";
+          ctx.textAlign = "center";
+          ctx.fillText("Jump directly — one step!", targetX, startY + boxH + 75);
+
+          // Bottom text
+          const btmReveal = Math.max(0, Math.min(1, (p - 0.7) / 0.2));
+          ctx.globalAlpha = r * btmReveal;
+          ctx.font = '300 18px "DM Sans"';
+          ctx.fillStyle = "#888";
+          ctx.fillText("10 items or 10,000,000 — same speed", cx, cy + 180);
+
+          ctx.globalAlpha = 1;
+        },
+
+        ologn: (ctx, p, t) => {
+          const cx = VW / 2, cy = VH / 2 - 30;
+          const r = Math.max(0, Math.min(1, p / 0.2));
+          ctx.globalAlpha = r;
+
+          ctx.font = '600 28px "DM Sans"';
+          ctx.fillStyle = "#d0d0d0";
+          ctx.textAlign = "center";
+          ctx.fillText("O(log n) — Binary Search", cx, 280);
+
+          // Show halving steps
+          const steps = ["1,000,000", "500,000", "250,000", "125,000", "…", "1"];
+          const stepLabels = ["Start", "Step 1", "Step 2", "Step 3", "", "~20 steps"];
+          const barMaxW = 600;
+          const barH = 36;
+          const barY = 340;
+
+          for (let i = 0; i < steps.length; i++) {
+            const stepReveal = Math.max(0, Math.min(1, (p - 0.15 - i * 0.1) / 0.15));
+            ctx.globalAlpha = r * stepReveal;
+
+            const frac = i === 5 ? 0.01 : 1 / Math.pow(2, i);
+            const w = Math.max(20, barMaxW * frac);
+            const y = barY + i * (barH + 16);
+            const x = cx - w / 2;
+
+            const alpha = i === 5 ? 0.3 : 0.12 + 0.03 * i;
+            ctx.fillStyle = `rgba(204,68,68,${alpha})`;
+            ctx.strokeStyle = "#cc4444";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.roundRect(x, y, w, barH, 4);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = '500 14px "JetBrains Mono"';
+            ctx.fillStyle = "#d0d0d0";
+            ctx.textAlign = "center";
+            ctx.fillText(steps[i], cx, y + 24);
+
+            ctx.font = '400 13px "DM Sans"';
+            ctx.fillStyle = "#606060";
+            ctx.textAlign = "left";
+            ctx.fillText(stepLabels[i], cx + barMaxW / 2 + 20, y + 24);
+          }
+
+          const btmReveal = Math.max(0, Math.min(1, (p - 0.85) / 0.15));
+          ctx.globalAlpha = r * btmReveal;
+          ctx.font = '300 18px "DM Sans"';
+          ctx.fillStyle = "#888";
+          ctx.textAlign = "center";
+          ctx.fillText("Double the data → just one more step", cx, barY + 6 * (barH + 16) + 30);
+
+          ctx.globalAlpha = 1;
+        },
+
+        on: (ctx, p, t) => {
+          const cx = VW / 2, cy = VH / 2;
+          const r = Math.max(0, Math.min(1, p / 0.2));
+          ctx.globalAlpha = r;
+
+          ctx.font = '600 28px "DM Sans"';
+          ctx.fillStyle = "#d0d0d0";
+          ctx.textAlign = "center";
+          ctx.fillText("O(n) — Linear Scan", cx, 280);
+
+          // Show scanning through a list
+          const count = 16;
+          const boxW = 50, boxH = 50, gap = 6;
+          const totalW = count * (boxW + gap) - gap;
+          const startX = cx - totalW / 2;
+          const startY = cy - 40;
+
+          const scanPos = Math.floor(p * count * 1.2);
+
+          for (let i = 0; i < count; i++) {
+            const itemReveal = Math.max(0, Math.min(1, (p - 0.05 - i * 0.02) / 0.1));
+            ctx.globalAlpha = r * itemReveal;
+
+            const x = startX + i * (boxW + gap);
+            const isScanned = i < scanPos;
+            const isCurrent = i === scanPos;
+
+            ctx.fillStyle = isCurrent ? "rgba(204,68,68,0.25)" : isScanned ? "rgba(112,160,96,0.1)" : "rgba(30,30,30,0.8)";
+            ctx.strokeStyle = isCurrent ? "#cc4444" : isScanned ? "#70a060" : "#282828";
+            ctx.lineWidth = isCurrent ? 2 : 1;
+            ctx.beginPath();
+            ctx.roundRect(x, startY, boxW, boxH, 4);
+            ctx.fill();
+            ctx.stroke();
+
+            if (isScanned) {
+              ctx.font = '500 18px "DM Sans"';
+              ctx.fillStyle = "#70a060";
+              ctx.textAlign = "center";
+              ctx.fillText("✓", x + boxW / 2, startY + 33);
+            }
+          }
+
+          ctx.globalAlpha = r;
+          ctx.font = '400 18px "DM Sans"';
+          ctx.fillStyle = "#888";
+          ctx.textAlign = "center";
+          ctx.fillText("Must check each element — no shortcuts", cx, startY + boxH + 60);
+
+          const btmReveal = Math.max(0, Math.min(1, (p - 0.7) / 0.2));
+          ctx.globalAlpha = r * btmReveal;
+          ctx.font = '300 18px "DM Sans"';
+          ctx.fillStyle = "#cc8844";
+          ctx.fillText("Double the list → double the time", cx, startY + boxH + 100);
+
+          ctx.globalAlpha = 1;
+        },
+
+        onlogn: (ctx, p, t) => {
+          const cx = VW / 2, cy = VH / 2;
+          const r = Math.max(0, Math.min(1, p / 0.2));
+          ctx.globalAlpha = r;
+
+          ctx.font = '600 28px "DM Sans"';
+          ctx.fillStyle = "#d0d0d0";
+          ctx.textAlign = "center";
+          ctx.fillText("O(n log n) — Divide & Conquer", cx, 280);
+
+          // Merge sort tree visualization
+          const levels = [
+            [{ w: 700, label: "[8 elements unsorted]" }],
+            [{ w: 330, label: "[4 elems]" }, { w: 330, label: "[4 elems]" }],
+            [{ w: 150, label: "[2]" }, { w: 150, label: "[2]" }, { w: 150, label: "[2]" }, { w: 150, label: "[2]" }],
+            [{ w: 700, label: "[1,2,3,4,5,6,7,8] sorted ✓" }],
+          ];
+          const levelLabels = ["Split", "Split again", "Compare & merge", "Result"];
+
+          const treeY = 340;
+          const levelH = 80;
+
+          for (let lv = 0; lv < levels.length; lv++) {
+            const lvReveal = Math.max(0, Math.min(1, (p - 0.15 - lv * 0.15) / 0.2));
+            ctx.globalAlpha = r * lvReveal;
+
+            const row = levels[lv];
+            const totalRowW = row.reduce((s, b) => s + b.w, 0) + (row.length - 1) * 20;
+            let rx = cx - totalRowW / 2;
+            const ry = treeY + lv * levelH;
+
+            for (const box of row) {
+              const isResult = lv === 3;
+              ctx.fillStyle = isResult ? "rgba(112,160,96,0.1)" : "rgba(30,30,30,0.8)";
+              ctx.strokeStyle = isResult ? "#70a060" : "#282828";
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.roundRect(rx, ry, box.w, 44, 6);
+              ctx.fill();
+              ctx.stroke();
+
+              ctx.font = '400 14px "JetBrains Mono"';
+              ctx.fillStyle = isResult ? "#70a060" : "#aaa";
+              ctx.textAlign = "center";
+              ctx.fillText(box.label, rx + box.w / 2, ry + 28);
+              rx += box.w + 20;
+            }
+
+            // Level label
+            ctx.font = '400 13px "DM Sans"';
+            ctx.fillStyle = "#606060";
+            ctx.textAlign = "left";
+            ctx.fillText(levelLabels[lv], cx + totalRowW / 2 + 30, ry + 28);
+
+            // Arrows between levels
+            if (lv < 3) {
+              ctx.strokeStyle = "#444";
+              ctx.lineWidth = 1;
+              ctx.setLineDash([4, 4]);
+              ctx.lineDashOffset = -t * 20;
+              ctx.beginPath();
+              ctx.moveTo(cx, ry + 44);
+              ctx.lineTo(cx, ry + levelH - 2);
+              ctx.stroke();
+              ctx.setLineDash([]);
+            }
+          }
+
+          ctx.globalAlpha = 1;
+        },
+
+        on2: (ctx, p, t) => {
+          const cx = VW / 2, cy = VH / 2;
+          const r = Math.max(0, Math.min(1, p / 0.2));
+          ctx.globalAlpha = r;
+
+          ctx.font = '600 28px "DM Sans"';
+          ctx.fillStyle = "#d0d0d0";
+          ctx.textAlign = "center";
+          ctx.fillText("O(n²) — Every Pair Compared", cx, 280);
+
+          // Grid showing n×n comparisons
+          const gridSize = 8;
+          const cellSize = 36;
+          const gridW = gridSize * cellSize;
+          const startX = cx - gridW / 2;
+          const startY = 340;
+
+          const filledCells = Math.floor(p * gridSize * gridSize * 1.2);
+
+          for (let row = 0; row < gridSize; row++) {
+            for (let col = 0; col < gridSize; col++) {
+              const idx = row * gridSize + col;
+              const cellReveal = Math.max(0, Math.min(1, (p - 0.1) / 0.3));
+              ctx.globalAlpha = r * cellReveal;
+
+              const x = startX + col * cellSize;
+              const y = startY + row * cellSize;
+              const isFilled = idx < filledCells;
+
+              ctx.fillStyle = isFilled ? "rgba(204,68,68,0.2)" : "rgba(30,30,30,0.4)";
+              ctx.strokeStyle = "#282828";
+              ctx.lineWidth = 0.5;
+              ctx.beginPath();
+              ctx.rect(x, y, cellSize - 2, cellSize - 2);
+              ctx.fill();
+              ctx.stroke();
+            }
+          }
+
+          ctx.globalAlpha = r;
+
+          // Labels
+          ctx.font = '400 14px "JetBrains Mono"';
+          ctx.fillStyle = "#cc4444";
+          ctx.textAlign = "center";
+          ctx.fillText("n elements →", cx, startY - 10);
+
+          ctx.save();
+          ctx.translate(startX - 20, startY + gridW / 2);
+          ctx.rotate(-Math.PI / 2);
+          ctx.fillText("n elements →", 0, 0);
+          ctx.restore();
+
+          // Stats
+          const statsReveal = Math.max(0, Math.min(1, (p - 0.6) / 0.2));
+          ctx.globalAlpha = r * statsReveal;
+
+          const statsX = cx;
+          const statsY = startY + gridW + 40;
+          ctx.font = '400 18px "DM Sans"';
+          ctx.fillStyle = "#cc8844";
+          ctx.textAlign = "center";
+          ctx.fillText("n = 1,000 → 1,000,000 comparisons", statsX, statsY);
+          ctx.fillText("n = 1,000,000 → 1,000,000,000,000 comparisons", statsX, statsY + 30);
+
+          ctx.globalAlpha = 1;
+        },
+
+        o2n: (ctx, p, t) => {
+          const cx = VW / 2, cy = VH / 2;
+          const r = Math.max(0, Math.min(1, p / 0.2));
+          ctx.globalAlpha = r;
+
+          ctx.font = '600 28px "DM Sans"';
+          ctx.fillStyle = "#d0d0d0";
+          ctx.textAlign = "center";
+          ctx.fillText("O(2ⁿ) — Exponential Growth", cx, 280);
+
+          // Binary tree (fibonacci recursion tree)
+          const levels = 5;
+          const nodeR = 14;
+          const treeTop = 340;
+          const levelH = 65;
+
+          for (let lv = 0; lv < levels; lv++) {
+            const nodes = Math.pow(2, lv);
+            const lvReveal = Math.max(0, Math.min(1, (p - 0.1 - lv * 0.1) / 0.15));
+            ctx.globalAlpha = r * lvReveal;
+
+            const spacing = 800 / (nodes + 1);
+
+            for (let i = 0; i < nodes; i++) {
+              const x = cx - 400 + spacing * (i + 1);
+              const y = treeTop + lv * levelH;
+
+              // Line to parent
+              if (lv > 0) {
+                const parentNodes = Math.pow(2, lv - 1);
+                const parentSpacing = 800 / (parentNodes + 1);
+                const parentIdx = Math.floor(i / 2);
+                const px = cx - 400 + parentSpacing * (parentIdx + 1);
+                const py = treeTop + (lv - 1) * levelH;
+                ctx.strokeStyle = "#333";
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(px, py + nodeR);
+                ctx.lineTo(x, y - nodeR);
+                ctx.stroke();
+              }
+
+              const dangerLevel = lv / (levels - 1);
+              const red = Math.floor(204 * dangerLevel + 30);
+              ctx.fillStyle = `rgba(${red},${Math.floor(68 * (1 - dangerLevel * 0.5))},${Math.floor(68 * (1 - dangerLevel * 0.5))},0.2)`;
+              ctx.strokeStyle = `rgb(${red},${Math.floor(68 * (1 - dangerLevel * 0.3))},${Math.floor(68 * (1 - dangerLevel * 0.3))})`;
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.arc(x, y, nodeR, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.stroke();
+            }
+          }
+
+          // Warning text
+          const warnReveal = Math.max(0, Math.min(1, (p - 0.7) / 0.2));
+          ctx.globalAlpha = r * warnReveal;
+
+          ctx.font = '400 18px "DM Sans"';
+          ctx.fillStyle = "#cc4444";
+          ctx.textAlign = "center";
+          const warnY = treeTop + levels * levelH + 20;
+          ctx.fillText("Each level doubles the work", cx, warnY);
+          ctx.font = '300 16px "DM Sans"';
+          ctx.fillStyle = "#888";
+          ctx.fillText("n = 30 → 1 billion ops    |    n = 50 → more than atoms in a human body", cx, warnY + 35);
+
+          ctx.globalAlpha = 1;
+        },
+
+        summary: (ctx, p, t) => {
+          const cx = VW / 2;
+          const r = Math.max(0, Math.min(1, p / 0.15));
+
+          const rows = [
+            { label: "O(1)", desc: "Constant", color: "#70a060", example: "Array index lookup" },
+            { label: "O(log n)", desc: "Logarithmic", color: "#70a060", example: "Binary search" },
+            { label: "O(n)", desc: "Linear", color: "#cc8844", example: "Linear scan" },
+            { label: "O(n log n)", desc: "Linearithmic", color: "#cc8844", example: "Merge sort" },
+            { label: "O(n²)", desc: "Quadratic", color: "#cc4444", example: "Bubble sort" },
+            { label: "O(2ⁿ)", desc: "Exponential", color: "#cc4444", example: "Naive Fibonacci" },
+          ];
+
+          const tableTop = 340;
+          const rowH = 52;
+          const tableW = 800;
+          const startX = cx - tableW / 2;
+
+          for (let i = 0; i < rows.length; i++) {
+            const rowReveal = Math.max(0, Math.min(1, (p - 0.1 - i * 0.06) / 0.15));
+            ctx.globalAlpha = r * rowReveal;
+
+            const y = tableTop + i * rowH;
+            const row = rows[i];
+
+            // Row background
+            ctx.fillStyle = i % 2 === 0 ? "rgba(30,30,30,0.4)" : "rgba(22,22,22,0.4)";
+            ctx.beginPath();
+            ctx.roundRect(startX, y, tableW, rowH - 4, 4);
+            ctx.fill();
+
+            // Complexity
+            ctx.font = '600 18px "JetBrains Mono"';
+            ctx.fillStyle = row.color;
+            ctx.textAlign = "left";
+            ctx.fillText(row.label, startX + 20, y + 32);
+
+            // Description
+            ctx.font = '400 16px "DM Sans"';
+            ctx.fillStyle = "#aaa";
+            ctx.fillText(row.desc, startX + 200, y + 32);
+
+            // Example
+            ctx.font = '400 16px "DM Sans"';
+            ctx.fillStyle = "#666";
+            ctx.textAlign = "right";
+            ctx.fillText(row.example, startX + tableW - 20, y + 32);
+
+            // Speed bar
+            const barWidths = [20, 60, 150, 250, 500, 700];
+            const barW = barWidths[i] * 0.4;
+            ctx.fillStyle = row.color + "30";
+            ctx.beginPath();
+            ctx.roundRect(startX + 400, y + 12, barW, rowH - 28, 3);
+            ctx.fill();
+          }
+
+          // Bottom message
+          const msgReveal = Math.max(0, Math.min(1, (p - 0.8) / 0.15));
+          ctx.globalAlpha = r * msgReveal;
+          ctx.font = '300 18px "DM Sans"';
+          ctx.fillStyle = "#888";
+          ctx.textAlign = "center";
+          ctx.fillText("Choose the algorithm that scales with your data.", cx, tableTop + rows.length * rowH + 40);
+
+          ctx.globalAlpha = 1;
+        },
+      };
+
+      // ===== RENDERER =====
+      const renderScene = createSceneRenderer(scenes, sceneElements, {
+        bg: "#0e0e0e",
+        draw: customDraw,
+      });
+
+      // ===== BOOT =====
+      createLesson({
+        lessonId: "big-o",
+        scenes,
+        IX,
+        render: renderScene,
+      });
+    </script>
+  </body>
+</html>

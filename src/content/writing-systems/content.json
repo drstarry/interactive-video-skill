@@ -1,0 +1,189 @@
+{
+  "meta": {
+    "lessonId": "writing-systems",
+    "voice": "en-US-AndrewNeural",
+    "rate": "+5%",
+    "gap": 1.2,
+    "duration": 303,
+    "audioGenerated": true
+  },
+  "narration": [
+    {
+      "t": 1.2,
+      "text": "Before writing existed, human knowledge lived only in memory. Every generation had to relearn what the last had discovered. Then, around five thousand years ago, something changed. People began scratching marks into clay, and the world was never the same."
+    },
+    {
+      "t": 17.78,
+      "text": "The story begins in ancient Sumer, in what is now southern Iraq, around 3400 BCE. The Sumerians developed cuneiform, one of the earliest known writing systems. It started as simple pictures, or pictographs, pressed into wet clay tablets. A drawing of a head meant head. A drawing of water meant water."
+    },
+    {
+      "t": 39.77,
+      "text": "But here is where it gets interesting. Over centuries, those pictures became abstract. The scribes used a wedge-shaped reed stylus, and the images simplified into combinations of wedge marks. The word cuneiform itself comes from the Latin cuneus, meaning wedge. Writing had evolved from drawing pictures to pressing patterns."
+    },
+    {
+      "t": 59.76,
+      "text": "Around the same time, another great civilization was developing its own system. In Egypt, hieroglyphics emerged around 3200 BCE. Unlike cuneiform, Egyptian hieroglyphs kept their pictorial beauty for thousands of years. They were used on temple walls and monuments, meant to last for eternity.",
+      "endsBeforeIx": "q-early-systems"
+    },
+    {
+      "t": 80.26,
+      "text": "Now, both cuneiform and hieroglyphics shared a fundamental limitation. They used hundreds, sometimes thousands, of different symbols. Learning to read and write required years of training. Literacy was reserved for a tiny elite of scribes and priests. Most people would never read a single word in their entire lives."
+    },
+    {
+      "t": 100.39,
+      "text": "Meanwhile, far to the east, Chinese characters were taking shape. The earliest Chinese writing appears on oracle bones from the Shang dynasty, around 1200 BCE. Priests would carve questions onto turtle shells and animal bones, then heat them until they cracked. The patterns of cracks were read as answers from the spirits."
+    },
+    {
+      "t": 120.94,
+      "text": "Chinese characters evolved differently from Western writing. Instead of simplifying toward an alphabet, they developed into a logographic system where each character represents a word or meaningful unit. Some characters are pictographic, showing what they mean. Others combine a meaning component with a sound component. This system has continued in use for over three thousand years, making it the longest continuously used writing system in the world.",
+      "endsBeforeIx": "try-categorize-systems"
+    },
+    {
+      "t": 147.46,
+      "text": "Now we reach the most revolutionary moment in the history of writing. Around 1050 BCE, the Phoenicians, a seafaring trading people from the coast of modern-day Lebanon, created something radically new. Instead of hundreds of symbols, they used just 22 letters. Each letter represented a consonant sound, not a whole word or syllable."
+    },
+    {
+      "t": 169.1,
+      "text": "Why was this so transformative? Because with only 22 symbols to learn, ordinary people could become literate. You did not need years of training. The Phoenician alphabet spread rapidly along Mediterranean trade routes, carried by merchants from port to port."
+    },
+    {
+      "t": 185.95,
+      "text": "The Greeks adopted the Phoenician alphabet around 800 BCE and made a crucial improvement. They added vowels. The Phoenician alphabet only wrote consonants, so readers had to guess the vowels from context. The Greeks took some consonant letters that didn't match Greek sounds and repurposed them as vowel markers. This gave us the first true alphabet, where both consonants and vowels are written explicitly.",
+      "endsBeforeIx": "q-greek-innovation"
+    },
+    {
+      "t": 210.53,
+      "text": "From the Greek alphabet, two major branches grew. The Romans adapted it into the Latin alphabet, which you are hearing described right now. Meanwhile, missionaries created the Cyrillic alphabet for Slavic languages, based on Greek letters. The Phoenician invention rippled outward for millennia."
+    },
+    {
+      "t": 228.22,
+      "text": "Let us put this long journey in order. From Sumerian pictographs to cuneiform, from Egyptian hieroglyphs to the Phoenician consonant alphabet, from the Greek addition of vowels to the Latin and Cyrillic scripts we use today. Each transition solved a real problem. Pictographs were too literal. Logograms required too many symbols. Consonant alphabets were ambiguous. Full alphabets unlocked mass literacy.",
+      "endsBeforeIx": "try-timeline"
+    },
+    {
+      "t": 254.21,
+      "text": "And here is something remarkable to consider. The basic idea behind the Phoenician alphabet, representing individual sounds with individual letters, was so powerful that it only had to be invented once. Nearly every alphabet in the world today descends from that single innovation on the shores of the Mediterranean over three thousand years ago."
+    },
+    {
+      "t": 275.04,
+      "text": "Writing transformed human civilization. It allowed laws to be recorded, stories to be preserved, and knowledge to accumulate across generations. Every book you have read, every message you have sent, traces back to those first marks pressed into clay in ancient Sumer. The history of writing is, in a very real sense, the history of human progress itself.",
+      "endsBeforeIx": "q-final"
+    }
+  ],
+  "interactions": {
+    "q-early-systems": {
+      "time": 79.06,
+      "title": "Early Writing Origins",
+      "desc": "What did cuneiform symbols evolve from?",
+      "options": [
+        "Abstract geometric patterns invented by mathematicians",
+        "Pictographs — simple pictures representing objects",
+        "A secret code developed for military communication"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Exactly right",
+          "body": "Cuneiform began as pictographs pressed into clay. Over centuries, scribes using wedge-shaped styluses simplified these pictures into abstract wedge patterns."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "Cuneiform started as pictographs — simple drawings of the things they represented. A picture of a head meant head. These gradually became abstract wedge marks over time."
+        }
+      }
+    },
+    "try-categorize-systems": {
+      "time": 146.26,
+      "title": "Classify Writing Systems",
+      "desc": "Drag each writing system into the correct category based on how its symbols work.",
+      "widget": "categorize",
+      "categories": [
+        {
+          "label": "Logographic (symbol = word)",
+          "items": [
+            "Chinese characters",
+            "Egyptian hieroglyphs",
+            "Sumerian pictographs"
+          ]
+        },
+        {
+          "label": "Alphabetic (symbol = sound)",
+          "items": [
+            "Greek alphabet",
+            "Latin alphabet",
+            "Cyrillic script"
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": {
+          "body": "Well done! Logographic systems use symbols for whole words or concepts, while alphabetic systems map symbols to individual sounds."
+        },
+        "wrong": {
+          "body": "Remember: logographic systems like Chinese use one symbol per word, while alphabets like Greek and Latin use symbols for individual sounds."
+        }
+      }
+    },
+    "q-greek-innovation": {
+      "time": 209.33,
+      "title": "The Greek Breakthrough",
+      "desc": "What key improvement did the Greeks make to the Phoenician alphabet?",
+      "options": [
+        "They added punctuation marks between words",
+        "They added dedicated symbols for vowel sounds",
+        "They doubled the number of consonant letters"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Correct",
+          "body": "The Greeks repurposed Phoenician consonant letters that didn't fit Greek sounds and used them as vowels. This created the first true alphabet with both consonants and vowels written out."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "The Greeks' key innovation was adding vowels. The Phoenician alphabet only wrote consonants, leaving readers to guess vowels from context. By adding vowel letters, the Greeks created the first complete alphabet."
+        }
+      }
+    },
+    "try-timeline": {
+      "time": 253.01,
+      "title": "Timeline of Writing",
+      "desc": "Drag these writing milestones into chronological order, from earliest to latest.",
+      "widget": "sort",
+      "sortItems": [
+        "Sumerian cuneiform (~3400 BCE)",
+        "Egyptian hieroglyphs (~3200 BCE)",
+        "Chinese oracle bone script (~1200 BCE)",
+        "Phoenician alphabet (~1050 BCE)",
+        "Greek alphabet with vowels (~800 BCE)",
+        "Latin alphabet spreads with Rome (~300 BCE)"
+      ],
+      "feedback": {
+        "correct": {
+          "body": "Perfect timeline! Each system built on or responded to the limitations of earlier ones."
+        },
+        "wrong": {
+          "body": "The correct order runs from Sumerian cuneiform (earliest) through Egyptian, Chinese, Phoenician, Greek, and finally the Latin alphabet spreading with Rome."
+        }
+      }
+    },
+    "q-final": {
+      "time": 297.29,
+      "title": "The Big Picture",
+      "desc": "Why was the Phoenician alphabet considered revolutionary compared to earlier writing systems?",
+      "options": [
+        "It was the most beautiful and artistic writing system ever created",
+        "It used only about 22 symbols, making literacy accessible to ordinary people",
+        "It was the first system that could represent every human language"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Exactly",
+          "body": "By reducing writing to just 22 consonant letters, the Phoenicians made literacy achievable without years of specialized training. This single innovation is the ancestor of nearly every alphabet used today."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "The Phoenician alphabet's revolution was practical, not aesthetic. With only 22 letters representing consonant sounds, ordinary people could learn to read and write without years of training. This accessibility changed everything."
+        }
+      }
+    }
+  }
+}

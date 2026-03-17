@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net;
+      font-src https://fonts.gstatic.com;
+      media-src 'self';
+      img-src 'self' data:;
+    " />
+    <title>Introduction to Rust Ownership — Interactive Tutorial</title>
+    <link rel="stylesheet" href="src/lesson.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <style>
+      :root {
+        --bg: #111111;
+        --bg-card: #1a1a1a;
+        --bg-el: #222222;
+        --bg-ov: rgba(17,17,17,0.95);
+        --surface: #1a1a1a;
+        --border: #2a2a2a;
+        --text: #e0e0e0;
+        --text2: #666666;
+        --accent: #999999;
+        --acc-dim: #666666;
+        --acc-glow: rgba(153,153,153,0.08);
+        --grn: #999999;
+        --warm: #999999;
+        --cool: #999999;
+        --red: #cc4444;
+        --sans: 'DM Sans', -apple-system, sans-serif;
+        --mono: 'JetBrains Mono', monospace;
+        --serif: 'DM Sans', -apple-system, sans-serif;
+      }
+    </style>
+  </head>
+  <body data-theme="clean-dark">
+    <!-- Navigation -->
+                <nav class="site-nav">
+      <a class="site-nav-brand" href="https://github.com/drstarry/interactive-video-skill">Interactive Video Skill</a>
+      <div class="site-nav-links">
+        <a href="skill-onboarding.html">Onboarding [theme: Chalkboard]</a>
+        <a href="git-rebase.html">Git Rebase [theme: Terminal]</a>
+        <a href="writing-systems.html">Writing [theme: Notebook]</a>
+        <a href="dns-resolution.html">DNS [theme: Blueprint]</a>
+        <a href="rust-ownership.html" class="active">Rust [theme: Clean Dark]</a>
+        <a href="vaccines.html">Vaccines [theme: Clean Light]</a>
+        <a href="sourdough.html">Sourdough [theme: Studio]</a>
+        <a href="big-o.html">Big O [theme: Focus]</a>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="wrap">
+      <div class="hdr">
+        <h1>Introduction to Rust Ownership</h1>
+        <p class="sub">Memory safety without a garbage collector — how Rust's ownership system works</p>
+      </div>
+
+      <div class="vid-wrap">
+        <canvas id="cvs"></canvas>
+        <div class="scn-label" id="scn-label"></div>
+        <div class="math-layer" id="math-layer"></div>
+        <div class="ov" id="ov">
+          <div class="top-badge" id="badge"></div>
+          <div class="card" id="card"></div>
+        </div>
+      </div>
+
+      <div class="ctl">
+        <button id="btn-play">
+          <svg id="play-icon" viewBox="0 0 24 24">
+            <polygon points="5,3 19,12 5,21" />
+          </svg>
+        </button>
+        <span class="tl" id="t-cur">0:00</span>
+        <span class="sep">/</span>
+        <span class="tl" id="t-dur">0:00</span>
+        <div class="tbar" id="tbar">
+          <div class="fill" id="tprog"></div>
+          <div class="scrub" id="tscrub"></div>
+        </div>
+        <button class="mute" id="btn-mute">Narration: On</button>
+        <button class="fs" id="btn-fs">Fullscreen</button>
+      </div>
+
+      <div class="scores" id="scores"></div>
+      <div class="chapters-header">Chapters</div>
+      <div id="chapters"></div>
+    </div>
+
+    <script type="module">
+      import { createLesson } from "./src/engine/lesson.js";
+      import { createSceneRenderer } from "./src/engine/scene-renderer.js";
+      import { VW, VH } from "./src/engine/canvas.js";
+
+      // ===== SCENE DATA =====
+      const scenes = [
+        { s: 0, e: 22.99, label: "The Problem", bg: "intro" },
+        { s: 22.99, e: 62.06, label: "Ownership & Moves", bg: "ownership" },
+        { s: 62.06, e: 79.75, label: "The Three Rules", bg: "rules" },
+        { s: 79.75, e: 115.32, label: "Borrowing", bg: "borrowing" },
+        { s: 115.32, e: 153.14, label: "Mutable References", bg: "mutref" },
+        { s: 153.14, e: 185.66, label: "Lifetimes", bg: "lifetimes" },
+        { s: 185.66, e: 209, label: "Summary", bg: "summary" },
+      ];
+
+      const IX = [
+        {
+          id: "try-ownership-rules",
+          time: 78.55,
+          cat: "try",
+          title: "Order the Ownership Rules",
+          desc: "Arrange Rust's three ownership rules in the correct order.",
+          options: [],
+        },
+        {
+          id: "q-borrowing",
+          time: 114.12,
+          cat: "q",
+          title: "Borrowing Check",
+          desc: "What does a shared reference (&T) allow you to do?",
+          options: [
+            { k: "A", c: false },
+            { k: "B", c: true },
+            { k: "C", c: false },
+          ],
+        },
+        {
+          id: "try-valid-code",
+          time: 151.94,
+          cat: "try",
+          title: "Valid or Invalid?",
+          desc: "Categorize each Rust code snippet as valid or invalid.",
+          options: [],
+        },
+        {
+          id: "q-lifetimes",
+          time: 184.46,
+          cat: "q",
+          title: "Lifetime Check",
+          desc: "Why does Rust reject a function that returns a reference to a local variable?",
+          options: [
+            { k: "A", c: true },
+            { k: "B", c: false },
+            { k: "C", c: false },
+          ],
+        },
+      ];
+
+      // ===== DECLARATIVE ELEMENTS =====
+      const sceneElements = {
+        intro: [
+          { type: "glow", x: 960, y: 540, radius: 450, color: "rgba(153,153,153,0.05)" },
+          {
+            type: "text", x: 960, y: 340,
+            text: "Memory Safety",
+            font: '600 52px "DM Sans"', color: "#e0e0e0",
+          },
+          {
+            type: "text", x: 960, y: 410,
+            text: "without a garbage collector",
+            font: '300 24px "DM Sans"', color: "#666666",
+            revealAt: 0.15,
+          },
+          {
+            type: "rule", x1: 860, y1: 450, x2: 1060, y2: 450,
+            color: "#999999", revealAt: 0.25,
+          },
+          {
+            type: "text", x: 560, y: 560,
+            text: "C / C++",
+            font: '500 22px "DM Sans"', color: "#cc4444",
+            revealAt: 0.35,
+          },
+          {
+            type: "text", x: 560, y: 600,
+            text: "Manual memory management",
+            font: '400 16px "DM Sans"', color: "#666666",
+            revealAt: 0.4,
+          },
+          {
+            type: "text", x: 960, y: 560,
+            text: "Java / Python",
+            font: '500 22px "DM Sans"', color: "#999999",
+            revealAt: 0.45,
+          },
+          {
+            type: "text", x: 960, y: 600,
+            text: "Garbage collector",
+            font: '400 16px "DM Sans"', color: "#666666",
+            revealAt: 0.5,
+          },
+          {
+            type: "text", x: 1360, y: 560,
+            text: "Rust",
+            font: '700 22px "DM Sans"', color: "#e0e0e0",
+            revealAt: 0.6,
+          },
+          {
+            type: "text", x: 1360, y: 600,
+            text: "Ownership system",
+            font: '400 16px "DM Sans"', color: "#999999",
+            revealAt: 0.65,
+          },
+        ],
+        rules: [
+          { type: "glow", x: 960, y: 540, radius: 400, color: "rgba(153,153,153,0.04)" },
+          {
+            type: "text", x: 960, y: 260,
+            text: "The Three Rules of Ownership",
+            font: '600 36px "DM Sans"', color: "#e0e0e0",
+          },
+          {
+            type: "rule", x1: 810, y1: 300, x2: 1110, y2: 300,
+            color: "#999999", revealAt: 0.1,
+          },
+        ],
+        summary: [
+          { type: "glow", x: 960, y: 540, radius: 500, color: "rgba(153,153,153,0.04)" },
+          {
+            type: "text", x: 960, y: 300,
+            text: "Rust's Safety Guarantees",
+            font: '600 40px "DM Sans"', color: "#e0e0e0",
+          },
+          {
+            type: "rule", x1: 830, y1: 340, x2: 1090, y2: 340,
+            color: "#999999", revealAt: 0.1,
+          },
+        ],
+      };
+
+      // ===== CUSTOM DRAW =====
+      const customDraw = {
+        ownership: (ctx, p, t) => {
+          const cx = VW / 2, cy = VH / 2;
+
+          // Title
+          const titleReveal = Math.max(0, Math.min(1, p / 0.1));
+          ctx.globalAlpha = titleReveal;
+          ctx.font = '600 36px "DM Sans"';
+          ctx.fillStyle = "#e0e0e0";
+          ctx.textAlign = "center";
+          ctx.fillText("Ownership & Move Semantics", cx, 200);
+
+          // Code block background
+          const codeReveal = Math.max(0, Math.min(1, (p - 0.15) / 0.15));
+          ctx.globalAlpha = codeReveal;
+          const bx = 360, by = 280, bw = 600, bh = 260;
+          ctx.fillStyle = "#1a1a1a";
+          ctx.beginPath();
+          ctx.roundRect(bx, by, bw, bh, 12);
+          ctx.fill();
+          ctx.strokeStyle = "#2a2a2a";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          // Code lines
+          const lines = [
+            'let s1 = String::from("hello");',
+            'let s2 = s1;  // s1 is moved!',
+            '',
+            '// println!("{}", s1);  // ERROR!',
+            'println!("{}", s2);     // OK',
+          ];
+          ctx.font = '400 18px "JetBrains Mono"';
+          ctx.textAlign = "left";
+          lines.forEach((line, i) => {
+            const lineReveal = Math.max(0, Math.min(1, (p - 0.2 - i * 0.06) / 0.1));
+            ctx.globalAlpha = lineReveal;
+            if (line.startsWith('//')) {
+              ctx.fillStyle = "#cc4444";
+            } else if (line.includes('moved')) {
+              ctx.fillStyle = "#999999";
+            } else {
+              ctx.fillStyle = "#e0e0e0";
+            }
+            ctx.fillText(line, bx + 24, by + 40 + i * 32);
+          });
+
+          // Move diagram on the right
+          const diagReveal = Math.max(0, Math.min(1, (p - 0.55) / 0.15));
+          ctx.globalAlpha = diagReveal;
+
+          // s1 box
+          ctx.fillStyle = "#222222";
+          ctx.beginPath();
+          ctx.roundRect(1100, 320, 120, 50, 8);
+          ctx.fill();
+          ctx.strokeStyle = "#666666";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.font = '500 18px "JetBrains Mono"';
+          ctx.fillStyle = "#666666";
+          ctx.textAlign = "center";
+          ctx.fillText("s1", 1160, 352);
+
+          // Arrow
+          const arrowP = Math.max(0, Math.min(1, (p - 0.65) / 0.1));
+          ctx.globalAlpha = diagReveal * arrowP;
+          ctx.strokeStyle = "#999999";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(1160, 370);
+          ctx.lineTo(1160, 420);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(1150, 410);
+          ctx.lineTo(1160, 425);
+          ctx.lineTo(1170, 410);
+          ctx.fill();
+
+          // s2 box
+          const s2Reveal = Math.max(0, Math.min(1, (p - 0.7) / 0.1));
+          ctx.globalAlpha = diagReveal * s2Reveal;
+          ctx.fillStyle = "#222222";
+          ctx.beginPath();
+          ctx.roundRect(1100, 430, 120, 50, 8);
+          ctx.fill();
+          ctx.strokeStyle = "#e0e0e0";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.font = '500 18px "JetBrains Mono"';
+          ctx.fillStyle = "#e0e0e0";
+          ctx.textAlign = "center";
+          ctx.fillText("s2", 1160, 462);
+
+          // "moved" label
+          ctx.font = '400 14px "DM Sans"';
+          ctx.fillStyle = "#999999";
+          ctx.fillText("move", 1210, 400);
+
+          // Crossed out s1
+          const crossReveal = Math.max(0, Math.min(1, (p - 0.75) / 0.1));
+          ctx.globalAlpha = diagReveal * crossReveal;
+          ctx.strokeStyle = "#cc4444";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(1105, 325);
+          ctx.lineTo(1215, 365);
+          ctx.stroke();
+
+          ctx.globalAlpha = 1;
+        },
+
+        rules: (ctx, p, t) => {
+          const cx = VW / 2;
+          const rules = [
+            { num: "1", text: "Each value has exactly one owner" },
+            { num: "2", text: "There can only be one owner at a time" },
+            { num: "3", text: "When the owner goes out of scope, the value is dropped" },
+          ];
+
+          rules.forEach((rule, i) => {
+            const reveal = Math.max(0, Math.min(1, (p - 0.2 - i * 0.15) / 0.15));
+            ctx.globalAlpha = reveal;
+
+            const ry = 380 + i * 100;
+
+            // Rule box
+            ctx.fillStyle = "#1a1a1a";
+            ctx.beginPath();
+            ctx.roundRect(cx - 340, ry, 680, 70, 10);
+            ctx.fill();
+            ctx.strokeStyle = "#2a2a2a";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Number circle
+            ctx.fillStyle = "#999999";
+            ctx.beginPath();
+            ctx.arc(cx - 290, ry + 35, 20, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = '600 18px "DM Sans"';
+            ctx.fillStyle = "#111111";
+            ctx.textAlign = "center";
+            ctx.fillText(rule.num, cx - 290, ry + 42);
+
+            // Rule text
+            ctx.font = '400 20px "DM Sans"';
+            ctx.fillStyle = "#e0e0e0";
+            ctx.textAlign = "left";
+            ctx.fillText(rule.text, cx - 250, ry + 42);
+          });
+
+          ctx.globalAlpha = 1;
+        },
+
+        borrowing: (ctx, p, t) => {
+          const cx = VW / 2;
+
+          // Title
+          const titleReveal = Math.max(0, Math.min(1, p / 0.1));
+          ctx.globalAlpha = titleReveal;
+          ctx.font = '600 36px "DM Sans"';
+          ctx.fillStyle = "#e0e0e0";
+          ctx.textAlign = "center";
+          ctx.fillText("Borrowing & References", cx, 200);
+
+          // Shared reference diagram
+          const sharedReveal = Math.max(0, Math.min(1, (p - 0.15) / 0.15));
+          ctx.globalAlpha = sharedReveal;
+
+          // Owner box
+          ctx.fillStyle = "#222222";
+          ctx.beginPath();
+          ctx.roundRect(440, 340, 160, 60, 8);
+          ctx.fill();
+          ctx.strokeStyle = "#999999";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.font = '500 18px "JetBrains Mono"';
+          ctx.fillStyle = "#e0e0e0";
+          ctx.textAlign = "center";
+          ctx.fillText("s: String", 520, 377);
+
+          // &s references
+          const refs = ["&s (r1)", "&s (r2)", "&s (r3)"];
+          refs.forEach((ref, i) => {
+            const refReveal = Math.max(0, Math.min(1, (p - 0.3 - i * 0.08) / 0.1));
+            ctx.globalAlpha = sharedReveal * refReveal;
+
+            const rx = 340 + i * 120, ry = 460;
+            ctx.fillStyle = "#1a1a1a";
+            ctx.beginPath();
+            ctx.roundRect(rx, ry, 110, 45, 6);
+            ctx.fill();
+            ctx.strokeStyle = "#666666";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.font = '400 14px "JetBrains Mono"';
+            ctx.fillStyle = "#999999";
+            ctx.textAlign = "center";
+            ctx.fillText(ref, rx + 55, ry + 28);
+
+            // Arrow up to owner
+            ctx.strokeStyle = "#666666";
+            ctx.setLineDash([4, 4]);
+            ctx.lineDashOffset = -t * 15;
+            ctx.beginPath();
+            ctx.moveTo(rx + 55, ry);
+            ctx.lineTo(520, 400);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          });
+
+          // Label
+          ctx.globalAlpha = sharedReveal;
+          ctx.font = '400 16px "DM Sans"';
+          ctx.fillStyle = "#666666";
+          ctx.textAlign = "center";
+          ctx.fillText("Multiple shared references (&T) — read only", 520, 540);
+
+          // Mutable reference side
+          const mutReveal = Math.max(0, Math.min(1, (p - 0.55) / 0.15));
+          ctx.globalAlpha = mutReveal;
+
+          // Owner box (right side)
+          ctx.fillStyle = "#222222";
+          ctx.beginPath();
+          ctx.roundRect(1180, 340, 180, 60, 8);
+          ctx.fill();
+          ctx.strokeStyle = "#999999";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.font = '500 18px "JetBrains Mono"';
+          ctx.fillStyle = "#e0e0e0";
+          ctx.textAlign = "center";
+          ctx.fillText("s: String", 1270, 377);
+
+          // Single &mut s
+          const mutRefReveal = Math.max(0, Math.min(1, (p - 0.65) / 0.1));
+          ctx.globalAlpha = mutReveal * mutRefReveal;
+          ctx.fillStyle = "#1a1a1a";
+          ctx.beginPath();
+          ctx.roundRect(1210, 460, 120, 45, 6);
+          ctx.fill();
+          ctx.strokeStyle = "#e0e0e0";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.font = '400 14px "JetBrains Mono"';
+          ctx.fillStyle = "#e0e0e0";
+          ctx.textAlign = "center";
+          ctx.fillText("&mut s", 1270, 488);
+
+          // Arrow
+          ctx.strokeStyle = "#e0e0e0";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(1270, 460);
+          ctx.lineTo(1270, 400);
+          ctx.stroke();
+
+          // Label
+          ctx.globalAlpha = mutReveal;
+          ctx.font = '400 16px "DM Sans"';
+          ctx.fillStyle = "#666666";
+          ctx.textAlign = "center";
+          ctx.fillText("One mutable reference (&mut T) — read + write", 1270, 540);
+
+          // VS divider
+          const vsReveal = Math.max(0, Math.min(1, (p - 0.5) / 0.1));
+          ctx.globalAlpha = vsReveal;
+          ctx.font = '300 20px "DM Sans"';
+          ctx.fillStyle = "#666666";
+          ctx.textAlign = "center";
+          ctx.fillText("OR", 880, 420);
+
+          ctx.globalAlpha = 1;
+        },
+
+        mutref: (ctx, p, t) => {
+          const cx = VW / 2;
+
+          // Title
+          const titleReveal = Math.max(0, Math.min(1, p / 0.1));
+          ctx.globalAlpha = titleReveal;
+          ctx.font = '600 36px "DM Sans"';
+          ctx.fillStyle = "#e0e0e0";
+          ctx.textAlign = "center";
+          ctx.fillText("The Borrowing Rule", cx, 200);
+
+          // The rule box
+          const ruleReveal = Math.max(0, Math.min(1, (p - 0.1) / 0.15));
+          ctx.globalAlpha = ruleReveal;
+          ctx.fillStyle = "#1a1a1a";
+          ctx.beginPath();
+          ctx.roundRect(cx - 380, 250, 760, 60, 10);
+          ctx.fill();
+          ctx.strokeStyle = "#999999";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.font = '400 18px "DM Sans"';
+          ctx.fillStyle = "#e0e0e0";
+          ctx.textAlign = "center";
+          ctx.fillText("Either ONE &mut  OR  any number of &T  — never both at once", cx, 286);
+
+          // Data race scenario
+          const scenarioReveal = Math.max(0, Math.min(1, (p - 0.4) / 0.15));
+          ctx.globalAlpha = scenarioReveal;
+
+          ctx.font = '500 20px "DM Sans"';
+          ctx.fillStyle = "#cc4444";
+          ctx.textAlign = "center";
+          ctx.fillText("Without this rule: data race!", cx, 400);
+
+          // Thread boxes
+          const t1Reveal = Math.max(0, Math.min(1, (p - 0.5) / 0.1));
+          ctx.globalAlpha = scenarioReveal * t1Reveal;
+
+          // Thread 1
+          ctx.fillStyle = "#222222";
+          ctx.beginPath();
+          ctx.roundRect(cx - 280, 440, 200, 100, 8);
+          ctx.fill();
+          ctx.strokeStyle = "#cc4444";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.font = '500 16px "DM Sans"';
+          ctx.fillStyle = "#cc4444";
+          ctx.textAlign = "center";
+          ctx.fillText("Thread A", cx - 180, 470);
+          ctx.font = '400 14px "JetBrains Mono"';
+          ctx.fillStyle = "#e0e0e0";
+          ctx.fillText("writes to data", cx - 180, 510);
+
+          // Thread 2
+          ctx.fillStyle = "#222222";
+          ctx.beginPath();
+          ctx.roundRect(cx + 80, 440, 200, 100, 8);
+          ctx.fill();
+          ctx.strokeStyle = "#cc4444";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.font = '500 16px "DM Sans"';
+          ctx.fillStyle = "#cc4444";
+          ctx.textAlign = "center";
+          ctx.fillText("Thread B", cx + 180, 470);
+          ctx.font = '400 14px "JetBrains Mono"';
+          ctx.fillStyle = "#e0e0e0";
+          ctx.fillText("reads from data", cx + 180, 510);
+
+          // Shared data
+          const dataReveal = Math.max(0, Math.min(1, (p - 0.6) / 0.1));
+          ctx.globalAlpha = scenarioReveal * dataReveal;
+          ctx.fillStyle = "#1a1a1a";
+          ctx.beginPath();
+          ctx.roundRect(cx - 70, 580, 140, 50, 8);
+          ctx.fill();
+          ctx.strokeStyle = "#2a2a2a";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.font = '500 16px "JetBrains Mono"';
+          ctx.fillStyle = "#e0e0e0";
+          ctx.textAlign = "center";
+          ctx.fillText("data", cx, 612);
+
+          // Arrows from threads to data
+          ctx.strokeStyle = "#cc4444";
+          ctx.setLineDash([4, 4]);
+          ctx.lineDashOffset = -t * 20;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(cx - 180, 540);
+          ctx.lineTo(cx - 30, 580);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(cx + 180, 540);
+          ctx.lineTo(cx + 30, 580);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Rust prevents this
+          const preventReveal = Math.max(0, Math.min(1, (p - 0.75) / 0.1));
+          ctx.globalAlpha = scenarioReveal * preventReveal;
+          ctx.font = '500 20px "DM Sans"';
+          ctx.fillStyle = "#999999";
+          ctx.fillText("Rust prevents this at compile time", cx, 690);
+
+          ctx.globalAlpha = 1;
+        },
+
+        lifetimes: (ctx, p, t) => {
+          const cx = VW / 2;
+
+          // Title
+          const titleReveal = Math.max(0, Math.min(1, p / 0.1));
+          ctx.globalAlpha = titleReveal;
+          ctx.font = '600 36px "DM Sans"';
+          ctx.fillStyle = "#e0e0e0";
+          ctx.textAlign = "center";
+          ctx.fillText("Lifetimes", cx, 200);
+
+          // Dangling pointer example
+          const codeReveal = Math.max(0, Math.min(1, (p - 0.15) / 0.15));
+          ctx.globalAlpha = codeReveal;
+
+          const bx = cx - 280, by = 260, bw = 560, bh = 220;
+          ctx.fillStyle = "#1a1a1a";
+          ctx.beginPath();
+          ctx.roundRect(bx, by, bw, bh, 12);
+          ctx.fill();
+          ctx.strokeStyle = "#2a2a2a";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          const codeLines = [
+            { text: "fn dangle() -> &String {", color: "#e0e0e0" },
+            { text: "    let s = String::from(\"hello\");", color: "#e0e0e0" },
+            { text: "    &s  // ERROR: s is dropped here!", color: "#cc4444" },
+            { text: "}", color: "#e0e0e0" },
+            { text: "// reference would point to freed memory", color: "#666666" },
+          ];
+
+          ctx.font = '400 16px "JetBrains Mono"';
+          ctx.textAlign = "left";
+          codeLines.forEach((line, i) => {
+            const lineReveal = Math.max(0, Math.min(1, (p - 0.2 - i * 0.06) / 0.1));
+            ctx.globalAlpha = codeReveal * lineReveal;
+            ctx.fillStyle = line.color;
+            ctx.fillText(line.text, bx + 20, by + 40 + i * 32);
+          });
+
+          // Scope visualization
+          const scopeReveal = Math.max(0, Math.min(1, (p - 0.55) / 0.15));
+          ctx.globalAlpha = scopeReveal;
+
+          // Scope bar for s
+          ctx.fillStyle = "#222222";
+          ctx.beginPath();
+          ctx.roundRect(cx - 280, 540, 560, 40, 6);
+          ctx.fill();
+
+          // s lifetime bar
+          const barW = 350;
+          ctx.fillStyle = "#cc4444";
+          ctx.globalAlpha = scopeReveal * 0.5;
+          ctx.beginPath();
+          ctx.roundRect(cx - 260, 548, barW, 24, 4);
+          ctx.fill();
+          ctx.globalAlpha = scopeReveal;
+          ctx.font = '400 14px "JetBrains Mono"';
+          ctx.fillStyle = "#e0e0e0";
+          ctx.textAlign = "left";
+          ctx.fillText("s lives here", cx - 250, 566);
+
+          // Drop marker
+          ctx.fillStyle = "#cc4444";
+          ctx.font = '600 14px "DM Sans"';
+          ctx.textAlign = "center";
+          ctx.fillText("dropped!", cx - 260 + barW + 10, 566);
+
+          // Reference extends beyond
+          const refReveal = Math.max(0, Math.min(1, (p - 0.7) / 0.15));
+          ctx.globalAlpha = scopeReveal * refReveal;
+          ctx.fillStyle = "#222222";
+          ctx.beginPath();
+          ctx.roundRect(cx - 280, 600, 560, 40, 6);
+          ctx.fill();
+          ctx.fillStyle = "#999999";
+          ctx.globalAlpha = scopeReveal * refReveal * 0.4;
+          ctx.beginPath();
+          ctx.roundRect(cx - 260, 608, 500, 24, 4);
+          ctx.fill();
+          ctx.globalAlpha = scopeReveal * refReveal;
+          ctx.font = '400 14px "JetBrains Mono"';
+          ctx.fillStyle = "#e0e0e0";
+          ctx.textAlign = "left";
+          ctx.fillText("&s tries to live here — dangling!", cx - 250, 626);
+
+          ctx.globalAlpha = 1;
+        },
+
+        summary: (ctx, p, t) => {
+          const cx = VW / 2;
+          const items = [
+            { label: "Ownership", desc: "Deterministic cleanup", icon: "1" },
+            { label: "Move Semantics", desc: "No double frees", icon: "2" },
+            { label: "Borrowing Rules", desc: "No data races", icon: "3" },
+            { label: "Lifetimes", desc: "No dangling pointers", icon: "4" },
+          ];
+
+          items.forEach((item, i) => {
+            const reveal = Math.max(0, Math.min(1, (p - 0.15 - i * 0.12) / 0.15));
+            ctx.globalAlpha = reveal;
+
+            const iy = 400 + i * 85;
+
+            // Box
+            ctx.fillStyle = "#1a1a1a";
+            ctx.beginPath();
+            ctx.roundRect(cx - 300, iy, 600, 65, 8);
+            ctx.fill();
+            ctx.strokeStyle = "#2a2a2a";
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Number circle
+            ctx.fillStyle = "#999999";
+            ctx.beginPath();
+            ctx.arc(cx - 250, iy + 32, 18, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.font = '600 16px "DM Sans"';
+            ctx.fillStyle = "#111111";
+            ctx.textAlign = "center";
+            ctx.fillText(item.icon, cx - 250, iy + 38);
+
+            // Label
+            ctx.font = '500 20px "DM Sans"';
+            ctx.fillStyle = "#e0e0e0";
+            ctx.textAlign = "left";
+            ctx.fillText(item.label, cx - 210, iy + 30);
+
+            // Desc
+            ctx.font = '400 15px "DM Sans"';
+            ctx.fillStyle = "#666666";
+            ctx.fillText(item.desc, cx - 210, iy + 56);
+          });
+
+          // Bottom text
+          const bottomReveal = Math.max(0, Math.min(1, (p - 0.7) / 0.15));
+          ctx.globalAlpha = bottomReveal;
+          ctx.font = '300 20px "DM Sans"';
+          ctx.fillStyle = "#999999";
+          ctx.textAlign = "center";
+          ctx.fillText("All checked at compile time — zero runtime cost", cx, 770);
+
+          ctx.globalAlpha = 1;
+        },
+      };
+
+      // ===== RENDERER =====
+      const renderScene = createSceneRenderer(scenes, sceneElements, {
+        bg: "#111111",
+        draw: customDraw,
+      });
+
+      // ===== BOOT =====
+      createLesson({
+        lessonId: "rust-ownership",
+        scenes,
+        IX,
+        render: renderScene,
+      });
+    </script>
+  </body>
+</html>

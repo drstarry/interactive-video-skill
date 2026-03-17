@@ -1,0 +1,155 @@
+{
+  "meta": {
+    "lessonId": "dns-resolution",
+    "voice": "en-US-AndrewNeural",
+    "rate": "+5%",
+    "gap": 1.2,
+    "duration": 246,
+    "audioGenerated": true
+  },
+  "narration": [
+    {
+      "t": 1.2,
+      "text": "Every time you type a web address into your browser, something remarkable happens behind the scenes. Your computer has to translate that human-friendly name, like example dot com, into a numeric IP address that networks actually understand. This process is called DNS resolution, and it happens billions of times every day across the internet."
+    },
+    {
+      "t": 22.56,
+      "text": "Think of DNS as the internet's phone book. You know the name you want to reach, but you need to look up the number. Except this phone book is distributed across thousands of servers worldwide, and your query might pass through several of them before you get an answer."
+    },
+    {
+      "t": 37.44,
+      "text": "Let's walk through the key players in DNS resolution. First, there's your local machine, which has a built-in DNS cache. If you've visited a site recently, the answer might already be stored locally. Next is the recursive resolver, usually run by your ISP or a service like Google's 8.8.8.8. This is the workhorse that does the heavy lifting on your behalf."
+    },
+    {
+      "t": 60.31,
+      "text": "Above the resolver sit three tiers of authoritative servers. At the very top are the root servers, thirteen clusters identified by letters A through M. They don't know every domain, but they know who to ask next. Below them are the TLD servers, responsible for top-level domains like dot com, dot org, or dot net. And finally, the authoritative nameserver for the specific domain holds the actual IP address you need.",
+      "endsBeforeIx": "try-dns-components"
+    },
+    {
+      "t": 87.26,
+      "text": "Now let's trace the actual query flow, step by step. You type example dot com into your browser. First, your operating system checks its local DNS cache. No luck? It sends a query to the recursive resolver. The resolver checks its own cache. If the answer isn't there, it begins an iterative lookup."
+    },
+    {
+      "t": 106.54,
+      "text": "The resolver asks a root server: where can I find dot com? The root server responds with a referral, pointing to the dot com TLD servers. The resolver then asks the TLD server: where is example dot com? The TLD server responds with another referral, this time to example dot com's authoritative nameserver. Finally, the resolver queries the authoritative server, which returns the actual IP address. The resolver caches this answer, then sends it back to your browser.",
+      "endsBeforeIx": "try-query-order"
+    },
+    {
+      "t": 135.98,
+      "text": "There's an important distinction between two types of DNS queries. A recursive query is what your computer sends to the resolver. It essentially says: get me the answer, I don't care how. The resolver must return either the final answer or an error. An iterative query is what the resolver sends to root, TLD, and authoritative servers. Each server responds with the best answer it has, which is usually a referral saying, I don't know, but ask this server next.",
+      "endsBeforeIx": "q-query-types"
+    },
+    {
+      "t": 163.58,
+      "text": "Caching is what makes DNS fast. Without it, every single web request would require multiple round trips across the globe. Every DNS record comes with a TTL, or time to live, measured in seconds. This tells the resolver how long it can cache the answer before it must ask again."
+    },
+    {
+      "t": 181.54,
+      "text": "A typical TTL might be 300 seconds, or five minutes. During that window, any subsequent query for the same domain gets an instant answer from cache. When the TTL expires, the resolver discards the cached record and performs a fresh lookup. This balance between speed and freshness is critical. Set the TTL too low and you overload DNS servers. Set it too high and changes to your domain take forever to propagate.",
+      "endsBeforeIx": "q-ttl"
+    },
+    {
+      "t": 208.82,
+      "text": "Let's put it all together. DNS resolution is a hierarchical, distributed lookup system. Your browser asks a resolver. The resolver walks down the tree, from root to TLD to authoritative, caching answers along the way. The TTL on each record controls how long those cached answers stay valid. It all happens in milliseconds, yet it's one of the most fundamental protocols that makes the web work. Next time you load a page, remember: before a single byte of HTML arrives, DNS had to do its job first."
+    }
+  ],
+  "interactions": {
+    "try-dns-components": {
+      "time": 86.06,
+      "title": "DNS Architecture",
+      "desc": "Tap each component to learn its role in DNS resolution.",
+      "widget": "hotspot",
+      "hotspots": [
+        {
+          "label": "Local DNS Cache",
+          "icon": "1",
+          "explanation": "Your operating system stores recent lookups. If the domain was resolved recently and the TTL hasn't expired, no network request is needed at all."
+        },
+        {
+          "label": "Recursive Resolver",
+          "icon": "2",
+          "explanation": "Usually run by your ISP or a public service like 8.8.8.8 or 1.1.1.1. It accepts recursive queries from clients and performs iterative lookups on their behalf."
+        },
+        {
+          "label": "Root Servers",
+          "icon": "3",
+          "explanation": "Thirteen root server clusters (A through M) operated by different organizations. They don't store domain records directly but refer resolvers to the correct TLD servers."
+        },
+        {
+          "label": "TLD Servers",
+          "icon": "4",
+          "explanation": "Each top-level domain (com, org, net, etc.) has dedicated nameservers. They refer resolvers to the authoritative nameserver for a specific domain."
+        },
+        {
+          "label": "Authoritative Nameserver",
+          "icon": "5",
+          "explanation": "The final authority for a domain. It holds the actual DNS records (A, AAAA, CNAME, MX, etc.) and returns the definitive answer."
+        }
+      ]
+    },
+    "try-query-order": {
+      "time": 134.79,
+      "title": "Order the DNS Query Steps",
+      "desc": "Drag to arrange the steps of a DNS lookup in the correct order.",
+      "widget": "sort",
+      "sortItems": [
+        "Browser checks local DNS cache",
+        "Query sent to recursive resolver",
+        "Resolver queries a root server",
+        "Root server refers to TLD server",
+        "Resolver queries the TLD server",
+        "TLD server refers to authoritative nameserver",
+        "Resolver queries authoritative nameserver",
+        "IP address returned to browser"
+      ],
+      "feedback": {
+        "correct": {
+          "body": "That's the complete DNS resolution flow. Each step narrows the search from the general (root) to the specific (authoritative)."
+        },
+        "wrong": {
+          "body": "Remember: the lookup starts locally, then moves to the resolver, which walks down the hierarchy from root to TLD to authoritative."
+        }
+      }
+    },
+    "q-query-types": {
+      "time": 162.38,
+      "title": "Recursive vs Iterative",
+      "desc": "When a recursive resolver contacts a root server, what type of query does it send?",
+      "options": [
+        "A recursive query, demanding the final answer",
+        "An iterative query, accepting referrals",
+        "A broadcast query to all root servers simultaneously"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Correct",
+          "body": "The resolver sends iterative queries to authoritative servers. Each server returns the best referral it can, and the resolver follows the chain."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "Recursive queries are what your computer sends to the resolver. The resolver itself uses iterative queries when talking to root, TLD, and authoritative servers, accepting referrals at each step."
+        }
+      }
+    },
+    "q-ttl": {
+      "time": 207.63,
+      "title": "TTL Trade-offs",
+      "desc": "A company changes their server IP address but users still reach the old server for hours. What is the most likely cause?",
+      "options": [
+        "The authoritative nameserver is offline",
+        "Resolvers are serving a cached record with a long TTL",
+        "The root servers haven't been updated yet"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Correct",
+          "body": "When a DNS record has a long TTL, resolvers keep serving the cached (now stale) IP address until the TTL expires. This is the classic DNS propagation delay."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "Root servers only store referrals to TLD servers, not individual domain records. The real issue is that resolvers cache the old IP address and won't re-query until the TTL expires."
+        }
+      }
+    }
+  }
+}

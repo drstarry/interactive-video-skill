@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "lessonId": "sourdough",
+    "voice": "en-US-AndrewNeural",
+    "rate": "+5%",
+    "gap": 1.2,
+    "duration": 301,
+    "audioGenerated": true
+  },
+  "narration": [
+    {
+      "t": 1.2,
+      "text": "Welcome to the science of sourdough bread. For thousands of years, humans have been making bread with nothing more than flour, water, and the invisible organisms floating in the air around us. Today, we'll explore how this ancient process actually works, from the living ecosystem in your starter to the chemistry that gives sourdough its distinctive tang."
+    },
+    {
+      "t": 22.03,
+      "text": "Let's start with the sourdough starter itself. A starter is a living ecosystem, a symbiotic community of wild yeast and lactic acid bacteria. The wild yeast, most commonly Saccharomyces cerevisiae and Kazachstania humilis, are responsible for producing carbon dioxide gas, which makes the bread rise. But here's what makes sourdough special: the bacteria."
+    },
+    {
+      "t": 44.76,
+      "text": "The dominant bacteria in a sourdough starter are Lactobacillus species. These bacteria outnumber the yeast by roughly one hundred to one. They produce two key acids: lactic acid, which gives a mild, yogurt-like sourness, and acetic acid, which provides that sharp, vinegary tang. The balance between these two acids is what determines your bread's flavor profile."
+    },
+    {
+      "t": 68.06,
+      "text": "So what controls whether your sourdough tastes mildly tangy or intensely sour? It comes down to fermentation conditions. Warmer temperatures, around seventy-five to eighty degrees Fahrenheit, favor lactic acid production, creating a milder, more complex flavor. Cooler temperatures, like a long overnight rise in the refrigerator, favor acetic acid, which pushes the flavor toward that sharp, pronounced sourness.",
+      "endsBeforeIx": "try-temp"
+    },
+    {
+      "t": 94.18,
+      "text": "Now let's look at what happens during fermentation at the molecular level. When you mix flour and water, enzymes called amylases begin breaking down starch into simple sugars like maltose and glucose. The yeast and bacteria feed on these sugars. The yeast converts them into carbon dioxide and ethanol through alcoholic fermentation. The bacteria convert them into lactic and acetic acids through, you guessed it, lactic acid fermentation.",
+      "endsBeforeIx": "try-categorize"
+    },
+    {
+      "t": 121.2,
+      "text": "Here's a key difference between sourdough and commercial yeast bread. Commercial yeast, Saccharomyces cerevisiae, is a single strain selected for fast, powerful gas production. It raises dough in one to two hours. A sourdough starter works much more slowly, typically needing four to twelve hours for a bulk fermentation. But that slow process is exactly what develops flavor. The bacteria need time to produce their acids, and the longer fermentation also allows enzymes to break down proteins, creating more complex flavors and better digestibility.",
+      "endsBeforeIx": "q-yeast"
+    },
+    {
+      "t": 155.33,
+      "text": "Let's talk about gluten development. When flour proteins, glutenin and gliadin, absorb water, they link together into an elastic network called gluten. This network traps the carbon dioxide gas from fermentation, allowing the dough to rise. In sourdough, the acids produced during fermentation actually strengthen the gluten network, making it more extensible. This is why sourdough can achieve an open, airy crumb structure even without aggressive kneading."
+    },
+    {
+      "t": 184.01,
+      "text": "Hydration ratio is another critical variable. Hydration is the percentage of water relative to flour by weight. A typical sourdough runs between sixty-five and eighty-five percent hydration. Lower hydration, around sixty-five percent, gives a tighter crumb and a dough that's easier to shape. Higher hydration, around eighty percent and above, produces those coveted large, irregular holes but requires more skill to handle. The water content also affects fermentation speed, since bacteria and yeast need water to be metabolically active.",
+      "endsBeforeIx": "try-hydration"
+    },
+    {
+      "t": 218.18,
+      "text": "Now that we understand the individual steps, let's put them all together. Making sourdough bread follows a specific sequence, and the order matters because each step depends on what came before.",
+      "endsBeforeIx": "try-steps"
+    },
+    {
+      "t": 230.09,
+      "text": "Finally, let's talk about the bake itself. Sourdough is typically baked at very high temperatures, around four-fifty to five hundred degrees Fahrenheit, often in a Dutch oven. The enclosed environment traps steam released from the dough, which keeps the crust soft during the first phase of baking, allowing maximum oven spring. Once the lid comes off, the Maillard reaction and caramelization create that deep, crackly crust. The acids in the dough actually enhance the Maillard reaction, which is why sourdough develops a more complex, deeper-colored crust than regular bread.",
+      "endsBeforeIx": "q-crust"
+    },
+    {
+      "t": 264.7,
+      "text": "To recap: sourdough bread is the product of a living ecosystem. Wild yeast provides the lift, while lactobacillus bacteria create the signature sour flavor through lactic and acetic acid production. Temperature, time, and hydration are your main control variables. The slow fermentation process not only develops flavor but also improves the bread's texture, digestibility, and shelf life compared to commercial yeast breads. Now you have the science to bake with intention, not just intuition."
+    }
+  ],
+  "interactions": {
+    "try-temp": {
+      "time": 92.97,
+      "title": "Temperature and Flavor",
+      "desc": "Slide to explore how fermentation temperature affects sourdough flavor.",
+      "widget": "slider",
+      "slider": {
+        "min": 38,
+        "max": 85,
+        "step": 1,
+        "initial": 75,
+        "unit": "°F",
+        "stops": [
+          {
+            "value": 40,
+            "label": "Refrigerator retard",
+            "detail": "Very slow fermentation. Acetic acid dominates. Sharp, vinegary tang with complex flavors developing over 12-72 hours."
+          },
+          {
+            "value": 55,
+            "label": "Cool room",
+            "detail": "Slow fermentation favoring acetic acid. Noticeably sour, good for flavor development over 8-16 hours."
+          },
+          {
+            "value": 75,
+            "label": "Room temperature",
+            "detail": "Balanced fermentation. Lactic acid slightly favored. Mild, yogurt-like sourness with moderate rise in 4-8 hours."
+          },
+          {
+            "value": 82,
+            "label": "Warm proofing",
+            "detail": "Fast fermentation. Lactic acid dominates. Mildest sourness, fastest rise in 3-5 hours, but less complex flavor."
+          }
+        ]
+      }
+    },
+    "try-categorize": {
+      "time": 120,
+      "title": "Who Does What?",
+      "desc": "Drag each product to the organism that produces it.",
+      "widget": "categorize",
+      "categories": [
+        {
+          "label": "Wild Yeast",
+          "items": [
+            "Carbon dioxide",
+            "Ethanol"
+          ]
+        },
+        {
+          "label": "Lactobacillus",
+          "items": [
+            "Lactic acid",
+            "Acetic acid"
+          ]
+        },
+        {
+          "label": "Enzymes (amylases)",
+          "items": [
+            "Maltose",
+            "Glucose"
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": {
+          "body": "Exactly right. Yeast handles gas and alcohol, bacteria make the acids, and enzymes break starch into the sugars that feed both."
+        },
+        "wrong": {
+          "body": "Not quite. Remember: yeast produces CO2 and ethanol, bacteria produce the acids, and amylase enzymes break starch into sugars."
+        }
+      }
+    },
+    "q-yeast": {
+      "time": 154.13,
+      "title": "Sourdough vs. Commercial Yeast",
+      "desc": "Why does sourdough bread have more complex flavor than commercial yeast bread?",
+      "options": [
+        "Wild yeast produces different gases than commercial yeast",
+        "The longer fermentation gives bacteria time to produce acids and enzymes time to break down proteins",
+        "Sourdough uses a different type of flour that has more flavor compounds"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Correct!",
+          "body": "Time is the key ingredient. The slow fermentation allows bacteria to produce flavor-building acids while enzymes break proteins into amino acids that contribute complexity."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "The flavor difference comes from time. Sourdough's long fermentation lets bacteria produce lactic and acetic acids, and gives enzymes time to break down proteins into flavorful amino acids. The yeast species and flour can be identical."
+        }
+      }
+    },
+    "try-hydration": {
+      "time": 216.99,
+      "title": "Hydration Explorer",
+      "desc": "Slide to see how water content changes the bread.",
+      "widget": "slider",
+      "slider": {
+        "min": 55,
+        "max": 95,
+        "step": 5,
+        "initial": 70,
+        "unit": "%",
+        "stops": [
+          {
+            "value": 60,
+            "label": "Stiff dough (bagels)",
+            "detail": "Very tight, dense crumb. Easy to shape. Chewy texture. Slow fermentation due to limited water."
+          },
+          {
+            "value": 70,
+            "label": "Standard sourdough",
+            "detail": "Moderate crumb structure. Good balance of flavor and handleability. A great starting point for beginners."
+          },
+          {
+            "value": 80,
+            "label": "High hydration",
+            "detail": "Open, irregular crumb with large holes. Sticky dough that requires stretch-and-fold technique. Thinner, crispier crust."
+          },
+          {
+            "value": 90,
+            "label": "Ciabatta territory",
+            "detail": "Extremely open crumb. Very difficult to handle. Requires experience and bench flour. Maximum oven spring potential."
+          }
+        ]
+      }
+    },
+    "try-steps": {
+      "time": 228.88,
+      "title": "Order the Sourdough Process",
+      "desc": "Drag to arrange the bread-making steps from first to last.",
+      "widget": "sort",
+      "sortItems": [
+        "Feed and activate the starter",
+        "Mix flour, water, and starter (autolyse)",
+        "Stretch and fold during bulk fermentation",
+        "Shape the dough and cold-proof overnight",
+        "Score the dough and bake in a Dutch oven"
+      ],
+      "feedback": {
+        "correct": {
+          "body": "Perfect sequence! Each step builds on the previous one, from cultivating the organisms to shaping the final loaf."
+        },
+        "wrong": {
+          "body": "Check the order. Remember: the starter must be active before mixing, bulk fermentation develops gluten and flavor, then you shape, proof, and finally bake."
+        }
+      }
+    },
+    "q-crust": {
+      "time": 263.5,
+      "title": "The Sourdough Crust",
+      "desc": "Why does sourdough develop a deeper, more complex crust color than regular bread?",
+      "options": [
+        "Sourdough is baked at higher temperatures",
+        "The acids in the dough enhance the Maillard reaction",
+        "Wild yeast produces more surface sugars during baking"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Correct!",
+          "body": "The lactic and acetic acids lower the dough's pH, which accelerates the Maillard reaction between amino acids and reducing sugars, producing deeper browning and more complex flavor compounds in the crust."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "While temperature and sugars matter, the key factor is the acids produced by fermentation. These acids lower the dough's pH, which enhances the Maillard reaction and produces a deeper, more flavorful crust."
+        }
+      }
+    }
+  }
+}
