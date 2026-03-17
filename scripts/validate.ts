@@ -6,7 +6,7 @@
 
 import { readFileSync, existsSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { parseScenes } from './parse_html.js';
+import { parseScenes, parseInteractions } from './parse_html.js';
 
 const args = process.argv.slice(2);
 const lessonId = args[0];
@@ -132,7 +132,44 @@ if (!existsSync(htmlPath)) {
       if (meta?.duration && Math.abs(lastE - meta.duration) > 1) {
         err(`Last scene ends at ${lastE}s but duration is ${meta.duration}s`);
       }
+      // Check max scene duration
+      for (let i = 0; i < sBounds.length; i++) {
+        const dur = eBounds[i] - sBounds[i];
+        if (dur > 45) {
+          warn(`Scene ${i} is ${dur.toFixed(1)}s (max recommended: ~40s) — consider splitting`);
+        }
+      }
+
       ok(`${sBounds.length} scenes, boundaries checked`);
+    }
+  }
+
+  // Attribution footer
+  if (!html.includes('site-footer')) {
+    err('Attribution footer missing — add <footer class="site-footer"> before <script>');
+  }
+
+  // data-theme attribute
+  if (!/data-theme="[a-z-]+"/.test(html)) {
+    err('Missing data-theme attribute on <body> — theme CSS will not activate');
+  }
+
+  // ctx.canvas.width/height usage (should use VW/VH instead)
+  if (/ctx\.canvas\.(width|height)/.test(html)) {
+    err('Uses ctx.canvas.width/height — use VW/VH from canvas.js instead (breaks on retina)');
+  }
+
+  // Lesson ID consistency between HTML and content.json
+  const htmlLessonId = html.match(/lessonId:\s*["']([^"']+)["']/)?.[1];
+  if (htmlLessonId && meta?.lessonId && htmlLessonId !== meta.lessonId) {
+    err(`Lesson ID mismatch: HTML has "${htmlLessonId}", content.json has "${meta.lessonId}"`);
+  }
+
+  // Back-to-back quiz check
+  const ixData = parseInteractions(html);
+  for (let i = 1; i < ixData.length; i++) {
+    if (ixData[i].cat === 'q' && ixData[i - 1].cat === 'q') {
+      warn(`Interactions ${i - 1} and ${i} are both quizzes — consider varying types`);
     }
   }
 

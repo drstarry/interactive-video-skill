@@ -228,7 +228,16 @@ const sceneElements = {
       h: 500,
       fill: "rgba(192,57,43,0.06)",
       stroke: "#c0392b",
-      label: "Result",
+      // No label here — use a separate text element as heading instead
+    },
+    {
+      type: "text",
+      x: 960,
+      y: 330,
+      text: "Result",
+      font: '600 24px "DM Sans"',
+      color: "#c0392b",
+      revealAt: 0.2,
     },
     {
       type: "text",

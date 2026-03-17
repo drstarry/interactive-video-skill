@@ -88,6 +88,30 @@ Pick the highest row that fits the content:
 
 **Stem rewrite test:** "What is X?" → try "Why does X?" or "What happens if X?". If the rewrite doesn't work, the content may not need an interaction.
 
+## Canvas text spacing
+
+Minimum distances between text elements on canvas:
+
+| Between | Min gap |
+|---------|---------|
+| Body text lines (16-18px font) | 32px |
+| Heading text lines (20px+ font) | 40px |
+| Heading → body text | 50px |
+
+Boxes (`rect`) must be tall enough to contain their text with these gaps. Example: 4 lines of 18px text at 32px spacing = `4×32 + 40 = 168px` height minimum.
+
+**Never use `rect` `label` with text inside the box.** The engine renders `label` at the vertical center of the rect, which overlaps with any text elements positioned inside. Instead, remove `label` and add an explicit `text` element near the top of the rect as a heading.
+
+## Length targets
+
+| Length | Duration | Guidance |
+|--------|----------|----------|
+| **quick** | ~2-3 min | Hit the highlights. One key idea per topic. |
+| **standard** | ~5-6 min | Explain each topic with one example. |
+| **deep** | ~8-10 min | Multiple examples, edge cases, connections between topics. |
+
+Self-check: estimate audio duration before writing. If it feels thin for the selected length, add depth.
+
 ## Animation rules
 
 - **One focal point per beat.** Dim non-active areas to 40-60% opacity.
