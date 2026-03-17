@@ -24,6 +24,7 @@ Parse `$ARGUMENTS` for source (URL, file, topic, or "codebase"), scope hints ("f
 - **Scene boundaries must be strictly sequential** — each scene's `s` must equal the previous scene's `e`. No gaps, no overlaps.
 - **Canvas text spacing minimums:** 32px between lines of body text (16-18px font), 40px between lines of heading text (20px+ font), 50px between a heading and body text. Boxes must be tall enough to contain their text with these gaps.
 - **Never use `rect` `label` with text inside the box.** The engine renders `label` at the vertical center of the rect, which overlaps with any text elements positioned inside. Instead, remove `label` and add an explicit `text` element near the top of the rect as a heading.
+- **Always include the attribution footer** from `page-template.md` — the `<footer class="site-footer">` block goes after `.wrap` and before `<script>`. Do not omit it.
 
 ## Quality principles (the "why" behind good walkthroughs)
 
