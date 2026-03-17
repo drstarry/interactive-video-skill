@@ -12,7 +12,7 @@ import { readFileSync, existsSync, writeFileSync } from 'fs';
 import { join, resolve, dirname } from 'path';
 import { execFileSync } from 'child_process';
 import { fileURLToPath } from 'url';
-import { parseScenes, parseInteractions } from '../scripts/parse_html.js';
+import { parseScenes, parseInteractions } from './parse_html.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
