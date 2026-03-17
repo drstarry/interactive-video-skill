@@ -26,6 +26,19 @@ Parse `$ARGUMENTS` for source (URL, file, topic, or "codebase"), scope hints ("f
 - **Never use `rect` `label` with text inside the box.** The engine renders `label` at the vertical center of the rect, which overlaps with any text elements positioned inside. Instead, remove `label` and add an explicit `text` element near the top of the rect as a heading.
 - **Always include the attribution footer** from `page-template.md` — the `<footer class="site-footer">` block goes after `.wrap` and before `<script>`. Do not omit it.
 
+## Gotchas (common failures — check these before finalizing)
+
+- **Scenes too short for narration.** Estimate ~150 words/minute. A 200-word narration segment needs ~80s, not 30s. If scenes feel rushed, you under-estimated.
+- **Too many text elements per scene.** 3-4 text elements is the sweet spot. More than 5 creates visual clutter — split into two scenes instead.
+- **`globalAlpha` not reset.** If you set `ctx.globalAlpha` in a custom draw function, always reset to `1` at the end. Otherwise it bleeds into the next scene.
+- **Hardcoded colors instead of theme palette.** Don't use `#ff0000` — pull colors from `styles.json` for the selected theme. Hardcoded colors break when switching themes.
+- **Quiz distractors that are obviously wrong.** "42", "none of the above", or joke answers don't test comprehension. Each distractor should be a plausible misconception.
+- **Multiple quizzes in a row.** Vary interaction types (quiz → sort → categorize → widget). Back-to-back quizzes feel like an exam.
+- **Interaction placed at scene boundary.** Place interactions 1-2 seconds before scene end, not at the exact boundary — gives the player time to pause.
+- **Lesson ID mismatch.** The ID must match in: `createLesson({ lessonId })`, `content.json meta.lessonId`, directory `src/content/{id}/`, and audio `audio/lessons/{id}/`.
+- **Rect boxes too short for content.** Account for font size + line spacing + padding. A box with 4 lines of 18px text at 32px spacing needs at least `4*32 + 40 = 168px` height.
+- **Forgetting `feedback.correct` / `feedback.wrong`** in content.json interactions. The engine shows a blank response without them.
+
 ## Quality principles (the "why" behind good walkthroughs)
 
 - **Research grounds the content.** Verify facts before writing. Calibrate depth to the use case.
@@ -113,13 +126,16 @@ Self-check: estimate audio duration before writing. If it feels thin for the sel
 
 ## Phase 3: GENERATE
 
-**Read all reference files in one parallel message:**
+**Read the reference files you need** (always in one parallel message):
+
+- Always: `page-template.md`, `styles.json`, `engine-contracts.md`
+- For custom draw functions or complex animations: also `render-patterns.md`
 
 ```
 Read(engine-contracts.md)
 Read(page-template.md)
-Read(render-patterns.md)
 Read(styles.json)
+# Read(render-patterns.md) — only if this lesson uses custom draw
 ```
 
 **Write content.json** → `{out}/src/content/{lessonId}/content.json`
@@ -157,3 +173,16 @@ sleep 1 && open "http://localhost:{port}/{lessonId}.html"
 ```
 
 Show the user: title, duration, scene count, interaction count, scene breakdown, files created.
+
+**Optional: visual verification** — skip if it fails (Playwright may not be installed):
+```bash
+cd $SKILL_DIR && npx tsx scripts/visual_verify.ts {lessonId} \
+  --html {out}/{lessonId}.html --out {out}/verify-{lessonId} || true
+```
+If it succeeds, screenshots are saved to `verify-{lessonId}/`. If it fails, continue — the lesson is already validated and served.
+
+**Log the lesson** — append to `${CLAUDE_PLUGIN_DATA}/lessons.json` (create if missing):
+```json
+{ "id": "{lessonId}", "title": "...", "theme": "...", "duration": 0, "scenes": 0, "interactions": 0, "date": "YYYY-MM-DD", "output": "{out}" }
+```
+This lets future invocations see what's been built before.

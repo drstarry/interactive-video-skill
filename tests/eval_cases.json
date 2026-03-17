@@ -1,0 +1,87 @@
+[
+  {
+    "id": "quick-topic",
+    "description": "Quick lesson from a topic string",
+    "prompt": "Make a quick interactive lesson about how DNS resolution works",
+    "expect": {
+      "html_exists": true,
+      "content_json_exists": true,
+      "audio_exists": true,
+      "min_scenes": 2,
+      "max_scenes": 6,
+      "min_interactions": 2,
+      "max_duration_seconds": 240,
+      "has_footer": true,
+      "has_data_theme": true,
+      "scene_boundaries_valid": true,
+      "no_validation_errors": true,
+      "interaction_types_varied": true
+    }
+  },
+  {
+    "id": "standard-url",
+    "description": "Standard lesson from a URL source",
+    "prompt": "Turn https://en.wikipedia.org/wiki/Sorting_algorithm into a standard interactive walkthrough",
+    "expect": {
+      "html_exists": true,
+      "content_json_exists": true,
+      "audio_exists": true,
+      "min_scenes": 4,
+      "max_scenes": 12,
+      "min_interactions": 3,
+      "min_duration_seconds": 240,
+      "max_duration_seconds": 480,
+      "has_footer": true,
+      "has_data_theme": true,
+      "scene_boundaries_valid": true,
+      "no_validation_errors": true,
+      "theme_colors_from_palette": true
+    }
+  },
+  {
+    "id": "deep-file",
+    "description": "Deep lesson from a local file",
+    "prompt": "Create a deep interactive explainer from ./README.md",
+    "expect": {
+      "html_exists": true,
+      "content_json_exists": true,
+      "audio_exists": true,
+      "min_scenes": 6,
+      "min_interactions": 4,
+      "min_duration_seconds": 400,
+      "max_duration_seconds": 720,
+      "has_footer": true,
+      "has_data_theme": true,
+      "scene_boundaries_valid": true,
+      "no_validation_errors": true,
+      "has_custom_draw": true
+    }
+  },
+  {
+    "id": "codebase-mode",
+    "description": "Lesson from codebase exploration",
+    "prompt": "Make an interactive onboarding walkthrough of this codebase",
+    "expect": {
+      "html_exists": true,
+      "content_json_exists": true,
+      "audio_exists": true,
+      "min_scenes": 3,
+      "min_interactions": 2,
+      "has_footer": true,
+      "has_data_theme": true,
+      "scene_boundaries_valid": true,
+      "no_validation_errors": true
+    }
+  },
+  {
+    "id": "should-not-trigger",
+    "description": "Prompts that should NOT trigger this skill",
+    "negative_prompts": [
+      "Create a PowerPoint presentation",
+      "Record my screen",
+      "Make a slideshow of photos",
+      "Generate a PDF report",
+      "Build me a REST API"
+    ]
+  }
+]

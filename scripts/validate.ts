@@ -6,6 +6,7 @@
 
 import { readFileSync, existsSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { parseScenes } from './parse_html.js';
 
 const args = process.argv.slice(2);
 const lessonId = args[0];
@@ -102,13 +103,12 @@ if (!existsSync(htmlPath)) {
   const html = readFileSync(htmlPath, 'utf-8');
 
   // Scene boundaries
-  const scenesMatch = html.match(/const scenes\s*=\s*\[([\s\S]*?)\];/);
-  if (!scenesMatch) {
+  const scenes = parseScenes(html);
+  if (!scenes) {
     warn('Could not parse scenes array from HTML');
   } else {
-    const sceneText = scenesMatch[1];
-    const sBounds = [...sceneText.matchAll(/s:\s*([\d.]+)/g)].map(m => parseFloat(m[1]));
-    const eBounds = [...sceneText.matchAll(/e:\s*([\d.]+)/g)].map(m => parseFloat(m[1]));
+    const sBounds = scenes.starts;
+    const eBounds = scenes.ends;
 
     if (sBounds.length !== eBounds.length) {
       err('Scene s/e count mismatch');
