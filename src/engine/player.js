@@ -227,6 +227,13 @@ export function createPlayer({
       }
     }
 
+    // Reset narration state so the next segment plays correctly.
+    // Mark current segment as spoken to avoid replaying it from the start.
+    const ni = getNI(time);
+    lastSpoke = ni;
+    currentNarIdx = -1;
+    waitingForAudio = false;
+
     playing = true;
     lastTs = null;
     updatePlayIcon(true);
@@ -263,9 +270,37 @@ export function createPlayer({
   function seek(pct) {
     if (activeIx) return;
     stopAudio();
-    lastSpoke = -1;
-    currentNarIdx = -1;
     time = Math.max(0, Math.min(pct * duration, duration));
+    const ni = getNI(time);
+
+    // If the current segment is linked to an undone quiz, trigger it directly.
+    // Otherwise mark it as spoken so we skip to the next segment boundary.
+    if (ni >= 0 && narToIx.has(ni) && !done.has(narToIx.get(ni).id)) {
+      lastSpoke = ni;
+      currentNarIdx = -1;
+      renderFrame();
+      updateUI();
+      showIx(narToIx.get(ni));
+      return;
+    }
+
+    // Also check if we landed right on an unlinked interaction
+    if (interactions) {
+      for (const ix of interactions) {
+        if (linkedIx.has(ix.id)) continue;
+        if (!done.has(ix.id) && time >= ix.time - 0.5 && time <= ix.time + 1) {
+          lastSpoke = ni;
+          currentNarIdx = -1;
+          renderFrame();
+          updateUI();
+          showIx(ix);
+          return;
+        }
+      }
+    }
+
+    lastSpoke = ni;
+    currentNarIdx = -1;
     renderFrame();
     updateUI();
   }
@@ -334,8 +369,10 @@ export function createPlayer({
   function seekToIx(ix, mt, e) {
     if (e) e.stopPropagation();
     if (activeIx) return;
-    pause(); stopAudio(); lastSpoke = -1;
-    time = mt; renderFrame(); updateUI();
+    pause(); stopAudio();
+    time = mt;
+    lastSpoke = getNI(time);
+    renderFrame(); updateUI();
     if (!done.has(ix.id)) showIx(ix);
   }
 

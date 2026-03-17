@@ -1,0 +1,278 @@
+{
+  "meta": {
+    "lessonId": "skill-best-practices",
+    "voice": "en-US-AvaNeural",
+    "rate": "+5%",
+    "gap": 1.2,
+    "duration": 488,
+    "audioGenerated": true
+  },
+  "narration": [
+    {
+      "t": 1.2,
+      "text": "Skills have become one of the most powerful extension points in Claude Code. They let you encode expertise, automate workflows, and share best practices across your team. But writing a great skill is harder than it looks. In this walkthrough, we'll cover the nine types of skills, the techniques that make them effective, how to test them with evals, and how to distribute them at scale."
+    },
+    {
+      "t": 24.34,
+      "text": "Let's start with the big picture. After cataloging hundreds of skills in active use at Anthropic, a clear taxonomy emerged. Skills cluster into nine recurring categories, and the best ones fit cleanly into one. The more confusing skills tend to straddle several."
+    },
+    {
+      "t": 41.86,
+      "text": "The first category is Library and API Reference. These skills explain how to correctly use a library, CLI, or SDK. They often include a folder of code snippets and a list of gotchas. Think of your internal billing library with its edge cases, or a CLI wrapper with examples for every subcommand."
+    },
+    {
+      "t": 62.83,
+      "text": "Second is Product Verification. These skills describe how to test or verify that code actually works. They're often paired with tools like Playwright or tmux. The article emphasizes that verification skills are extremely valuable. Having Claude record a video of its output or enforce programmatic assertions at each step catches issues that code review misses."
+    },
+    {
+      "t": 85.87,
+      "text": "Third, Data Fetching and Analysis. These connect to your data and monitoring stacks. They might include libraries to fetch data with credentials, specific dashboard IDs, and instructions for common query workflows."
+    },
+    {
+      "t": 100.8,
+      "text": "Fourth is Business Process and Team Automation. These automate repetitive workflows into one command. A standup post skill that aggregates your ticket tracker, GitHub activity, and Slack into a formatted update. Or a ticket creation skill that enforces schema validation and post-creation workflows."
+    },
+    {
+      "t": 120.41,
+      "text": "Fifth, Code Scaffolding and Templates. These generate boilerplate for specific patterns in your codebase. They're especially useful when your scaffolding has natural language requirements that pure code templates can't cover."
+    },
+    {
+      "t": 134.21,
+      "text": "Sixth is Code Quality and Review. Skills that enforce your org's code standards. These can include deterministic scripts or tools for maximum robustness. You might run them automatically as part of hooks or inside GitHub Actions."
+    },
+    {
+      "t": 149.59,
+      "text": "Seventh, CI/CD and Deployment. Skills that help you fetch, push, and deploy code. A babysit PR skill that monitors a pull request, retries flaky CI, resolves merge conflicts, and enables auto-merge."
+    },
+    {
+      "t": 165.74,
+      "text": "Eighth is Runbooks. These take a symptom, like a Slack thread or alert, walk through a multi-tool investigation, and produce a structured report. Think of a service debugging skill that maps symptoms to tools to query patterns for your highest-traffic services."
+    },
+    {
+      "t": 182.54,
+      "text": "And ninth, Infrastructure Operations. Skills that perform routine maintenance, some involving destructive actions that benefit from guardrails. Like finding orphaned pods, posting to Slack for a soak period, then cleaning up after user confirmation.",
+      "endsBeforeIx": "try-skill-types"
+    },
+    {
+      "t": 198.86,
+      "text": "Now let's talk about what makes a skill great. The single highest-signal content in any skill is the Gotchas section. These should be built from common failure points. Every time Claude hits an edge case, that's a future gotcha. Ideally, you update your skill over time to capture these."
+    },
+    {
+      "t": 216.36,
+      "text": "A common misconception is that skills are just markdown files. The most interesting part of skills is that they're folders. You should think of the entire file system as a form of context engineering and progressive disclosure. Tell Claude what files are in your skill, and it will read them at appropriate times. Split detailed function signatures into references. Put templates in assets. Include scripts Claude can execute."
+    },
+    {
+      "t": 242.47,
+      "text": "The description field is critical, and it's not for humans. When Claude Code starts a session, it builds a listing of every available skill with its description. This listing is what Claude scans to decide whether a skill matches a request. So the description is a trigger description, not a summary. Write it for matching accuracy."
+    },
+    {
+      "t": 263.26,
+      "text": "Give Claude flexibility. Skills are reusable, so being too specific in your instructions causes problems. Give Claude the information it needs, but let it adapt to the situation. A rigid step-by-step script breaks when context varies. Instead, provide goals, constraints, and reference material.",
+      "endsBeforeIx": "q-writing-tips"
+    },
+    {
+      "t": 283.22,
+      "text": "Two more powerful techniques. First, skills can store data. Use append-only logs or JSON files within the skill directory. A standup skill that keeps a log of every post means Claude can read its own history and tell what's changed since yesterday. Use the CLAUDE_PLUGIN_DATA folder for stable storage that survives upgrades."
+    },
+    {
+      "t": 305.18,
+      "text": "Second, on-demand hooks. Skills can include session-scoped hooks that activate only when the skill is called. A careful hook that blocks destructive commands when you're touching production. A freeze hook that blocks edits outside a specific directory. These are too opinionated to run all the time, but extremely useful sometimes.",
+      "endsBeforeIx": "try-sort-techniques"
+    },
+    {
+      "t": 325.92,
+      "text": "Now let's talk about testing. The Skill Creator tool from Anthropic added evals, benchmarking, and A/B comparison. Evals function as tests. You define test prompts with expected outputs, and the tool validates performance."
+    },
+    {
+      "t": 341.42,
+      "text": "There are two key applications. First, catching quality regressions. As models and infrastructure evolve, previously functional skills may behave differently. Running evals against new model versions provides early warning before the team is affected."
+    },
+    {
+      "t": 357.62,
+      "text": "Second, detecting obsolescence. If the base model passes your evals without the skill loaded, that's a signal the skill's techniques may have been absorbed into the model's default behavior. The skill might be ready to retire."
+    },
+    {
+      "t": 372.02,
+      "text": "Benchmark mode tracks three metrics: eval pass rate, elapsed time, and token usage. Multi-agent support runs evals in parallel with independent contexts, eliminating cross-contamination between test runs. And comparator agents enable blind A/B testing between skill versions.",
+      "endsBeforeIx": "q-testing"
+    },
+    {
+      "t": 391.08,
+      "text": "There are two fundamental categories of skills that require different testing strategies. Capability uplift skills teach Claude techniques it cannot do consistently on its own. These may become unnecessary as models improve. Encoded preference skills sequence existing capabilities according to your organization's workflows. These are more durable over time.",
+      "endsBeforeIx": "try-categorize-skills"
+    },
+    {
+      "t": 413.21,
+      "text": "Finally, distribution. For smaller teams, check skills into your repo under dot claude slash skills. Every checked-in skill adds a little context to the model. As you scale, an internal plugin marketplace lets your team choose which skills to install."
+    },
+    {
+      "t": 429.86,
+      "text": "For measurement, use a PreToolUse hook that logs skill usage. This means you can find skills that are popular or that are under-triggering compared to expectations. The description optimization feature in Skill Creator can analyze your descriptions against sample prompts and reduce false positives and false negatives."
+    },
+    {
+      "t": 449.09,
+      "text": "Skills can also compose with each other. Reference other skills by name, and the model will invoke them if installed. Dependency management isn't built into marketplaces yet, but the model handles cross-skill references naturally.",
+      "endsBeforeIx": "q-distribution"
+    },
+    {
+      "t": 463.56,
+      "text": "Let's wrap up. The best skills started as a few lines and a single gotcha, then got better because people kept adding to them as Claude hit new edge cases. Think of this as a grab bag of useful tips that work, not a definitive guide. The best way to understand skills is to start experimenting and see what works for you."
+    }
+  ],
+  "interactions": {
+    "try-skill-types": {
+      "time": 197.66,
+      "title": "Match the Skill Types",
+      "desc": "Drag each scenario into the right category.",
+      "widget": "categorize",
+      "categories": [
+        {
+          "label": "Verification",
+          "items": [
+            "Playwright signup flow driver",
+            "Checkout test with Stripe cards"
+          ]
+        },
+        {
+          "label": "Automation",
+          "items": [
+            "Standup post aggregator",
+            "Weekly recap generator"
+          ]
+        },
+        {
+          "label": "Runbook",
+          "items": [
+            "Service debugging mapper",
+            "Log correlator by request ID"
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Nice!",
+          "body": "You can tell the type by its primary purpose: testing output, automating a workflow, or investigating a problem."
+        },
+        "wrong": {
+          "title": "Close",
+          "body": "Verification skills test correctness. Automation skills run workflows. Runbooks investigate symptoms."
+        }
+      }
+    },
+    "q-writing-tips": {
+      "time": 282.03,
+      "title": "Skill Writing Best Practice",
+      "desc": "What is the highest-signal content in any skill?",
+      "options": [
+        "A comprehensive API reference",
+        "A gotchas section built from real failure points",
+        "A detailed step-by-step workflow"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Exactly!",
+          "body": "Gotchas capture what Claude actually gets wrong. Every correction is a future gotcha entry."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "API references and workflows are useful, but the gotchas section is the highest-signal content because it directly addresses failure modes."
+        }
+      }
+    },
+    "try-sort-techniques": {
+      "time": 324.72,
+      "title": "Order the Skill Layers",
+      "desc": "Drag to arrange from outermost to innermost.",
+      "widget": "sort",
+      "sortItems": [
+        "Description field (model trigger)",
+        "SKILL.md (top-level instructions)",
+        "Reference files (progressive disclosure)",
+        "Scripts and libraries (composable code)",
+        "On-demand hooks (session-scoped behavior)"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Perfect!",
+          "body": "The description triggers the skill, SKILL.md provides the plan, references add depth, scripts add capability, and hooks add guardrails."
+        },
+        "wrong": {
+          "title": "Check the order",
+          "body": "Think of it as layers: the model first sees the description, then reads SKILL.md, then discovers deeper files, scripts, and hooks."
+        }
+      }
+    },
+    "q-testing": {
+      "time": 389.88,
+      "title": "Eval Strategy",
+      "desc": "When should you consider retiring a skill?",
+      "options": [
+        "When the skill hasn't been used in a week",
+        "When the base model passes your evals without the skill loaded",
+        "When a newer model version is released"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Right!",
+          "body": "If the base model produces correct output without the skill, the skill's techniques may have been absorbed into default behavior."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "Low usage or new models alone don't mean a skill is obsolete. The signal is when the base model passes your evals without the skill loaded."
+        }
+      }
+    },
+    "try-categorize-skills": {
+      "time": 412.01,
+      "title": "Classify Skill Types",
+      "desc": "Drag each skill into the right category.",
+      "widget": "categorize",
+      "categories": [
+        {
+          "label": "Capability Uplift",
+          "items": [
+            "Frontend design taste",
+            "Canvas animation techniques"
+          ]
+        },
+        {
+          "label": "Encoded Preference",
+          "items": [
+            "NDA review workflow",
+            "Standup post formatting"
+          ]
+        }
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Correct!",
+          "body": "Uplift skills teach new techniques. Preference skills encode existing workflows. Uplift skills may become obsolete; preference skills are more durable."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "Capability uplift teaches Claude something new. Encoded preference sequences things Claude can already do."
+        }
+      }
+    },
+    "q-distribution": {
+      "time": 462.36,
+      "title": "Distribution Strategy",
+      "desc": "What's the recommended way to optimize a skill's trigger accuracy?",
+      "options": [
+        "Add more keywords to the description field",
+        "Use Skill Creator to analyze descriptions against sample prompts",
+        "Make the description longer and more detailed"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Exactly!",
+          "body": "Skill Creator's description optimizer tests against real prompts to reduce false positives and negatives. It improved triggering on 5 of 6 public skills."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "Adding keywords or length can actually hurt precision. The optimizer analyzes against real prompts to find the right balance."
+        }
+      }
+    }
+  }
+}

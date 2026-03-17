@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net;
+      font-src https://fonts.gstatic.com;
+      media-src 'self';
+      img-src 'self' data:;
+    " />
+    <title>Agent Skill Best Practices — Interactive Tutorial</title>
+    <link rel="stylesheet" href="src/lesson.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <style>
+      :root {
+        --bg: #e2d6c0;
+        --bg-card: #d8ccb4;
+        --bg-el: #cec2aa;
+        --bg-ov: rgba(226,214,192,0.96);
+        --surface: #d8ccb4;
+        --border: #bab0a0;
+        --text: #3a3020;
+        --text2: #7a6e58;
+        --accent: #c85a28;
+        --acc-dim: #983e18;
+        --acc-glow: rgba(200,90,40,0.06);
+        --grn: #4a7a38;
+        --warm: #c85a28;
+        --cool: #4a6a8a;
+        --red: #b84028;
+        --sans: 'DM Sans', -apple-system, sans-serif;
+        --mono: 'JetBrains Mono', monospace;
+        --serif: 'DM Sans', -apple-system, sans-serif;
+      }
+    </style>
+  </head>
+  <body data-theme="studio">
+    <nav class="site-nav">
+      <a class="site-nav-brand" href="https://github.com/drstarry/interactive-video-skill">Interactive Video Skill</a>
+      <div class="site-nav-links">
+        <a href="skill-onboarding.html">Onboarding [theme: Chalkboard]</a>
+        <a href="git-rebase.html">Git Rebase [theme: Terminal]</a>
+        <a href="writing-systems.html">Writing [theme: Notebook]</a>
+        <a href="dns-resolution.html">DNS [theme: Blueprint]</a>
+        <a href="rust-ownership.html">Rust [theme: Clean Dark]</a>
+        <a href="vaccines.html">Vaccines [theme: Clean Light]</a>
+        <a href="skill-best-practices.html" class="active">Skills [theme: Studio]</a>
+        <a href="harness-engineering.html">Harness [theme: Focus]</a>
+      </div>
+    </nav>
+
+    <div class="wrap">
+      <div class="hdr">
+        <h1>Agent Skill Best Practices</h1>
+        <p class="sub">Design, test, and distribute skills that make Claude Code better.</p>
+      </div>
+
+      <div class="vid-wrap">
+        <canvas id="cvs"></canvas>
+        <div class="scn-label" id="scn-label"></div>
+        <div class="math-layer" id="math-layer"></div>
+        <div class="ov" id="ov">
+          <div class="top-badge" id="badge"></div>
+          <div class="card" id="card"></div>
+        </div>
+      </div>
+
+      <div class="ctl">
+        <button id="btn-play">
+          <svg id="play-icon" viewBox="0 0 24 24">
+            <polygon points="5,3 19,12 5,21" />
+          </svg>
+        </button>
+        <span class="tl" id="t-cur">0:00</span>
+        <span class="sep">/</span>
+        <span class="tl" id="t-dur">0:00</span>
+        <div class="tbar" id="tbar">
+          <div class="fill" id="tprog"></div>
+          <div class="scrub" id="tscrub"></div>
+        </div>
+        <button class="mute" id="btn-mute">Narration: On</button>
+        <button class="fs" id="btn-fs">Fullscreen</button>
+      </div>
+
+      <div class="scores" id="scores"></div>
+      <div class="chapters-header">Chapters</div>
+      <div id="chapters"></div>
+    </div>
+
+    <footer class="site-footer">
+      <a href="https://github.com/drstarry/interactive-video-skill" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        Generated with Interactive Video Skill
+      </a>
+    </footer>
+
+    <script type="module">
+      import { createLesson } from "./src/engine/lesson.js";
+      import { createSceneRenderer } from "./src/engine/scene-renderer.js";
+      import { VW, VH } from "./src/engine/canvas.js";
+
+      // ===== SCENE DATA (16 scenes) =====
+      const scenes = [
+        { s: 0,      e: 24.34,  label: "Welcome",               bg: "welcome" },
+        { s: 24.34,  e: 41.86,  label: "The Taxonomy",           bg: "taxonomy" },
+        { s: 41.86,  e: 85.87,  label: "Library & Verification", bg: "lib-verify" },
+        { s: 85.87,  e: 120.41, label: "Data & Automation",      bg: "data-auto" },
+        { s: 120.41, e: 149.59, label: "Scaffolding & Quality",  bg: "scaffold-quality" },
+        { s: 149.59, e: 182.54, label: "CI/CD & Runbooks",       bg: "cicd-runbooks" },
+        { s: 182.54, e: 197.66, label: "Infrastructure",         bg: "infra" },
+        { s: 197.66, e: 242.47, label: "The Gotchas Section",    bg: "gotchas" },
+        { s: 242.47, e: 282.03, label: "Description & Flexibility", bg: "desc-flex" },
+        { s: 282.03, e: 324.72, label: "Memory & Hooks",         bg: "memory-hooks" },
+        { s: 324.72, e: 357.62, label: "Evals as Tests",         bg: "evals" },
+        { s: 357.62, e: 389.88, label: "Benchmarks & A/B",       bg: "benchmarks" },
+        { s: 389.88, e: 412.01, label: "Uplift vs Preference",   bg: "uplift-pref" },
+        { s: 412.01, e: 449.09, label: "Distribution",           bg: "distribution" },
+        { s: 449.09, e: 462.36, label: "Measurement",            bg: "measurement" },
+        { s: 462.36, e: 488,    label: "Conclusion",             bg: "conclusion" },
+      ];
+
+      const IX = [
+        { id: "try-skill-types", time: 197.66, cat: "try", title: "Match the Skill Types", desc: "Drag each scenario into the right category." },
+        { id: "q-writing-tips", time: 282.03, cat: "q", title: "Skill Writing Best Practice", desc: "What is the highest-signal content in any skill?",
+          options: [{ k: "A", c: false }, { k: "B", c: true }, { k: "C", c: false }] },
+        { id: "try-sort-techniques", time: 324.72, cat: "try", title: "Order the Skill Layers", desc: "Drag to arrange from outermost to innermost." },
+        { id: "q-testing", time: 389.88, cat: "q", title: "Eval Strategy", desc: "When should you consider retiring a skill?",
+          options: [{ k: "A", c: false }, { k: "B", c: true }, { k: "C", c: false }] },
+        { id: "try-categorize-skills", time: 412.01, cat: "try", title: "Classify Skill Types", desc: "Drag each skill into the right category." },
+        { id: "q-distribution", time: 462.36, cat: "q", title: "Distribution Strategy", desc: "What's the recommended way to optimize a skill's trigger accuracy?",
+          options: [{ k: "A", c: false }, { k: "B", c: true }, { k: "C", c: false }] },
+      ];
+
+      // ===== DECLARATIVE ELEMENTS =====
+      const CX = VW / 2;
+      const CY = VH / 2;
+
+      const sceneElements = {
+
+        // --- Scene 1: Welcome (0 - 24.34s) ---
+        // Narration t=1.2: "Skills have become one of the most powerful extension points...
+        //   encode expertise, automate workflows, share best practices...
+        //   nine types, techniques, evals, distribute at scale"
+        "welcome": [
+          { type: "glow", x: CX, y: CY - 40, radius: 500, color: "rgba(200,90,40,0.06)" },
+          { type: "text", x: CX, y: 180, text: "Agent Skill Best Practices",
+            font: '700 64px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center" },
+          { type: "rule", x1: CX - 120, y1: 240, x2: CX + 120, y2: 240,
+            color: "#c85a28", width: 3, revealAt: 0.08 },
+          { type: "text", x: CX, y: 300, text: "The most powerful extension point in Claude Code",
+            font: '400 28px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.12 },
+          // Four pillars revealed as narration lists them
+          { type: "rect", x: 160, y: 380, w: 360, h: 120,
+            fill: "rgba(200,90,40,0.04)", stroke: "#c85a28", lineWidth: 2, revealAt: 0.3 },
+          { type: "text", x: 340, y: 430, text: "Encode expertise",
+            font: '600 28px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.3 },
+          { type: "text", x: 340, y: 468, text: "Domain knowledge on tap",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.3 },
+          { type: "rect", x: 580, y: 380, w: 360, h: 120,
+            fill: "rgba(74,122,56,0.04)", stroke: "#4a7a38", lineWidth: 2, revealAt: 0.4 },
+          { type: "text", x: 760, y: 430, text: "Automate workflows",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a7a38", textAlign: "center", revealAt: 0.4 },
+          { type: "text", x: 760, y: 468, text: "Repeatable multi-step tasks",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.4 },
+          { type: "rect", x: 1000, y: 380, w: 360, h: 120,
+            fill: "rgba(74,106,138,0.04)", stroke: "#4a6a8a", lineWidth: 2, revealAt: 0.5 },
+          { type: "text", x: 1180, y: 430, text: "Share best practices",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a6a8a", textAlign: "center", revealAt: 0.5 },
+          { type: "text", x: 1180, y: 468, text: "Across your whole team",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.5 },
+          { type: "rect", x: 1420, y: 380, w: 360, h: 120,
+            fill: "rgba(200,90,40,0.04)", stroke: "#bab0a0", lineWidth: 2, revealAt: 0.6 },
+          { type: "text", x: 1600, y: 430, text: "Distribute at scale",
+            font: '600 28px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.6 },
+          { type: "text", x: 1600, y: 468, text: "From repo to marketplace",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.6 },
+          // Bottom summary
+          { type: "rule", x1: 300, y1: 560, x2: 1620, y2: 560,
+            color: "#bab0a0", width: 1, revealAt: 0.72 },
+          { type: "text", x: CX, y: 610, text: "9 types  +  techniques  +  evals  +  distribution",
+            font: '400 22px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.75 },
+        ],
+
+        // --- Scene 2: The Taxonomy (24.34 - 41.86s, 17.52s)
+        // Narration t=24.34: "hundreds of skills... clear taxonomy... nine recurring categories
+        //   best ones fit cleanly into one... confusing skills straddle several"
+        "taxonomy": [
+          { type: "text", x: CX, y: 160, text: "The Taxonomy",
+            font: '700 56px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center" },
+          { type: "rule", x1: CX - 100, y1: 210, x2: CX + 100, y2: 210,
+            color: "#c85a28", width: 3, revealAt: 0.08 },
+          { type: "text", x: CX, y: 270, text: "Hundreds of skills cataloged at Anthropic",
+            font: '400 26px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.15 },
+          // The 9 categories in a 3x3 grid
+          { type: "rect", x: 220, y: 330, w: 380, h: 80,
+            fill: "rgba(200,90,40,0.04)", stroke: "#c85a28", lineWidth: 1, revealAt: 0.25 },
+          { type: "text", x: 410, y: 378, text: "1. Library & API",
+            font: '500 22px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.25 },
+          { type: "rect", x: 660, y: 330, w: 380, h: 80,
+            fill: "rgba(74,106,138,0.04)", stroke: "#4a6a8a", lineWidth: 1, revealAt: 0.3 },
+          { type: "text", x: 850, y: 378, text: "2. Verification",
+            font: '500 22px "DM Sans", sans-serif', color: "#4a6a8a", textAlign: "center", revealAt: 0.3 },
+          { type: "rect", x: 1100, y: 330, w: 380, h: 80,
+            fill: "rgba(74,122,56,0.04)", stroke: "#4a7a38", lineWidth: 1, revealAt: 0.35 },
+          { type: "text", x: 1290, y: 378, text: "3. Data & Analysis",
+            font: '500 22px "DM Sans", sans-serif', color: "#4a7a38", textAlign: "center", revealAt: 0.35 },
+          { type: "rect", x: 220, y: 430, w: 380, h: 80,
+            fill: "rgba(200,90,40,0.04)", stroke: "#c85a28", lineWidth: 1, revealAt: 0.4 },
+          { type: "text", x: 410, y: 478, text: "4. Automation",
+            font: '500 22px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.4 },
+          { type: "rect", x: 660, y: 430, w: 380, h: 80,
+            fill: "rgba(74,106,138,0.04)", stroke: "#4a6a8a", lineWidth: 1, revealAt: 0.45 },
+          { type: "text", x: 850, y: 478, text: "5. Scaffolding",
+            font: '500 22px "DM Sans", sans-serif', color: "#4a6a8a", textAlign: "center", revealAt: 0.45 },
+          { type: "rect", x: 1100, y: 430, w: 380, h: 80,
+            fill: "rgba(74,122,56,0.04)", stroke: "#4a7a38", lineWidth: 1, revealAt: 0.5 },
+          { type: "text", x: 1290, y: 478, text: "6. Code Quality",
+            font: '500 22px "DM Sans", sans-serif', color: "#4a7a38", textAlign: "center", revealAt: 0.5 },
+          { type: "rect", x: 220, y: 530, w: 380, h: 80,
+            fill: "rgba(200,90,40,0.04)", stroke: "#c85a28", lineWidth: 1, revealAt: 0.55 },
+          { type: "text", x: 410, y: 578, text: "7. CI/CD",
+            font: '500 22px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.55 },
+          { type: "rect", x: 660, y: 530, w: 380, h: 80,
+            fill: "rgba(74,106,138,0.04)", stroke: "#4a6a8a", lineWidth: 1, revealAt: 0.6 },
+          { type: "text", x: 850, y: 578, text: "8. Runbooks",
+            font: '500 22px "DM Sans", sans-serif', color: "#4a6a8a", textAlign: "center", revealAt: 0.6 },
+          { type: "rect", x: 1100, y: 530, w: 380, h: 80,
+            fill: "rgba(74,122,56,0.04)", stroke: "#4a7a38", lineWidth: 1, revealAt: 0.65 },
+          { type: "text", x: 1290, y: 578, text: "9. Infrastructure",
+            font: '500 22px "DM Sans", sans-serif', color: "#4a7a38", textAlign: "center", revealAt: 0.65 },
+          // Bottom insight
+          { type: "rule", x1: 400, y1: 660, x2: 1520, y2: 660,
+            color: "#bab0a0", width: 1, revealAt: 0.75 },
+          { type: "text", x: CX, y: 710, text: "Best skills fit cleanly into one category",
+            font: '500 24px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.78 },
+          { type: "text", x: CX, y: 752, text: "Confusing skills tend to straddle several",
+            font: '400 20px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.85 },
+        ],
+
+        // --- Scene 3: Library & Verification (41.86 - 85.87s, 44.01s) ---
+        // t=41.86 (revealAt~0.0): "Library and API Reference... library, CLI, or SDK...
+        //   folder of code snippets and a list of gotchas... billing library... CLI wrapper"
+        // t=62.83 (revealAt~0.476): "Product Verification... Playwright or tmux...
+        //   record a video... programmatic assertions at each step"
+        "lib-verify": [
+          { type: "text", x: CX, y: 90, text: "Skill Types 1 & 2",
+            font: '700 40px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center" },
+          { type: "rule", x1: CX - 80, y1: 130, x2: CX + 80, y2: 130,
+            color: "#c85a28", width: 2, revealAt: 0.03 },
+          // Panel 1: Library & API
+          { type: "rect", x: 120, y: 170, w: 820, h: 480,
+            fill: "rgba(200,90,40,0.04)", stroke: "#c85a28", lineWidth: 2, revealAt: 0.05 },
+          { type: "text", x: 530, y: 220, text: "1. Library & API Reference",
+            font: '600 28px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.07 },
+          { type: "text", x: 530, y: 270, text: "How to correctly use a library, CLI, or SDK",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.1 },
+          { type: "text", x: 530, y: 320, text: "Code snippets + gotchas list",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.18 },
+          { type: "rule", x1: 280, y1: 360, x2: 780, y2: 360,
+            color: "#bab0a0", width: 1, revealAt: 0.22 },
+          { type: "text", x: 530, y: 400, text: "billing-lib with edge cases",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.25 },
+          { type: "text", x: 530, y: 440, text: "CLI wrapper with subcommand examples",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.32 },
+          { type: "text", x: 530, y: 490, text: "Internal SDK with type hints & patterns",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.38 },
+          // Panel 2: Product Verification
+          { type: "rect", x: 980, y: 170, w: 820, h: 480,
+            fill: "rgba(74,106,138,0.04)", stroke: "#4a6a8a", lineWidth: 2, revealAt: 0.47 },
+          { type: "text", x: 1390, y: 220, text: "2. Product Verification",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a6a8a", textAlign: "center", revealAt: 0.48 },
+          { type: "text", x: 1390, y: 270, text: "Test or verify that code actually works",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.52 },
+          { type: "text", x: 1390, y: 320, text: "Extremely valuable -- catches what review misses",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.56 },
+          { type: "rule", x1: 1140, y1: 360, x2: 1640, y2: 360,
+            color: "#bab0a0", width: 1, revealAt: 0.6 },
+          { type: "text", x: 1390, y: 400, text: "Playwright  |  tmux  |  headless browsers",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a6a8a", textAlign: "center", revealAt: 0.63 },
+          { type: "text", x: 1390, y: 440, text: "Record a video of output",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a6a8a", textAlign: "center", revealAt: 0.72 },
+          { type: "text", x: 1390, y: 480, text: "Programmatic assertions at each step",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a6a8a", textAlign: "center", revealAt: 0.8 },
+        ],
+
+        // --- Scene 4: Data & Automation (85.87 - 120.41s, 34.54s) ---
+        // t=85.87 (0.0): "Data Fetching and Analysis... data and monitoring stacks...
+        //   libraries to fetch data with credentials, dashboard IDs, common query workflows"
+        // t=100.8 (0.432): "Business Process and Team Automation... standup post...
+        //   ticket tracker, GitHub activity, Slack... ticket creation... schema validation"
+        "data-auto": [
+          { type: "text", x: CX, y: 90, text: "Skill Types 3 & 4",
+            font: '700 40px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center" },
+          { type: "rule", x1: CX - 80, y1: 130, x2: CX + 80, y2: 130,
+            color: "#c85a28", width: 2, revealAt: 0.03 },
+          // Panel 1: Data Fetching
+          { type: "rect", x: 120, y: 170, w: 820, h: 480,
+            fill: "rgba(74,122,56,0.04)", stroke: "#4a7a38", lineWidth: 2, revealAt: 0.05 },
+          { type: "text", x: 530, y: 220, text: "3. Data Fetching & Analysis",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a7a38", textAlign: "center", revealAt: 0.07 },
+          { type: "text", x: 530, y: 270, text: "Connect to your data and monitoring stacks",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.1 },
+          { type: "rule", x1: 280, y1: 310, x2: 780, y2: 310,
+            color: "#bab0a0", width: 1, revealAt: 0.15 },
+          { type: "text", x: 530, y: 350, text: "Libraries with credentials baked in",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a7a38", textAlign: "center", revealAt: 0.18 },
+          { type: "text", x: 530, y: 390, text: "Specific dashboard IDs",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a7a38", textAlign: "center", revealAt: 0.24 },
+          { type: "text", x: 530, y: 430, text: "Common query workflow instructions",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a7a38", textAlign: "center", revealAt: 0.3 },
+          { type: "text", x: 530, y: 480, text: "Metrics, logs, and analytics pipelines",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.36 },
+          // Panel 2: Business Automation
+          { type: "rect", x: 980, y: 170, w: 820, h: 480,
+            fill: "rgba(200,90,40,0.04)", stroke: "#c85a28", lineWidth: 2, revealAt: 0.43 },
+          { type: "text", x: 1390, y: 220, text: "4. Business Process Automation",
+            font: '600 28px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.45 },
+          { type: "text", x: 1390, y: 270, text: "Automate repetitive workflows into one command",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.5 },
+          { type: "rule", x1: 1140, y1: 310, x2: 1640, y2: 310,
+            color: "#bab0a0", width: 1, revealAt: 0.55 },
+          { type: "text", x: 1390, y: 350, text: "Standup post: tickets + GitHub + Slack",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.58 },
+          { type: "text", x: 1390, y: 390, text: "Aggregates multiple sources into formatted update",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.65 },
+          { type: "text", x: 1390, y: 440, text: "Ticket creation with schema validation",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.75 },
+          { type: "text", x: 1390, y: 480, text: "Post-creation workflow enforcement",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.82 },
+        ],
+
+        // --- Scene 5: Scaffolding & Quality (120.41 - 149.59s, 29.18s) ---
+        // t=120.41 (0.0): "Code Scaffolding and Templates... boilerplate for specific patterns...
+        //   natural language requirements that pure code templates can't cover"
+        // t=134.21 (0.473): "Code Quality and Review... org's code standards...
+        //   deterministic scripts or tools... hooks or inside GitHub Actions"
+        "scaffold-quality": [
+          { type: "text", x: CX, y: 90, text: "Skill Types 5 & 6",
+            font: '700 40px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center" },
+          { type: "rule", x1: CX - 80, y1: 130, x2: CX + 80, y2: 130,
+            color: "#c85a28", width: 2, revealAt: 0.03 },
+          // Panel 1: Code Scaffolding
+          { type: "rect", x: 120, y: 170, w: 820, h: 480,
+            fill: "rgba(74,106,138,0.04)", stroke: "#4a6a8a", lineWidth: 2, revealAt: 0.05 },
+          { type: "text", x: 530, y: 220, text: "5. Code Scaffolding & Templates",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a6a8a", textAlign: "center", revealAt: 0.07 },
+          { type: "text", x: 530, y: 270, text: "Generate boilerplate for specific patterns",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.1 },
+          { type: "text", x: 530, y: 310, text: "in your codebase",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.12 },
+          { type: "rule", x1: 280, y1: 350, x2: 780, y2: 350,
+            color: "#bab0a0", width: 1, revealAt: 0.18 },
+          { type: "text", x: 530, y: 390, text: "Natural language requirements",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a6a8a", textAlign: "center", revealAt: 0.22 },
+          { type: "text", x: 530, y: 430, text: "that pure code templates can't cover",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a6a8a", textAlign: "center", revealAt: 0.28 },
+          { type: "text", x: 530, y: 480, text: "new-component, new-service, new-endpoint",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a6a8a", textAlign: "center", revealAt: 0.36 },
+          // Panel 2: Code Quality
+          { type: "rect", x: 980, y: 170, w: 820, h: 480,
+            fill: "rgba(74,122,56,0.04)", stroke: "#4a7a38", lineWidth: 2, revealAt: 0.47 },
+          { type: "text", x: 1390, y: 220, text: "6. Code Quality & Review",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a7a38", textAlign: "center", revealAt: 0.48 },
+          { type: "text", x: 1390, y: 270, text: "Enforce your org's code standards",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.52 },
+          { type: "rule", x1: 1140, y1: 310, x2: 1640, y2: 310,
+            color: "#bab0a0", width: 1, revealAt: 0.58 },
+          { type: "text", x: 1390, y: 350, text: "Deterministic scripts for robustness",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a7a38", textAlign: "center", revealAt: 0.62 },
+          { type: "text", x: 1390, y: 390, text: "Run via hooks or GitHub Actions",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a7a38", textAlign: "center", revealAt: 0.7 },
+          { type: "text", x: 1390, y: 440, text: "Flag anti-patterns automatically",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.78 },
+          { type: "text", x: 1390, y: 480, text: "PR review checklist enforcement",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.85 },
+        ],
+
+        // --- Scene 6: CI/CD & Runbooks (149.59 - 182.54s, 32.95s) ---
+        // t=149.59 (0.0): "CI/CD and Deployment... fetch, push, deploy code...
+        //   babysit PR skill... monitors, retries flaky CI, resolves merge conflicts, auto-merge"
+        // t=165.74 (0.49): "Runbooks... symptom like Slack thread or alert...
+        //   multi-tool investigation... structured report... service debugging"
+        "cicd-runbooks": [
+          { type: "text", x: CX, y: 90, text: "Skill Types 7 & 8",
+            font: '700 40px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center" },
+          { type: "rule", x1: CX - 80, y1: 130, x2: CX + 80, y2: 130,
+            color: "#c85a28", width: 2, revealAt: 0.03 },
+          // Panel 1: CI/CD
+          { type: "rect", x: 120, y: 170, w: 820, h: 480,
+            fill: "rgba(200,90,40,0.04)", stroke: "#c85a28", lineWidth: 2, revealAt: 0.05 },
+          { type: "text", x: 530, y: 220, text: "7. CI/CD & Deployment",
+            font: '600 28px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.07 },
+          { type: "text", x: 530, y: 270, text: "Fetch, push, and deploy code",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.1 },
+          { type: "rule", x1: 280, y1: 310, x2: 780, y2: 310,
+            color: "#bab0a0", width: 1, revealAt: 0.15 },
+          { type: "text", x: 530, y: 350, text: "babysit-pr skill:",
+            font: '600 18px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.18 },
+          { type: "text", x: 530, y: 390, text: "Monitor PR  |  Retry flaky CI",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.24 },
+          { type: "text", x: 530, y: 430, text: "Resolve merge conflicts",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.3 },
+          { type: "text", x: 530, y: 470, text: "Enable auto-merge when green",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.36 },
+          // Panel 2: Runbooks
+          { type: "rect", x: 980, y: 170, w: 820, h: 480,
+            fill: "rgba(74,106,138,0.04)", stroke: "#4a6a8a", lineWidth: 2, revealAt: 0.49 },
+          { type: "text", x: 1390, y: 220, text: "8. Runbooks",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a6a8a", textAlign: "center", revealAt: 0.5 },
+          { type: "text", x: 1390, y: 270, text: "Symptom in, structured report out",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.54 },
+          { type: "rule", x1: 1140, y1: 310, x2: 1640, y2: 310,
+            color: "#bab0a0", width: 1, revealAt: 0.58 },
+          { type: "text", x: 1390, y: 350, text: "Input: Slack thread or alert",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a6a8a", textAlign: "center", revealAt: 0.6 },
+          { type: "text", x: 1390, y: 390, text: "Multi-tool investigation path",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a6a8a", textAlign: "center", revealAt: 0.67 },
+          { type: "text", x: 1390, y: 440, text: "service-debug: symptom -> tools -> queries",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a6a8a", textAlign: "center", revealAt: 0.75 },
+          { type: "text", x: 1390, y: 480, text: "Maps highest-traffic service patterns",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.85 },
+        ],
+
+        // --- Scene 7: Infrastructure (182.54 - 197.66s, 15.12s) ---
+        // t=182.54 (0.0): "Infrastructure Operations... routine maintenance...
+        //   destructive actions with guardrails... orphaned pods, Slack soak period,
+        //   cleanup after user confirmation"
+        "infra": [
+          { type: "text", x: CX, y: 120, text: "Skill Type 9",
+            font: '700 40px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center" },
+          { type: "rule", x1: CX - 80, y1: 160, x2: CX + 80, y2: 160,
+            color: "#c85a28", width: 2, revealAt: 0.05 },
+          // Single centered panel
+          { type: "rect", x: CX - 440, y: 200, w: 880, h: 500,
+            fill: "rgba(74,122,56,0.04)", stroke: "#4a7a38", lineWidth: 2, revealAt: 0.1 },
+          { type: "text", x: CX, y: 260, text: "9. Infrastructure Operations",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a7a38", textAlign: "center", revealAt: 0.12 },
+          { type: "text", x: CX, y: 310, text: "Routine maintenance, some involving destructive actions",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.18 },
+          { type: "text", x: CX, y: 350, text: "that benefit from guardrails",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.22 },
+          { type: "rule", x1: CX - 260, y1: 390, x2: CX + 260, y2: 390,
+            color: "#bab0a0", width: 1, revealAt: 0.3 },
+          { type: "text", x: CX, y: 430, text: "1. Find orphaned pods",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a7a38", textAlign: "center", revealAt: 0.35 },
+          { type: "text", x: CX, y: 470, text: "2. Post to Slack for soak period",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a7a38", textAlign: "center", revealAt: 0.45 },
+          { type: "text", x: CX, y: 510, text: "3. Clean up after user confirmation",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a7a38", textAlign: "center", revealAt: 0.55 },
+          { type: "text", x: CX, y: 580, text: "terraform plan + apply with safety checks",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.65 },
+          // Bottom
+          { type: "text", x: CX, y: 760, text: "Best skills fit cleanly into one of these nine categories.",
+            font: '500 22px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.8 },
+        ],
+
+        // --- Scene 8: The Gotchas Section (197.66 - 242.47s, 44.81s) ---
+        // t=198.86 (revealAt~0.027): "highest-signal content... Gotchas section...
+        //   common failure points... edge case = future gotcha... update over time"
+        // t=216.36 (revealAt~0.417): "skills are folders... file system as context engineering...
+        //   progressive disclosure... split function signatures into references...
+        //   templates in assets... include scripts Claude can execute"
+        "gotchas": [
+          { type: "glow", x: CX, y: 300, radius: 400, color: "rgba(200,90,40,0.06)" },
+          { type: "text", x: CX, y: 140, text: "The Gotchas Section",
+            font: '700 52px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center" },
+          { type: "rule", x1: CX - 100, y1: 190, x2: CX + 100, y2: 190,
+            color: "#c85a28", width: 3, revealAt: 0.03 },
+          { type: "text", x: CX, y: 240, text: "Highest-signal content in any skill",
+            font: '600 28px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.05 },
+          // Left panel: Gotchas
+          { type: "rect", x: 160, y: 290, w: 740, h: 340,
+            fill: "rgba(200,90,40,0.04)", stroke: "#c85a28", lineWidth: 2, revealAt: 0.08 },
+          { type: "text", x: 530, y: 340, text: "Built from common failure points",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.1 },
+          { type: "text", x: 530, y: 380, text: "Every edge case Claude hits = future gotcha",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.15 },
+          { type: "rule", x1: 300, y1: 420, x2: 760, y2: 420,
+            color: "#bab0a0", width: 1, revealAt: 0.2 },
+          { type: "text", x: 530, y: 460, text: "Update your skill over time",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.22 },
+          { type: "text", x: 530, y: 500, text: "as new failures are discovered",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.28 },
+          { type: "text", x: 530, y: 550, text: "Living documentation of real problems",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.34 },
+          // Right panel: Skills are folders
+          { type: "rect", x: 1020, y: 290, w: 740, h: 340,
+            fill: "rgba(74,106,138,0.04)", stroke: "#4a6a8a", lineWidth: 2, revealAt: 0.42 },
+          { type: "text", x: 1390, y: 340, text: "Skills are folders, not files",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a6a8a", textAlign: "center", revealAt: 0.44 },
+          { type: "text", x: 1390, y: 388, text: "File system = context engineering",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.5 },
+          { type: "rule", x1: 1160, y1: 420, x2: 1620, y2: 420,
+            color: "#bab0a0", width: 1, revealAt: 0.55 },
+          { type: "text", x: 1390, y: 460, text: "references/  -- function signatures",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a6a8a", textAlign: "center", revealAt: 0.58 },
+          { type: "text", x: 1390, y: 500, text: "assets/      -- templates",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a6a8a", textAlign: "center", revealAt: 0.65 },
+          { type: "text", x: 1390, y: 540, text: "scripts/     -- executable tools",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a6a8a", textAlign: "center", revealAt: 0.72 },
+          // Bottom
+          { type: "text", x: CX, y: 700, text: "Progressive disclosure: Claude reads files at appropriate times",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.82 },
+        ],
+
+        // --- Scene 9: Description & Flexibility (242.47 - 282.03s, 39.56s) ---
+        // t=242.47 (0.0): "description field is critical... not for humans...
+        //   listing of every available skill... trigger description, not a summary...
+        //   write it for matching accuracy"
+        // t=263.26 (0.526): "flexibility... too specific causes problems...
+        //   rigid step-by-step script breaks... goals, constraints, reference material"
+        "desc-flex": [
+          { type: "text", x: CX, y: 90, text: "Writing Great Skills",
+            font: '700 40px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center" },
+          { type: "rule", x1: CX - 80, y1: 130, x2: CX + 80, y2: 130,
+            color: "#c85a28", width: 2, revealAt: 0.03 },
+          // Panel 1: Description = Trigger
+          { type: "rect", x: 120, y: 170, w: 820, h: 480,
+            fill: "rgba(74,122,56,0.04)", stroke: "#4a7a38", lineWidth: 2, revealAt: 0.05 },
+          { type: "text", x: 530, y: 220, text: "Description = Trigger",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a7a38", textAlign: "center", revealAt: 0.07 },
+          { type: "text", x: 530, y: 270, text: "The description field is critical",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.1 },
+          { type: "text", x: 530, y: 310, text: "and it's NOT for humans",
+            font: '600 18px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.15 },
+          { type: "rule", x1: 280, y1: 350, x2: 780, y2: 350,
+            color: "#bab0a0", width: 1, revealAt: 0.2 },
+          { type: "text", x: 530, y: 390, text: "Claude builds a listing of every skill",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a7a38", textAlign: "center", revealAt: 0.22 },
+          { type: "text", x: 530, y: 430, text: "scans descriptions to match requests",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a7a38", textAlign: "center", revealAt: 0.3 },
+          { type: "text", x: 530, y: 480, text: "A trigger description, not a summary",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.38 },
+          { type: "text", x: 530, y: 520, text: "Write it for matching accuracy",
+            font: '600 18px "DM Sans", sans-serif', color: "#4a7a38", textAlign: "center", revealAt: 0.44 },
+          // Panel 2: Avoid Railroading
+          { type: "rect", x: 980, y: 170, w: 820, h: 480,
+            fill: "rgba(200,90,40,0.04)", stroke: "#c85a28", lineWidth: 2, revealAt: 0.52 },
+          { type: "text", x: 1390, y: 220, text: "Avoid Railroading",
+            font: '600 28px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.53 },
+          { type: "text", x: 1390, y: 270, text: "Give Claude flexibility",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.56 },
+          { type: "text", x: 1390, y: 310, text: "Too specific = breaks when context varies",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.62 },
+          { type: "rule", x1: 1140, y1: 350, x2: 1640, y2: 350,
+            color: "#bab0a0", width: 1, revealAt: 0.68 },
+          { type: "text", x: 1390, y: 390, text: "Rigid step-by-step scripts break",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.7 },
+          { type: "text", x: 1390, y: 440, text: "Instead provide:",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.76 },
+          { type: "text", x: 1390, y: 480, text: "Goals  |  Constraints  |  References",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.82 },
+          { type: "text", x: 1390, y: 530, text: "Let Claude adapt to the situation",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.9 },
+        ],
+
+        // --- Scene 10: Memory & Hooks (282.03 - 324.72s, 42.69s) ---
+        // t=283.22 (revealAt~0.028): "skills can store data... append-only logs or JSON files...
+        //   standup skill... reads its own history... CLAUDE_PLUGIN_DATA folder"
+        // t=305.18 (revealAt~0.542): "on-demand hooks... session-scoped...
+        //   careful hook blocks destructive commands... freeze hook blocks edits outside dir...
+        //   too opinionated to run all the time, extremely useful sometimes"
+        "memory-hooks": [
+          { type: "text", x: CX, y: 90, text: "Advanced Techniques",
+            font: '700 40px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center" },
+          { type: "rule", x1: CX - 80, y1: 130, x2: CX + 80, y2: 130,
+            color: "#c85a28", width: 2, revealAt: 0.03 },
+          // Panel 1: Store Data
+          { type: "rect", x: 120, y: 170, w: 820, h: 500,
+            fill: "rgba(200,90,40,0.04)", stroke: "#c85a28", lineWidth: 2, revealAt: 0.05 },
+          { type: "text", x: 530, y: 220, text: "Skills Can Store Data",
+            font: '600 28px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.07 },
+          { type: "text", x: 530, y: 270, text: "Append-only logs or JSON files",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.1 },
+          { type: "text", x: 530, y: 310, text: "within the skill directory",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.14 },
+          { type: "rule", x1: 280, y1: 350, x2: 780, y2: 350,
+            color: "#bab0a0", width: 1, revealAt: 0.18 },
+          { type: "text", x: 530, y: 390, text: "standup skill: logs every post",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.2 },
+          { type: "text", x: 530, y: 430, text: "Claude reads its own history",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.26 },
+          { type: "text", x: 530, y: 470, text: "tells what changed since yesterday",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.32 },
+          { type: "glow", x: 530, y: 540, radius: 100, color: "rgba(200,90,40,0.06)", revealAt: 0.38 },
+          { type: "text", x: 530, y: 540, text: "CLAUDE_PLUGIN_DATA",
+            font: '500 18px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.4 },
+          { type: "text", x: 530, y: 580, text: "Stable storage that survives upgrades",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.45 },
+          // Panel 2: On-Demand Hooks
+          { type: "rect", x: 980, y: 170, w: 820, h: 500,
+            fill: "rgba(74,106,138,0.04)", stroke: "#4a6a8a", lineWidth: 2, revealAt: 0.54 },
+          { type: "text", x: 1390, y: 220, text: "On-Demand Hooks",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a6a8a", textAlign: "center", revealAt: 0.55 },
+          { type: "text", x: 1390, y: 270, text: "Session-scoped, activate per skill",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.58 },
+          { type: "rule", x1: 1140, y1: 310, x2: 1640, y2: 310,
+            color: "#bab0a0", width: 1, revealAt: 0.62 },
+          { type: "text", x: 1390, y: 350, text: "careful-hook: block destructive cmds",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a6a8a", textAlign: "center", revealAt: 0.65 },
+          { type: "text", x: 1390, y: 390, text: "on production systems",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a6a8a", textAlign: "center", revealAt: 0.68 },
+          { type: "text", x: 1390, y: 440, text: "freeze-hook: block edits outside dir",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a6a8a", textAlign: "center", revealAt: 0.74 },
+          { type: "rule", x1: 1140, y1: 490, x2: 1640, y2: 490,
+            color: "#bab0a0", width: 1, revealAt: 0.82 },
+          { type: "text", x: 1390, y: 530, text: "Too opinionated to run always --",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.85 },
+          { type: "text", x: 1390, y: 570, text: "extremely useful sometimes",
+            font: '600 18px "DM Sans", sans-serif', color: "#4a6a8a", textAlign: "center", revealAt: 0.9 },
+        ],
+
+        // --- Scene 11: Evals as Tests (324.72 - 357.62s, 32.9s) ---
+        // t=325.92 (revealAt~0.036): "Skill Creator tool... evals, benchmarking, A/B comparison...
+        //   Evals function as tests... test prompts with expected outputs... validates performance"
+        // t=341.42 (revealAt~0.508): "catching quality regressions... models and infrastructure evolve...
+        //   running evals against new model versions... early warning"
+        "evals": [
+          { type: "text", x: CX, y: 120, text: "Evals as Tests",
+            font: '700 56px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center" },
+          { type: "rule", x1: CX - 80, y1: 170, x2: CX + 80, y2: 170,
+            color: "#c85a28", width: 3, revealAt: 0.04 },
+          { type: "text", x: CX, y: 220, text: "Skill Creator added evals, benchmarking, and A/B comparison",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.06 },
+          // Flow: Prompt -> Skill -> Output -> Check
+          { type: "rect", x: 180, y: 280, w: 320, h: 120,
+            fill: "rgba(200,90,40,0.05)", stroke: "#c85a28", lineWidth: 2, revealAt: 0.12 },
+          { type: "text", x: 340, y: 330, text: "Test Prompt",
+            font: '600 28px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.12 },
+          { type: "text", x: 340, y: 368, text: "with expected outputs",
+            font: '400 16px "JetBrains Mono", monospace', color: "#7a6e58", textAlign: "center", revealAt: 0.16 },
+          { type: "rule", x1: 510, y1: 340, x2: 600, y2: 340,
+            color: "#bab0a0", width: 3, revealAt: 0.2 },
+          { type: "rect", x: 610, y: 280, w: 320, h: 120,
+            fill: "rgba(74,122,56,0.05)", stroke: "#4a7a38", lineWidth: 2, revealAt: 0.24 },
+          { type: "text", x: 770, y: 330, text: "Skill Runs",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a7a38", textAlign: "center", revealAt: 0.24 },
+          { type: "text", x: 770, y: 368, text: "validates performance",
+            font: '400 16px "JetBrains Mono", monospace', color: "#7a6e58", textAlign: "center", revealAt: 0.28 },
+          { type: "rule", x1: 940, y1: 340, x2: 1030, y2: 340,
+            color: "#bab0a0", width: 3, revealAt: 0.32 },
+          { type: "rect", x: 1040, y: 280, w: 320, h: 120,
+            fill: "rgba(74,106,138,0.05)", stroke: "#4a6a8a", lineWidth: 2, revealAt: 0.36 },
+          { type: "text", x: 1200, y: 330, text: "Output Check",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a6a8a", textAlign: "center", revealAt: 0.36 },
+          { type: "text", x: 1200, y: 368, text: "compare to expected",
+            font: '400 16px "JetBrains Mono", monospace', color: "#7a6e58", textAlign: "center", revealAt: 0.4 },
+          { type: "rule", x1: 1370, y1: 340, x2: 1460, y2: 340,
+            color: "#bab0a0", width: 3, revealAt: 0.44 },
+          { type: "rect", x: 1470, y: 280, w: 280, h: 120,
+            fill: "rgba(74,122,56,0.05)", stroke: "#4a7a38", lineWidth: 2, revealAt: 0.46 },
+          { type: "text", x: 1610, y: 350, text: "Pass / Fail",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a7a38", textAlign: "center", revealAt: 0.46 },
+          // Bottom section: quality regressions
+          { type: "rule", x1: 300, y1: 460, x2: 1620, y2: 460,
+            color: "#bab0a0", width: 1, revealAt: 0.5 },
+          { type: "text", x: 480, y: 510, text: "Catching quality regressions",
+            font: '600 28px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.52 },
+          { type: "text", x: 480, y: 555, text: "Models and infrastructure evolve",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.58 },
+          { type: "text", x: 480, y: 595, text: "Previously functional skills may break",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.65 },
+          { type: "text", x: 1390, y: 510, text: "Early warning system",
+            font: '600 28px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.72 },
+          { type: "text", x: 1390, y: 555, text: "Run evals against new model versions",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.78 },
+          { type: "text", x: 1390, y: 595, text: "before the team is affected",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.85 },
+        ],
+
+        // --- Scene 12: Benchmarks & A/B (357.62 - 389.88s, 32.26s) ---
+        // t=357.62 (0.0): "detecting obsolescence... base model passes evals without skill...
+        //   skill's techniques absorbed... ready to retire"
+        // t=372.02 (0.446): "Benchmark mode tracks three metrics: pass rate, elapsed time, token usage...
+        //   multi-agent support... independent contexts... comparator agents... blind A/B testing"
+        "benchmarks": [
+          { type: "text", x: CX, y: 100, text: "Benchmarks & A/B Testing",
+            font: '700 44px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center" },
+          { type: "rule", x1: CX - 100, y1: 145, x2: CX + 100, y2: 145,
+            color: "#c85a28", width: 2, revealAt: 0.03 },
+          // Obsolescence detection block
+          { type: "rect", x: 200, y: 180, w: 1520, h: 120,
+            fill: "rgba(200,90,40,0.04)", stroke: "#c85a28", lineWidth: 2, revealAt: 0.05 },
+          { type: "text", x: 480, y: 230, text: "Detecting Obsolescence",
+            font: '600 28px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.07 },
+          { type: "text", x: 480, y: 268, text: "Base model passes without the skill?",
+            font: '400 16px "JetBrains Mono", monospace', color: "#7a6e58", textAlign: "center", revealAt: 0.12 },
+          { type: "text", x: 1390, y: 230, text: "Skill may be ready to retire",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.2 },
+          { type: "text", x: 1390, y: 268, text: "Techniques absorbed into default behavior",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.28 },
+          // Three metric boxes
+          { type: "rect", x: 160, y: 340, w: 480, h: 200,
+            fill: "rgba(200,90,40,0.05)", stroke: "#c85a28", lineWidth: 2, revealAt: 0.45 },
+          { type: "text", x: 400, y: 390, text: "Pass Rate",
+            font: '600 28px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.46 },
+          { type: "text", x: 400, y: 430, text: "Eval pass rate per version",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.5 },
+
+          { type: "rect", x: 720, y: 340, w: 480, h: 200,
+            fill: "rgba(74,122,56,0.05)", stroke: "#4a7a38", lineWidth: 2, revealAt: 0.54 },
+          { type: "text", x: 960, y: 390, text: "Elapsed Time",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a7a38", textAlign: "center", revealAt: 0.55 },
+          { type: "text", x: 960, y: 430, text: "Wall-clock end-to-end execution",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.58 },
+
+          { type: "rect", x: 1280, y: 340, w: 480, h: 200,
+            fill: "rgba(74,106,138,0.05)", stroke: "#4a6a8a", lineWidth: 2, revealAt: 0.62 },
+          { type: "text", x: 1520, y: 390, text: "Token Usage",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a6a8a", textAlign: "center", revealAt: 0.63 },
+          { type: "text", x: 1520, y: 430, text: "Input + output tokens per run",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.66 },
+
+          // Bottom: multi-agent and comparator
+          { type: "rule", x1: 300, y1: 590, x2: 1620, y2: 590,
+            color: "#bab0a0", width: 1, revealAt: 0.72 },
+          { type: "text", x: 480, y: 640, text: "Multi-agent: parallel evals",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a7a38", textAlign: "center", revealAt: 0.75 },
+          { type: "text", x: 480, y: 678, text: "Independent contexts, no cross-contamination",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.78 },
+          { type: "text", x: 1390, y: 640, text: "Comparator agents: blind A/B",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.84 },
+          { type: "text", x: 1390, y: 678, text: "Test between skill versions objectively",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.88 },
+        ],
+
+        // --- Scene 13: Uplift vs Preference (389.88 - 412.01s, 22.13s) ---
+        // t=391.08 (revealAt~0.054): "two fundamental categories... different testing strategies...
+        //   Capability uplift: techniques Claude can't do consistently... may become unnecessary...
+        //   Encoded preference: sequences existing capabilities... your org's workflows... more durable"
+        "uplift-pref": [
+          { type: "text", x: CX, y: 100, text: "Two Kinds of Skills",
+            font: '700 44px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center" },
+          { type: "rule", x1: CX - 100, y1: 145, x2: CX + 100, y2: 145,
+            color: "#c85a28", width: 2, revealAt: 0.04 },
+          { type: "text", x: CX, y: 190, text: "Two categories requiring different testing strategies",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.08 },
+          // Capability Uplift panel
+          { type: "rect", x: 120, y: 230, w: 780, h: 420,
+            fill: "rgba(200,90,40,0.04)", stroke: "#c85a28", lineWidth: 2, revealAt: 0.12 },
+          { type: "text", x: 510, y: 290, text: "Capability Uplift",
+            font: '600 28px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.14 },
+          { type: "text", x: 510, y: 340, text: "Teaches Claude techniques it",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.2 },
+          { type: "text", x: 510, y: 378, text: "cannot do consistently on its own",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.24 },
+          { type: "rule", x1: 260, y1: 420, x2: 760, y2: 420,
+            color: "#bab0a0", width: 1, revealAt: 0.3 },
+          { type: "text", x: 510, y: 460, text: "frontend-design-taste",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.34 },
+          { type: "text", x: 510, y: 500, text: "canvas-animation-techniques",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.38 },
+          { type: "text", x: 510, y: 550, text: "May become unnecessary as models improve",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.44 },
+          // "vs" divider
+          { type: "text", x: CX, y: 450, text: "vs",
+            font: '300 32px "DM Sans", sans-serif', color: "#bab0a0", textAlign: "center", revealAt: 0.48 },
+          // Encoded Preference panel
+          { type: "rect", x: 1020, y: 230, w: 780, h: 420,
+            fill: "rgba(74,106,138,0.04)", stroke: "#4a6a8a", lineWidth: 2, revealAt: 0.5 },
+          { type: "text", x: 1410, y: 290, text: "Encoded Preference",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a6a8a", textAlign: "center", revealAt: 0.52 },
+          { type: "text", x: 1410, y: 340, text: "Sequences existing capabilities",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.58 },
+          { type: "text", x: 1410, y: 378, text: "according to your org's workflows",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.62 },
+          { type: "rule", x1: 1160, y1: 420, x2: 1660, y2: 420,
+            color: "#bab0a0", width: 1, revealAt: 0.66 },
+          { type: "text", x: 1410, y: 460, text: "nda-review-workflow",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a6a8a", textAlign: "center", revealAt: 0.7 },
+          { type: "text", x: 1410, y: 500, text: "standup-post-formatting",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a6a8a", textAlign: "center", revealAt: 0.74 },
+          { type: "text", x: 1410, y: 550, text: "More durable over time",
+            font: '600 18px "DM Sans", sans-serif', color: "#4a6a8a", textAlign: "center", revealAt: 0.82 },
+        ],
+
+        // --- Scene 14: Distribution (412.01 - 449.09s, 37.08s) ---
+        // t=413.21 (revealAt~0.032): "smaller teams... .claude/skills... every skill adds context...
+        //   as you scale, internal plugin marketplace"
+        // t=429.86 (revealAt~0.481): "measurement... PreToolUse hook logs usage... popular or under-triggering...
+        //   description optimization... sample prompts... false positives and negatives"
+        "distribution": [
+          { type: "text", x: CX, y: 90, text: "Distribution & Measurement",
+            font: '700 44px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center" },
+          { type: "rule", x1: CX - 100, y1: 135, x2: CX + 100, y2: 135,
+            color: "#c85a28", width: 2, revealAt: 0.03 },
+          // Panel 1: Repo-local
+          { type: "rect", x: 120, y: 170, w: 820, h: 480,
+            fill: "rgba(74,122,56,0.04)", stroke: "#4a7a38", lineWidth: 2, revealAt: 0.05 },
+          { type: "text", x: 530, y: 220, text: "Repo-Local",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a7a38", textAlign: "center", revealAt: 0.07 },
+          { type: "text", x: 530, y: 270, text: "For smaller teams",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.1 },
+          { type: "rule", x1: 280, y1: 310, x2: 780, y2: 310,
+            color: "#bab0a0", width: 1, revealAt: 0.14 },
+          { type: "text", x: 530, y: 350, text: ".claude/skills/  checked into repo",
+            font: '400 16px "JetBrains Mono", monospace', color: "#4a7a38", textAlign: "center", revealAt: 0.16 },
+          { type: "text", x: 530, y: 390, text: "Every skill adds context to the model",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.22 },
+          { type: "text", x: 530, y: 430, text: "Version-controlled alongside code",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.28 },
+          { type: "text", x: 530, y: 470, text: "Team reviews skill changes in PRs",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.34 },
+          // Panel 2: Measurement
+          { type: "rect", x: 980, y: 170, w: 820, h: 480,
+            fill: "rgba(200,90,40,0.04)", stroke: "#c85a28", lineWidth: 2, revealAt: 0.48 },
+          { type: "text", x: 1390, y: 220, text: "Measurement & Optimization",
+            font: '600 28px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.49 },
+          { type: "text", x: 1390, y: 270, text: "As you scale, measure everything",
+            font: '400 18px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.52 },
+          { type: "rule", x1: 1140, y1: 310, x2: 1640, y2: 310,
+            color: "#bab0a0", width: 1, revealAt: 0.56 },
+          { type: "text", x: 1390, y: 350, text: "PreToolUse hook logs skill usage",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.58 },
+          { type: "text", x: 1390, y: 390, text: "Find popular vs under-triggering skills",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.64 },
+          { type: "text", x: 1390, y: 440, text: "Description optimizer in Skill Creator",
+            font: '400 16px "JetBrains Mono", monospace', color: "#c85a28", textAlign: "center", revealAt: 0.72 },
+          { type: "text", x: 1390, y: 480, text: "Analyze descriptions vs sample prompts",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.78 },
+          { type: "text", x: 1390, y: 520, text: "Reduce false positives & false negatives",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.85 },
+        ],
+
+        // --- Scene 15: Measurement (449.09 - 462.36s, 13.27s) ---
+        // t=449.09 (0.0): "Skills can compose with each other... reference other skills by name...
+        //   model invokes them if installed... dependency management not built in yet...
+        //   model handles cross-skill references naturally"
+        "measurement": [
+          { type: "text", x: CX, y: 120, text: "Skill Composition",
+            font: '700 44px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center" },
+          { type: "rule", x1: CX - 100, y1: 165, x2: CX + 100, y2: 165,
+            color: "#c85a28", width: 2, revealAt: 0.06 },
+          { type: "text", x: CX, y: 220, text: "Skills can compose with each other",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.1 },
+          // Cross-reference diagram
+          { type: "rect", x: 280, y: 270, w: 400, h: 140,
+            fill: "rgba(200,90,40,0.04)", stroke: "#c85a28", lineWidth: 2, revealAt: 0.18 },
+          { type: "text", x: 480, y: 320, text: "Skill A",
+            font: '600 28px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.2 },
+          { type: "text", x: 480, y: 360, text: "references Skill B by name",
+            font: '400 16px "JetBrains Mono", monospace', color: "#7a6e58", textAlign: "center", revealAt: 0.25 },
+          { type: "rule", x1: 700, y1: 340, x2: 860, y2: 340,
+            color: "#c85a28", width: 2, revealAt: 0.3 },
+          { type: "rect", x: 880, y: 270, w: 400, h: 140,
+            fill: "rgba(74,106,138,0.04)", stroke: "#4a6a8a", lineWidth: 2, revealAt: 0.32 },
+          { type: "text", x: 1080, y: 320, text: "Skill B",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a6a8a", textAlign: "center", revealAt: 0.34 },
+          { type: "text", x: 1080, y: 360, text: "invoked if installed",
+            font: '400 16px "JetBrains Mono", monospace', color: "#7a6e58", textAlign: "center", revealAt: 0.38 },
+          { type: "rule", x1: 1300, y1: 340, x2: 1460, y2: 340,
+            color: "#4a6a8a", width: 2, revealAt: 0.42 },
+          { type: "rect", x: 1480, y: 270, w: 400, h: 140,
+            fill: "rgba(74,122,56,0.04)", stroke: "#4a7a38", lineWidth: 2, revealAt: 0.44 },
+          { type: "text", x: 1680, y: 320, text: "Skill C",
+            font: '600 28px "DM Sans", sans-serif', color: "#4a7a38", textAlign: "center", revealAt: 0.46 },
+          { type: "text", x: 1680, y: 360, text: "across repos",
+            font: '400 16px "JetBrains Mono", monospace', color: "#7a6e58", textAlign: "center", revealAt: 0.5 },
+          // Bottom notes
+          { type: "rule", x1: 400, y1: 470, x2: 1520, y2: 470,
+            color: "#bab0a0", width: 1, revealAt: 0.58 },
+          { type: "text", x: CX, y: 520, text: "No built-in dependency management yet",
+            font: '400 18px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.62 },
+          { type: "text", x: CX, y: 570, text: "The model handles cross-skill references naturally",
+            font: '600 18px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.75 },
+        ],
+
+        // --- Scene 16: Conclusion (462.36 - 488s, 25.64s) ---
+        // t=463.56 (revealAt~0.047): "best skills started as a few lines and a single gotcha...
+        //   got better because people kept adding... grab bag of useful tips...
+        //   start experimenting and see what works for you"
+        "conclusion": [
+          { type: "glow", x: CX, y: CY - 60, radius: 500, color: "rgba(200,90,40,0.06)" },
+          { type: "text", x: CX, y: 180, text: "Start Small. Add Gotchas. Iterate.",
+            font: '700 52px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center" },
+          { type: "rule", x1: CX - 140, y1: 240, x2: CX + 140, y2: 240,
+            color: "#c85a28", width: 3, revealAt: 0.06 },
+          { type: "text", x: CX, y: 310, text: "The best skills started as a few lines",
+            font: '400 26px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.1 },
+          { type: "text", x: CX, y: 354, text: "and a single gotcha",
+            font: '400 26px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.16 },
+          { type: "text", x: CX, y: 420, text: "Then got better because people kept adding to them",
+            font: '400 22px "DM Sans", sans-serif', color: "#3a3020", textAlign: "center", revealAt: 0.26 },
+          { type: "text", x: CX, y: 462, text: "as Claude hit new edge cases",
+            font: '400 22px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.34 },
+          { type: "rule", x1: CX - 200, y1: 520, x2: CX + 200, y2: 520,
+            color: "#bab0a0", width: 1, revealAt: 0.44 },
+          { type: "text", x: CX, y: 570, text: "A grab bag of useful tips that work",
+            font: '400 22px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.5 },
+          { type: "text", x: CX, y: 612, text: "not a definitive guide",
+            font: '400 22px "DM Sans", sans-serif', color: "#7a6e58", textAlign: "center", revealAt: 0.56 },
+          { type: "glow", x: CX, y: 700, radius: 200, color: "rgba(200,90,40,0.08)", revealAt: 0.64 },
+          { type: "text", x: CX, y: 700, text: "Start experimenting and see what works for you.",
+            font: '500 28px "DM Sans", sans-serif', color: "#c85a28", textAlign: "center", revealAt: 0.68 },
+        ],
+      };
+
+      // ===== RENDERER =====
+      const renderScene = createSceneRenderer(scenes, sceneElements, {
+        bg: "#e2d6c0",
+      });
+
+      // ===== BOOT =====
+      createLesson({
+        lessonId: "skill-best-practices",
+        scenes,
+        IX,
+        render: renderScene,
+      });
+    </script>
+  </body>
+</html>

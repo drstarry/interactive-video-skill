@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net;
+      font-src https://fonts.gstatic.com;
+      media-src 'self';
+      img-src 'self' data:;
+    " />
+    <title>Harness Engineering — Interactive Tutorial</title>
+    <link rel="stylesheet" href="src/lesson.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <style>
+      :root {
+        --bg: #0e0e0e;
+        --bg-card: #161616;
+        --bg-el: #1e1e1e;
+        --bg-ov: rgba(14,14,14,0.95);
+        --surface: #161616;
+        --border: #282828;
+        --text: #d0d0d0;
+        --text2: #606060;
+        --accent: #cc4444;
+        --acc-dim: #992222;
+        --acc-glow: rgba(204,68,68,0.08);
+        --grn: #70a060;
+        --warm: #cc8844;
+        --cool: #6688aa;
+        --red: #cc4444;
+        --sans: 'DM Sans', -apple-system, sans-serif;
+        --mono: 'JetBrains Mono', monospace;
+        --serif: 'DM Sans', -apple-system, sans-serif;
+      }
+    </style>
+  </head>
+  <body data-theme="focus">
+    <nav class="site-nav">
+      <a class="site-nav-brand" href="https://github.com/drstarry/interactive-video-skill">Interactive Video Skill</a>
+      <div class="site-nav-links">
+        <a href="skill-onboarding.html">Onboarding [theme: Chalkboard]</a>
+        <a href="git-rebase.html">Git Rebase [theme: Terminal]</a>
+        <a href="writing-systems.html">Writing [theme: Notebook]</a>
+        <a href="dns-resolution.html">DNS [theme: Blueprint]</a>
+        <a href="rust-ownership.html">Rust [theme: Clean Dark]</a>
+        <a href="vaccines.html">Vaccines [theme: Clean Light]</a>
+        <a href="skill-best-practices.html">Skills [theme: Studio]</a>
+        <a href="harness-engineering.html" class="active">Harness [theme: Focus]</a>
+      </div>
+    </nav>
+
+    <div class="wrap">
+      <div class="hdr">
+        <h1>Harness Engineering</h1>
+        <p class="sub">Designing environments, scaffolding, and control systems that enable AI coding agents to produce reliable software at scale.</p>
+      </div>
+
+      <div class="vid-wrap">
+        <canvas id="cvs"></canvas>
+        <div class="scn-label" id="scn-label"></div>
+        <div class="math-layer" id="math-layer"></div>
+        <div class="ov" id="ov">
+          <div class="top-badge" id="badge"></div>
+          <div class="card" id="card"></div>
+        </div>
+      </div>
+
+      <div class="ctl">
+        <button id="btn-play">
+          <svg id="play-icon" viewBox="0 0 24 24">
+            <polygon points="5,3 19,12 5,21" />
+          </svg>
+        </button>
+        <span class="tl" id="t-cur">0:00</span>
+        <span class="sep">/</span>
+        <span class="tl" id="t-dur">0:00</span>
+        <div class="tbar" id="tbar">
+          <div class="fill" id="tprog"></div>
+          <div class="scrub" id="tscrub"></div>
+        </div>
+        <button class="mute" id="btn-mute">Narration: On</button>
+        <button class="fs" id="btn-fs">Fullscreen</button>
+      </div>
+
+      <div class="scores" id="scores"></div>
+      <div class="chapters-header">Chapters</div>
+      <div id="chapters"></div>
+    </div>
+
+    <footer class="site-footer">
+      <a href="https://github.com/drstarry/interactive-video-skill" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        Generated with Interactive Video Skill
+      </a>
+    </footer>
+
+    <script type="module">
+      import { createLesson } from "./src/engine/lesson.js";
+      import { createSceneRenderer } from "./src/engine/scene-renderer.js";
+      import { VW, VH } from "./src/engine/canvas.js";
+
+      // ===== SCENE DATA =====
+      const scenes = [
+        { s: 0,      e: 18.84,  label: "The Premise",           bg: "premise" },
+        { s: 18.84,  e: 43.34,  label: "The Numbers",           bg: "numbers" },
+        { s: 43.34,  e: 71.45,  label: "What Is It",            bg: "definition" },
+        { s: 71.45,  e: 84.05,  label: "The Mindset",           bg: "mindset" },
+        { s: 84.05,  e: 113.11, label: "Legibility: Apps",      bg: "legibility-apps" },
+        { s: 113.11, e: 130.94, label: "Legibility: Results",   bg: "legibility-results" },
+        { s: 130.94, e: 154.92, label: "Map Not Manual",        bg: "map-not-manual" },
+        { s: 154.92, e: 179.21, label: "Structured Docs",       bg: "structured-docs" },
+        { s: 179.21, e: 198.07, label: "Agent-First",           bg: "agent-first" },
+        { s: 198.07, e: 216.58, label: "Architecture Layers",   bg: "arch-layers" },
+        { s: 216.58, e: 238.06, label: "The Layer Stack",       bg: "layer-stack" },
+        { s: 238.06, e: 255.44, label: "Lint as Instructions",  bg: "lint-instructions" },
+        { s: 255.44, e: 299.47, label: "Boring Tech + Merging", bg: "boring-merge" },
+        { s: 299.47, e: 336.29, label: "Entropy",               bg: "entropy" },
+        { s: 336.29, e: 359.11, label: "Garbage Collection",    bg: "garbage-collection" },
+        { s: 359.11, e: 388.22, label: "Full Autonomy",         bg: "autonomy" },
+        { s: 388.22, e: 412,    label: "Takeaway",              bg: "takeaway" },
+      ];
+
+      const IX = [
+        { id: "q-mindset", time: 84.05, cat: "q", title: "The Harness Mindset", desc: "When an AI agent fails at a task, what is the harness engineering response?",
+          options: [{ k: "A", c: false }, { k: "B", c: true }, { k: "C", c: false }] },
+        { id: "try-sort-repo", time: 179.21, cat: "try", title: "Order the Knowledge Layers", desc: "Drag to arrange from entry point to deepest detail." },
+        { id: "q-legibility", time: 198.07, cat: "q", title: "Agent Legibility", desc: "Why did the 'one big AGENTS.md' approach fail?",
+          options: [{ k: "A", c: false }, { k: "B", c: true }, { k: "C", c: false }] },
+        { id: "try-categorize-enforcement", time: 255.44, cat: "try", title: "Enforcement Mechanisms", desc: "Drag each technique into the right enforcement category." },
+        { id: "q-merge", time: 299.47, cat: "q", title: "Merge Philosophy", desc: "What is the merge mantra in high-throughput harness engineering?",
+          options: [{ k: "A", c: false }, { k: "B", c: true }, { k: "C", c: false }] },
+        { id: "try-explore-entropy", time: 359.11, cat: "try", title: "Fighting Entropy", desc: "Tap each strategy to learn how it combats code drift." },
+        { id: "q-autonomy", time: 388.22, cat: "q", title: "Levels of Autonomy", desc: "At the highest autonomy level, when does the agent escalate to a human?",
+          options: [{ k: "A", c: false }, { k: "B", c: false }, { k: "C", c: true }] },
+      ];
+
+      // ===== DECLARATIVE ELEMENTS =====
+      const sceneElements = {
+
+        // Scene 1: The Premise (s=0, e=18.84, dur=18.84s)
+        // Narration: "What happens when a team builds an entire product with zero manually-written code?
+        // Not a weekend prototype. A real internal beta, roughly one million lines of code,
+        // shipped to hundreds of users over five months. This is the story of harness engineering."
+        "premise": [
+          { type: "glow", x: VW / 2, y: VH * 0.4, radius: 600, color: "rgba(204,68,68,0.06)" },
+          { type: "text", x: VW / 2, y: 280, text: "Harness Engineering",
+            font: '300 72px "DM Sans", sans-serif', color: "#d0d0d0" },
+          { type: "rule", x1: VW / 2 - 120, y1: 320, x2: VW / 2 + 120, y2: 320,
+            color: "#cc4444", width: 2, revealAt: 0.08 },
+          // "zero manually-written code" ~2s => 0.11
+          { type: "text", x: VW / 2, y: 400, text: "zero manually-written code",
+            font: '600 28px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.11 },
+          // "not a weekend prototype" ~4s => 0.21
+          { type: "text", x: VW / 2, y: 460, text: "Not a weekend prototype",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.21 },
+          // "roughly one million lines" ~6s => 0.32
+          { type: "rect", x: VW / 2 - 200, y: 510, w: 400, h: 90, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.32 },
+          { type: "text", x: VW / 2, y: 545, text: "~1,000,000",
+            font: '700 48px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.32 },
+          { type: "text", x: VW / 2, y: 585, text: "lines of code",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.35 },
+          // "hundreds of users over five months" ~10s => 0.53
+          { type: "text", x: VW / 2, y: 650, text: "hundreds of users  /  five months",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.53 },
+          // "this is the story" ~14s => 0.74
+          { type: "text", x: VW / 2, y: 720, text: "Humans steer, agents execute",
+            font: '400 28px "DM Sans", sans-serif', color: "#606060", revealAt: 0.74 },
+        ],
+
+        // Scene 2: The Numbers (s=18.84, e=43.34, dur=24.5s)
+        // Narration: "empty git repository... three engineers growing to seven...
+        // 1,500 pull requests... 3.5 PRs per engineer per day... ten times faster...
+        // humans never directly wrote any code"
+        "numbers": [
+          { type: "glow", x: VW / 2, y: VH * 0.45, radius: 500, color: "rgba(204,68,68,0.05)" },
+          { type: "text", x: VW / 2, y: 200, text: "The Experiment",
+            font: '300 48px "DM Sans", sans-serif', color: "#d0d0d0" },
+          { type: "rule", x1: VW / 2 - 80, y1: 235, x2: VW / 2 + 80, y2: 235,
+            color: "#cc4444", width: 2, revealAt: 0.03 },
+          // "empty git repository" ~1s => 0.04
+          { type: "text", x: VW / 2, y: 290, text: "Started: empty git repository",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.04 },
+          { type: "text", x: VW / 2, y: 322, text: "Late August 2025",
+            font: '400 16px "JetBrains Mono", monospace', color: "#cc8844", revealAt: 0.06 },
+          // "three engineers growing to seven" ~3s => 0.12
+          { type: "rect", x: 200, y: 370, w: 300, h: 130, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.12 },
+          { type: "text", x: 350, y: 415, text: "3 -> 7",
+            font: '700 36px "DM Sans", sans-serif', color: "#cc8844", revealAt: 0.12 },
+          { type: "text", x: 350, y: 460, text: "engineers",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.12 },
+          // "1,500 pull requests" ~7s => 0.29
+          { type: "rect", x: 560, y: 370, w: 300, h: 130, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.29 },
+          { type: "text", x: 710, y: 415, text: "1,500",
+            font: '700 48px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.29 },
+          { type: "text", x: 710, y: 460, text: "pull requests merged",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.29 },
+          // "3.5 PRs per engineer per day" ~10s => 0.41
+          { type: "rect", x: 920, y: 370, w: 300, h: 130, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.41 },
+          { type: "text", x: 1070, y: 415, text: "3.5",
+            font: '700 48px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.41 },
+          { type: "text", x: 1070, y: 460, text: "PRs / engineer / day",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.41 },
+          // "ten times faster" ~14s => 0.57
+          { type: "rect", x: 1280, y: 370, w: 300, h: 130, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.57 },
+          { type: "text", x: 1430, y: 415, text: "10x",
+            font: '700 48px "DM Sans", sans-serif', color: "#cc8844", revealAt: 0.57 },
+          { type: "text", x: 1430, y: 460, text: "faster than hand-writing",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.57 },
+          // "humans never directly wrote any code" ~18s => 0.73
+          { type: "rect", x: VW / 2 - 250, y: 550, w: 500, h: 80, radius: 8,
+            fill: "rgba(204,68,68,0.06)", stroke: "#cc4444", revealAt: 0.73 },
+          { type: "text", x: VW / 2, y: 600, text: "0 lines manually written",
+            font: '700 36px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.73 },
+          // bottom context
+          { type: "text", x: VW / 2, y: 680, text: "5 months, one human orchestrator",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", revealAt: 0.85 },
+        ],
+
+        // Scene 3: What Is It (s=43.34, e=71.45, dur=28.11s)
+        // Narration: "designing environments, scaffolding, feedback loops, and control systems...
+        // humans steer, agents execute... no longer writing code, but building the harness...
+        // tooling, abstractions, documentation, and review systems"
+        "definition": [
+          { type: "glow", x: VW / 2, y: VH * 0.4, radius: 550, color: "rgba(204,68,68,0.06)" },
+          { type: "text", x: VW / 2, y: 200, text: "What is Harness Engineering?",
+            font: '300 48px "DM Sans", sans-serif', color: "#d0d0d0" },
+          { type: "rule", x1: VW / 2 - 100, y1: 240, x2: VW / 2 + 100, y2: 240,
+            color: "#cc4444", width: 2, revealAt: 0.03 },
+          // "designing environments" ~2s => 0.07
+          { type: "rect", x: VW / 2 - 420, y: 290, w: 840, h: 120, radius: 10,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.07 },
+          { type: "text", x: VW / 2, y: 335, text: "Designing environments, scaffolding,",
+            font: '400 24px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.07 },
+          { type: "text", x: VW / 2, y: 375, text: "feedback loops, and control systems",
+            font: '400 24px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.10 },
+          // "humans steer, agents execute" ~8s => 0.28
+          { type: "text", x: VW / 2, y: 460, text: "Humans steer, agents execute",
+            font: '600 28px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.28 },
+          // "no longer writing code" ~12s => 0.43
+          { type: "text", x: VW / 2, y: 530, text: "The engineer's job is no longer writing code",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", revealAt: 0.43 },
+          // "building the harness" ~14s => 0.50
+          { type: "text", x: VW / 2, y: 580, text: "but building the harness:",
+            font: '500 22px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.50 },
+          // the four components ~16s => 0.57
+          { type: "rect", x: 250, y: 630, w: 200, h: 60, radius: 6,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.57 },
+          { type: "text", x: 350, y: 668, text: "Tooling",
+            font: '400 18px "JetBrains Mono", monospace', color: "#cc8844", revealAt: 0.57 },
+          { type: "rect", x: 480, y: 630, w: 260, h: 60, radius: 6,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.62 },
+          { type: "text", x: 610, y: 668, text: "Abstractions",
+            font: '400 18px "JetBrains Mono", monospace', color: "#cc8844", revealAt: 0.62 },
+          { type: "rect", x: 770, y: 630, w: 290, h: 60, radius: 6,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.67 },
+          { type: "text", x: 915, y: 668, text: "Documentation",
+            font: '400 18px "JetBrains Mono", monospace', color: "#cc8844", revealAt: 0.67 },
+          { type: "rect", x: 1090, y: 630, w: 260, h: 60, radius: 6,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.72 },
+          { type: "text", x: 1220, y: 668, text: "Review systems",
+            font: '400 18px "JetBrains Mono", monospace', color: "#cc8844", revealAt: 0.72 },
+          // "do useful work autonomously" ~22s => 0.78
+          { type: "text", x: VW / 2, y: 750, text: "allow agents to do useful work autonomously",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", revealAt: 0.78 },
+        ],
+
+        // Scene 4: The Mindset (s=71.45, e=84.05, dur=12.6s)
+        // Narration: "the fix is never try harder... what capability is missing...
+        // legible and enforceable... fundamental mindset shift"
+        "mindset": [
+          { type: "glow", x: VW / 2, y: VH / 2, radius: 500, color: "rgba(204,68,68,0.08)" },
+          // "something fails" ~1s => 0.08
+          { type: "text", x: VW / 2, y: 260, text: "When something fails...",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", revealAt: 0.0 },
+          // "the fix is never try harder" ~2s => 0.16
+          { type: "rect", x: VW / 2 - 280, y: 300, w: 560, h: 70, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.16 },
+          { type: "text", x: VW / 2, y: 345, text: "The fix is never \"try harder\"",
+            font: '600 28px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.16 },
+          // "what capability is missing" ~4s => 0.32
+          { type: "text", x: VW / 2, y: 440, text: "What capability",
+            font: '300 64px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.32 },
+          { type: "text", x: VW / 2, y: 520, text: "is missing?",
+            font: '300 64px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.40 },
+          { type: "rule", x1: VW / 2 - 80, y1: 560, x2: VW / 2 + 80, y2: 560,
+            color: "#cc4444", width: 2, revealAt: 0.48 },
+          // "legible and enforceable" ~8s => 0.63
+          { type: "text", x: VW / 2, y: 630, text: "Make it legible and enforceable",
+            font: '400 22px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.63 },
+          { type: "text", x: VW / 2, y: 670, text: "for the agent.",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", revealAt: 0.63 },
+          // "fundamental mindset shift" ~10s => 0.79
+          { type: "text", x: VW / 2, y: 740, text: "The fundamental mindset shift",
+            font: '500 22px "DM Sans", sans-serif', color: "#cc8844", revealAt: 0.79 },
+        ],
+
+        // Scene 5: Legibility: Apps (s=84.05, e=113.11, dur=29.06s)
+        // Narration starts at 85.25: "bottleneck shifted from code throughput to human QA...
+        // bootable per git worktree... Chrome DevTools Protocol...
+        // DOM snapshots, screenshots, navigation... observability stack... logs, metrics, traces"
+        "legibility-apps": [
+          { type: "glow", x: 400, y: 400, radius: 500, color: "rgba(204,68,68,0.05)" },
+          { type: "text", x: 160, y: 180, text: "Agent Legibility",
+            font: '300 48px "DM Sans", sans-serif', color: "#d0d0d0", textAlign: "left" },
+          { type: "rule", x1: 160, y1: 210, x2: 460, y2: 210,
+            color: "#cc4444", width: 2, revealAt: 0.02 },
+          // "bottleneck shifted" ~2s from scene start => (85.25-84.05)/29.06 = 0.04
+          { type: "text", x: 160, y: 260, text: "Bottleneck: code throughput -> human QA capacity",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.04 },
+          // "make the application itself directly legible" ~6s => 0.21
+          { type: "text", x: 160, y: 300, text: "Solution: make the app legible to the agent",
+            font: '500 20px "DM Sans", sans-serif', color: "#d0d0d0", textAlign: "left", revealAt: 0.14 },
+          // Concept 1: Bootable Worktrees ~10s => 0.34
+          { type: "rect", x: 160, y: 350, w: 580, h: 120, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.28 },
+          { type: "text", x: 200, y: 395, text: "Bootable Worktrees",
+            font: '600 24px "DM Sans", sans-serif', color: "#cc4444", textAlign: "left", revealAt: 0.28 },
+          { type: "text", x: 200, y: 435, text: "App boots per git worktree — isolated instances",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.31 },
+          // Concept 2: DevTools Protocol ~15s => 0.52
+          { type: "rect", x: 160, y: 490, w: 580, h: 120, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.45 },
+          { type: "text", x: 200, y: 535, text: "Chrome DevTools Protocol",
+            font: '600 24px "DM Sans", sans-serif', color: "#cc4444", textAlign: "left", revealAt: 0.45 },
+          { type: "text", x: 200, y: 575, text: "DOM snapshots, screenshots, navigation",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.50 },
+          // Concept 3: Observability ~20s => 0.69
+          { type: "rect", x: 160, y: 630, w: 580, h: 120, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.65 },
+          { type: "text", x: 200, y: 675, text: "Observability Stack",
+            font: '600 24px "DM Sans", sans-serif', color: "#cc4444", textAlign: "left", revealAt: 0.65 },
+          { type: "text", x: 200, y: 715, text: "Logs, metrics, traces — exposed per worktree",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.69 },
+          // Right side summary
+          { type: "rect", x: 900, y: 380, w: 440, h: 200, radius: 10,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.80 },
+          { type: "text", x: 1120, y: 440, text: "The agent can see",
+            font: '300 28px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.80 },
+          { type: "text", x: 1120, y: 485, text: "what the app is doing",
+            font: '300 28px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.80 },
+          { type: "text", x: 1120, y: 535, text: "wired into agent runtime",
+            font: '400 16px "JetBrains Mono", monospace', color: "#cc8844", revealAt: 0.85 },
+        ],
+
+        // Scene 6: Legibility: Results (s=113.11, e=130.94, dur=17.83s)
+        // Narration: "reproduce bugs, validate fixes... 800 milliseconds...
+        // six or more hours... while humans sleep"
+        "legibility-results": [
+          { type: "glow", x: VW / 2, y: VH * 0.4, radius: 500, color: "rgba(204,68,68,0.06)" },
+          { type: "text", x: VW / 2, y: 200, text: "What Legibility Enables",
+            font: '300 48px "DM Sans", sans-serif', color: "#d0d0d0" },
+          { type: "rule", x1: VW / 2 - 100, y1: 235, x2: VW / 2 + 100, y2: 235,
+            color: "#cc4444", width: 2, revealAt: 0.03 },
+          // "reproduce bugs, validate fixes" ~2s => 0.11
+          { type: "rect", x: 200, y: 290, w: 460, h: 130, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.11 },
+          { type: "text", x: 430, y: 340, text: "Reproduce bugs",
+            font: '600 28px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.11 },
+          { type: "text", x: 430, y: 385, text: "validate fixes with video proof",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.15 },
+          // "reason about UI behavior" ~4s => 0.22
+          { type: "rect", x: 720, y: 290, w: 460, h: 130, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.22 },
+          { type: "text", x: 950, y: 340, text: "UI reasoning",
+            font: '600 28px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.22 },
+          { type: "text", x: 950, y: 385, text: "agents reason about behavior end-to-end",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.26 },
+          // "under 800 milliseconds" ~7s => 0.39
+          { type: "rect", x: 200, y: 470, w: 460, h: 130, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.39 },
+          { type: "text", x: 430, y: 515, text: "< 800ms",
+            font: '700 48px "DM Sans", sans-serif', color: "#cc8844", revealAt: 0.39 },
+          { type: "text", x: 430, y: 565, text: "performance budgets enforced",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.42 },
+          // "six or more hours" ~10s => 0.56
+          { type: "rect", x: 720, y: 470, w: 460, h: 130, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.56 },
+          { type: "text", x: 950, y: 515, text: "6+ hours",
+            font: '700 48px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.56 },
+          { type: "text", x: 950, y: 565, text: "single autonomous agent runs",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.60 },
+          // "while humans sleep" ~14s => 0.78
+          { type: "rect", x: VW / 2 - 220, y: 650, w: 440, h: 70, radius: 8,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.78 },
+          { type: "text", x: VW / 2, y: 695, text: "often running while humans sleep",
+            font: '500 20px "JetBrains Mono", monospace', color: "#cc8844", revealAt: 0.78 },
+        ],
+
+        // Scene 7: Map Not Manual (s=130.94, e=154.92, dur=23.98s)
+        // Narration: "give the agent a map, not a thousand-page instruction manual...
+        // one big AGENTS.md approach failed... context is scarce...
+        // when everything is important, nothing is... monolithic manuals rot instantly"
+        "map-not-manual": [
+          { type: "glow", x: VW / 2, y: VH * 0.35, radius: 550, color: "rgba(204,68,68,0.06)" },
+          // "give the agent a map" ~1s => 0.04
+          { type: "text", x: VW / 2, y: 240, text: "Give the agent a map",
+            font: '300 56px "DM Sans", sans-serif', color: "#d0d0d0" },
+          { type: "rule", x1: VW / 2 - 100, y1: 280, x2: VW / 2 + 100, y2: 280,
+            color: "#cc4444", width: 2, revealAt: 0.04 },
+          // "not a thousand-page instruction manual" ~3s => 0.13
+          { type: "text", x: VW / 2, y: 340, text: "not a thousand-page manual",
+            font: '300 56px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.13 },
+          // "AGENTS.md approach failed" ~6s => 0.25
+          { type: "rect", x: 160, y: 420, w: 560, h: 100, radius: 10,
+            fill: "rgba(204,68,68,0.04)", stroke: "#cc4444", revealAt: 0.25 },
+          { type: "text", x: 440, y: 460, text: "One big AGENTS.md",
+            font: '500 22px "JetBrains Mono", monospace', color: "#cc4444", revealAt: 0.25 },
+          { type: "text", x: 440, y: 495, text: "FAILED",
+            font: '700 18px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.28 },
+          // "context is scarce" ~9s => 0.38
+          { type: "rect", x: 780, y: 420, w: 560, h: 100, radius: 10,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.38 },
+          { type: "text", x: 1060, y: 455, text: "Context is scarce",
+            font: '600 24px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.38 },
+          { type: "text", x: 1060, y: 495, text: "a giant file crowds out the task",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.42 },
+          // "when everything is important, nothing is" ~13s => 0.54
+          { type: "rect", x: VW / 2 - 340, y: 570, w: 680, h: 70, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.54 },
+          { type: "text", x: VW / 2, y: 615, text: "When everything is important, nothing is.",
+            font: '500 22px "JetBrains Mono", monospace', color: "#cc4444", revealAt: 0.54 },
+          // "monolithic manuals rot instantly" ~17s => 0.71
+          { type: "text", x: VW / 2, y: 710, text: "Monolithic manuals rot instantly",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", revealAt: 0.71 },
+          // need short stable entry points ~20s => 0.83
+          { type: "text", x: VW / 2, y: 760, text: "Agents need short, stable entry points",
+            font: '400 22px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.83 },
+          { type: "text", x: VW / 2, y: 800, text: "with pointers to deeper detail",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.87 },
+        ],
+
+        // Scene 8: Structured Docs (s=154.92, e=179.21, dur=24.29s)
+        // Narration: "AGENTS.md is a roughly 100-line table of contents...
+        // structured docs directory... design docs, execution plans, product specs...
+        // progressive disclosure... small stable entry point... where to look next...
+        // linters and CI validate the knowledge base"
+        "structured-docs": [
+          { type: "glow", x: 400, y: 400, radius: 500, color: "rgba(204,68,68,0.05)" },
+          { type: "text", x: 160, y: 180, text: "AGENTS.md",
+            font: '500 48px "JetBrains Mono", monospace', color: "#cc4444", textAlign: "left" },
+          { type: "rule", x1: 160, y1: 215, x2: 420, y2: 215,
+            color: "#cc4444", width: 2, revealAt: 0.02 },
+          // "roughly 100-line table of contents" ~2s => 0.08
+          { type: "rect", x: 160, y: 260, w: 600, h: 90, radius: 8,
+            fill: "rgba(204,68,68,0.06)", stroke: "#cc4444", revealAt: 0.08 },
+          { type: "text", x: 200, y: 295, text: "~100 lines",
+            font: '700 36px "DM Sans", sans-serif', color: "#cc4444", textAlign: "left", revealAt: 0.08 },
+          { type: "text", x: 200, y: 330, text: "table of contents -> docs/",
+            font: '400 18px "JetBrains Mono", monospace', color: "#606060", textAlign: "left", revealAt: 0.12 },
+          // "structured docs directory" -> individual items ~6s => 0.25
+          { type: "rect", x: 200, y: 380, w: 520, h: 56, radius: 6,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.25 },
+          { type: "text", x: 240, y: 415, text: "docs/architecture.md",
+            font: '400 20px "JetBrains Mono", monospace', color: "#606060", textAlign: "left", revealAt: 0.25 },
+          { type: "rect", x: 200, y: 450, w: 520, h: 56, radius: 6,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.30 },
+          { type: "text", x: 240, y: 485, text: "docs/design-docs/",
+            font: '400 20px "JetBrains Mono", monospace', color: "#606060", textAlign: "left", revealAt: 0.30 },
+          { type: "rect", x: 200, y: 520, w: 520, h: 56, radius: 6,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.35 },
+          { type: "text", x: 240, y: 555, text: "docs/execution-plans/",
+            font: '400 20px "JetBrains Mono", monospace', color: "#606060", textAlign: "left", revealAt: 0.35 },
+          { type: "rect", x: 200, y: 590, w: 520, h: 56, radius: 6,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.40 },
+          { type: "text", x: 240, y: 625, text: "docs/product-specs/",
+            font: '400 20px "JetBrains Mono", monospace', color: "#606060", textAlign: "left", revealAt: 0.40 },
+          { type: "rect", x: 200, y: 660, w: 520, h: 56, radius: 6,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.45 },
+          { type: "text", x: 240, y: 695, text: "docs/references/",
+            font: '400 20px "JetBrains Mono", monospace', color: "#606060", textAlign: "left", revealAt: 0.45 },
+          // Right side: "progressive disclosure" ~14s => 0.58
+          { type: "text", x: 1050, y: 340, text: "Progressive disclosure:",
+            font: '600 24px "DM Sans", sans-serif', color: "#d0d0d0", textAlign: "left", revealAt: 0.58 },
+          { type: "text", x: 1050, y: 390, text: "Start small and stable.",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.62 },
+          { type: "text", x: 1050, y: 430, text: "Teach where to look next.",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.66 },
+          // "linters and CI validate" ~20s => 0.82
+          { type: "rect", x: 1000, y: 510, w: 480, h: 80, radius: 8,
+            fill: "rgba(112,160,96,0.04)", stroke: "#282828", revealAt: 0.82 },
+          { type: "text", x: 1050, y: 545, text: "Mechanically enforced:",
+            font: '500 20px "DM Sans", sans-serif', color: "#70a060", textAlign: "left", revealAt: 0.82 },
+          { type: "text", x: 1050, y: 575, text: "linters + CI validate knowledge base",
+            font: '400 16px "JetBrains Mono", monospace', color: "#606060", textAlign: "left", revealAt: 0.86 },
+        ],
+
+        // Scene 9: Agent-First (s=179.21, e=198.07, dur=18.86s)
+        // Narration starts at 180.41: "optimized for the agent's legibility first...
+        // anything the agent can't access in context effectively doesn't exist...
+        // Google Docs, Slack, or people's heads is illegible...
+        // pushes more and more context into the repo"
+        "agent-first": [
+          { type: "glow", x: VW / 2, y: VH * 0.4, radius: 500, color: "rgba(204,68,68,0.06)" },
+          // "optimized for the agent's legibility first" ~2s => (180.41+2-179.21)/18.86 = 0.17
+          { type: "text", x: VW / 2, y: 260, text: "Optimized for agent",
+            font: '300 52px "DM Sans", sans-serif', color: "#d0d0d0" },
+          { type: "text", x: VW / 2, y: 320, text: "legibility first",
+            font: '300 52px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.10 },
+          { type: "rule", x1: VW / 2 - 80, y1: 360, x2: VW / 2 + 80, y2: 360,
+            color: "#cc4444", width: 2, revealAt: 0.14 },
+          // "not humans'" ~4s => 0.28
+          { type: "text", x: VW / 2, y: 420, text: "not humans'",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", revealAt: 0.22 },
+          // "anything the agent can't access" ~6s => 0.38
+          { type: "rect", x: VW / 2 - 370, y: 480, w: 740, h: 80, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#cc4444", revealAt: 0.38 },
+          { type: "text", x: VW / 2, y: 510, text: "Anything the agent can't access in context",
+            font: '400 22px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.38 },
+          { type: "text", x: VW / 2, y: 545, text: "effectively doesn't exist.",
+            font: '600 22px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.42 },
+          // "Google Docs, Slack, heads" ~10s => 0.58
+          { type: "rect", x: VW / 2 - 370, y: 610, w: 740, h: 80, radius: 8,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.58 },
+          { type: "text", x: VW / 2, y: 660, text: "Google Docs  /  Slack  /  people's heads",
+            font: '400 20px "JetBrains Mono", monospace', color: "#606060", revealAt: 0.58 },
+          // = illegible
+          { type: "text", x: VW / 2, y: 700, text: "= illegible to the system",
+            font: '500 18px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.62 },
+          // "pushes more context into the repo" ~14s => 0.78
+          { type: "text", x: VW / 2, y: 780, text: "Push context into the repo over time",
+            font: '400 22px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.78 },
+        ],
+
+        // Scene 10: Architecture Layers (s=198.07, e=216.58, dur=18.51s)
+        // Narration starts at 199.27: "enforce invariants, not micromanage implementations...
+        // rigid architectural model... fixed layers... strictly validated dependency directions"
+        "arch-layers": [
+          { type: "glow", x: VW / 2, y: VH * 0.35, radius: 550, color: "rgba(204,68,68,0.06)" },
+          // "enforce invariants" ~2s => (199.27+2-198.07)/18.51 = 0.17
+          { type: "text", x: VW / 2, y: 260, text: "Enforce invariants,",
+            font: '300 52px "DM Sans", sans-serif', color: "#d0d0d0" },
+          { type: "text", x: VW / 2, y: 320, text: "not implementations",
+            font: '300 52px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.10 },
+          { type: "rule", x1: VW / 2 - 100, y1: 360, x2: VW / 2 + 100, y2: 360,
+            color: "#cc4444", width: 2, revealAt: 0.14 },
+          // "don't micromanage" ~4s => 0.28
+          { type: "text", x: VW / 2, y: 430, text: "Don't micromanage how — guard what matters",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", revealAt: 0.24 },
+          // "rigid architectural model" ~6s => 0.38
+          { type: "rect", x: VW / 2 - 380, y: 490, w: 760, h: 100, radius: 10,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.38 },
+          { type: "text", x: VW / 2, y: 530, text: "Each business domain divided into fixed layers",
+            font: '400 22px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.38 },
+          { type: "text", x: VW / 2, y: 565, text: "with strictly validated dependency directions",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.44 },
+          // "types catch mistakes" ~10s => 0.59
+          { type: "text", x: VW / 2 - 180, y: 650, text: "Types catch mistakes",
+            font: '500 22px "JetBrains Mono", monospace', color: "#cc4444", revealAt: 0.55 },
+          // "config constrains choices" ~12s => 0.70
+          { type: "text", x: VW / 2 + 180, y: 650, text: "Config constrains choices",
+            font: '500 22px "JetBrains Mono", monospace', color: "#cc8844", revealAt: 0.65 },
+          // "let agent decide how" ~14s => 0.80
+          { type: "text", x: VW / 2, y: 730, text: "Let the agent decide how to implement",
+            font: '400 22px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.78 },
+        ],
+
+        // Scene 11: The Layer Stack (s=216.58, e=238.06, dur=21.48s)
+        // Narration: "Types, Config, Repo, Service, Runtime, UI...
+        // cross-cutting concerns... auth, connectors, telemetry...
+        // single explicit interface called Providers...
+        // enforced mechanically via custom linters... generated by the agent itself"
+        "layer-stack": [
+          { type: "glow", x: 450, y: 450, radius: 500, color: "rgba(204,68,68,0.05)" },
+          { type: "text", x: 160, y: 180, text: "The Enforcement Stack",
+            font: '300 40px "DM Sans", sans-serif', color: "#d0d0d0", textAlign: "left" },
+          { type: "rule", x1: 160, y1: 208, x2: 480, y2: 208,
+            color: "#cc4444", width: 2, revealAt: 0.02 },
+          // Types ~1s => 0.05
+          { type: "rect", x: 160, y: 250, w: 620, h: 55, radius: 6,
+            fill: "rgba(204,68,68,0.08)", stroke: "#cc4444", revealAt: 0.05 },
+          { type: "text", x: 470, y: 285, text: "Types",
+            font: '500 22px "JetBrains Mono", monospace', color: "#cc4444", revealAt: 0.05 },
+          // Config ~3s => 0.14
+          { type: "rect", x: 160, y: 318, w: 620, h: 55, radius: 6,
+            fill: "rgba(204,68,68,0.06)", stroke: "#282828", revealAt: 0.14 },
+          { type: "text", x: 470, y: 353, text: "Config",
+            font: '500 22px "JetBrains Mono", monospace', color: "#d0d0d0", revealAt: 0.14 },
+          // Repo ~4s => 0.19
+          { type: "rect", x: 160, y: 386, w: 620, h: 55, radius: 6,
+            fill: "rgba(204,68,68,0.06)", stroke: "#282828", revealAt: 0.19 },
+          { type: "text", x: 470, y: 421, text: "Repo",
+            font: '500 22px "JetBrains Mono", monospace', color: "#d0d0d0", revealAt: 0.19 },
+          // Service ~5s => 0.23
+          { type: "rect", x: 160, y: 454, w: 620, h: 55, radius: 6,
+            fill: "rgba(204,68,68,0.06)", stroke: "#282828", revealAt: 0.23 },
+          { type: "text", x: 470, y: 489, text: "Service",
+            font: '500 22px "JetBrains Mono", monospace', color: "#d0d0d0", revealAt: 0.23 },
+          // Runtime ~6s => 0.28
+          { type: "rect", x: 160, y: 522, w: 620, h: 55, radius: 6,
+            fill: "rgba(204,68,68,0.06)", stroke: "#282828", revealAt: 0.28 },
+          { type: "text", x: 470, y: 557, text: "Runtime",
+            font: '500 22px "JetBrains Mono", monospace', color: "#d0d0d0", revealAt: 0.28 },
+          // UI ~7s => 0.33
+          { type: "rect", x: 160, y: 590, w: 620, h: 55, radius: 6,
+            fill: "rgba(204,68,68,0.06)", stroke: "#282828", revealAt: 0.33 },
+          { type: "text", x: 470, y: 625, text: "UI",
+            font: '500 22px "JetBrains Mono", monospace', color: "#d0d0d0", revealAt: 0.33 },
+          // "cross-cutting concerns" ~10s => 0.47
+          { type: "rect", x: 900, y: 290, w: 500, h: 140, radius: 10,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.47 },
+          { type: "text", x: 940, y: 330, text: "Cross-cutting concerns:",
+            font: '600 22px "DM Sans", sans-serif', color: "#d0d0d0", textAlign: "left", revealAt: 0.47 },
+          { type: "text", x: 940, y: 370, text: "auth, connectors, telemetry",
+            font: '400 18px "JetBrains Mono", monospace', color: "#cc8844", textAlign: "left", revealAt: 0.52 },
+          { type: "text", x: 940, y: 405, text: "enter via single Providers interface",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.55 },
+          // "enforced mechanically" ~15s => 0.70
+          { type: "text", x: 940, y: 490, text: "Enforced via custom linters",
+            font: '500 20px "DM Sans", sans-serif', color: "#d0d0d0", textAlign: "left", revealAt: 0.70 },
+          { type: "text", x: 940, y: 525, text: "and structural tests",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.74 },
+          // "generated by the agent itself" ~18s => 0.84
+          { type: "text", x: 940, y: 590, text: "all generated by the agent itself",
+            font: '500 18px "JetBrains Mono", monospace', color: "#cc4444", textAlign: "left", revealAt: 0.84 },
+        ],
+
+        // Scene 12: Lint as Instructions (s=238.06, e=255.44, dur=17.38s)
+        // Narration: "custom lint error messages are written to inject remediation instructions...
+        // when the linter fires, the error message tells the agent exactly how to fix...
+        // documentation rules get promoted into code when docs alone don't hold"
+        "lint-instructions": [
+          { type: "glow", x: VW / 2, y: VH * 0.4, radius: 500, color: "rgba(204,68,68,0.06)" },
+          // "custom lint error messages" ~1s => 0.06
+          { type: "text", x: VW / 2, y: 220, text: "Error messages =",
+            font: '300 48px "DM Sans", sans-serif', color: "#d0d0d0" },
+          { type: "text", x: VW / 2, y: 280, text: "remediation instructions",
+            font: '300 48px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.08 },
+          { type: "rule", x1: VW / 2 - 100, y1: 320, x2: VW / 2 + 100, y2: 320,
+            color: "#cc4444", width: 2, revealAt: 0.12 },
+          // "inject... into agent context" ~4s => 0.23
+          { type: "rect", x: VW / 2 - 400, y: 370, w: 800, h: 130, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.23 },
+          { type: "text", x: VW / 2, y: 410, text: "Custom lint rules inject fix instructions",
+            font: '400 22px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.23 },
+          { type: "text", x: VW / 2, y: 450, text: "directly into the agent's context window",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", revealAt: 0.28 },
+          // example lint output ~7s => 0.40
+          { type: "rect", x: VW / 2 - 380, y: 540, w: 760, h: 90, radius: 6,
+            fill: "rgba(30,30,30,0.8)", stroke: "#cc4444", revealAt: 0.40 },
+          { type: "text", x: VW / 2, y: 575, text: "error: Import from 'repo' layer cannot depend on 'service'",
+            font: '400 16px "JetBrains Mono", monospace', color: "#cc4444", revealAt: 0.40 },
+          { type: "text", x: VW / 2, y: 610, text: "fix: Move shared logic to types/ or config/ layer",
+            font: '400 16px "JetBrains Mono", monospace', color: "#70a060", revealAt: 0.46 },
+          // "the agent reads the error and knows what to do" ~10s => 0.58
+          { type: "text", x: VW / 2, y: 690, text: "The agent reads the error",
+            font: '400 22px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.58 },
+          { type: "text", x: VW / 2, y: 730, text: "and knows exactly what to do",
+            font: '500 22px "DM Sans", sans-serif', color: "#cc8844", revealAt: 0.62 },
+          // "promoted into code" ~14s => 0.81
+          { type: "text", x: VW / 2, y: 810, text: "Promote docs into code when docs alone don't hold",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.81 },
+        ],
+
+        // Scene 13: Boring Tech + Merging (s=255.44, e=299.47, dur=44.03s)
+        // Two narrations: 256.63 "boring technology... composable stable APIs...
+        //   training data... reimplement... concurrency helper... 100% test coverage"
+        // 280.46 "merge philosophy... minimal blocking... short-lived PRs...
+        //   corrections are cheap, waiting is expensive... irresponsible in low-throughput"
+        "boring-merge": [
+          { type: "glow", x: VW / 2, y: VH * 0.4, radius: 550, color: "rgba(204,68,68,0.06)" },
+          // Boring tech panel — "boring technology" ~2s => (256.63+2-255.44)/44.03 = 0.07
+          { type: "rect", x: 160, y: 170, w: 700, h: 320, radius: 10,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.02 },
+          { type: "text", x: 200, y: 220, text: "Boring technology",
+            font: '300 40px "DM Sans", sans-serif', color: "#d0d0d0", textAlign: "left", revealAt: 0.02 },
+          { type: "rule", x1: 200, y1: 248, x2: 450, y2: 248,
+            color: "#cc4444", width: 2, revealAt: 0.04 },
+          // "composable, stable APIs" ~4s => 0.12
+          { type: "text", x: 200, y: 290, text: "Composable, stable APIs",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.10 },
+          // "well-represented in training data" ~5s => 0.14
+          { type: "text", x: 200, y: 330, text: "well-represented in training data",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.14 },
+          // "cheaper to reimplement" ~8s => 0.21
+          { type: "text", x: 200, y: 385, text: "Sometimes cheaper to reimplement",
+            font: '400 20px "DM Sans", sans-serif', color: "#d0d0d0", textAlign: "left", revealAt: 0.21 },
+          { type: "text", x: 200, y: 415, text: "than to fight opaque upstream libraries",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.23 },
+          // "built their own concurrency helper" ~12s => 0.31
+          { type: "text", x: 200, y: 460, text: "Example: built own concurrency helper",
+            font: '400 16px "JetBrains Mono", monospace', color: "#cc8844", textAlign: "left", revealAt: 0.29 },
+          // right side detail
+          { type: "text", x: 1050, y: 300, text: "100% test coverage",
+            font: '700 36px "DM Sans", sans-serif', color: "#70a060", textAlign: "left", revealAt: 0.33 },
+          { type: "text", x: 1050, y: 345, text: "integrated with telemetry",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.35 },
+          // Merge panel — "merge philosophy" ~25s => (280.46-255.44)/44.03 = 0.57
+          { type: "rect", x: 160, y: 540, w: 700, h: 280, radius: 10,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.55 },
+          { type: "text", x: 200, y: 590, text: "Merge philosophy",
+            font: '300 40px "DM Sans", sans-serif', color: "#d0d0d0", textAlign: "left", revealAt: 0.55 },
+          { type: "rule", x1: 200, y1: 618, x2: 420, y2: 618,
+            color: "#cc4444", width: 2, revealAt: 0.57 },
+          // "minimal blocking merge gates" ~27s => 0.61
+          { type: "text", x: 200, y: 660, text: "Minimal blocking merge gates",
+            font: '400 22px "DM Sans", sans-serif', color: "#d0d0d0", textAlign: "left", revealAt: 0.61 },
+          // "short-lived PRs" ~29s => 0.66
+          { type: "text", x: 200, y: 700, text: "PRs are short-lived",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.66 },
+          // "corrections are cheap, waiting is expensive" ~32s => 0.72
+          { type: "text", x: 200, y: 755, text: "Corrections are cheap,",
+            font: '500 28px "JetBrains Mono", monospace', color: "#cc4444", textAlign: "left", revealAt: 0.72 },
+          { type: "text", x: 200, y: 795, text: "waiting is expensive.",
+            font: '500 28px "JetBrains Mono", monospace', color: "#cc4444", textAlign: "left", revealAt: 0.74 },
+          // right side: "irresponsible in low-throughput" ~38s => 0.85
+          { type: "rect", x: 1000, y: 620, w: 440, h: 100, radius: 8,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.83 },
+          { type: "text", x: 1040, y: 660, text: "Caveat: irresponsible",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.83 },
+          { type: "text", x: 1040, y: 695, text: "in low-throughput environments",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.85 },
+        ],
+
+        // Scene 14: Entropy (s=299.47, e=336.29, dur=36.82s)
+        // Narration 300.67: "agent replicates existing patterns, including suboptimal ones...
+        //   drift... every Friday... twenty percent... AI slop... didn't scale"
+        // Narration 318.12: "golden principles... prefer shared utility packages...
+        //   don't probe data recklessly... typed SDKs"
+        "entropy": [
+          { type: "glow", x: 400, y: 400, radius: 500, color: "rgba(204,68,68,0.05)" },
+          { type: "text", x: 160, y: 180, text: "Fighting Entropy",
+            font: '300 48px "DM Sans", sans-serif', color: "#d0d0d0", textAlign: "left" },
+          { type: "rule", x1: 160, y1: 210, x2: 430, y2: 210,
+            color: "#cc4444", width: 2, revealAt: 0.02 },
+          // "agent replicates existing patterns" ~2s => (300.67+2-299.47)/36.82 = 0.09
+          { type: "rect", x: 160, y: 260, w: 700, h: 170, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.06 },
+          { type: "text", x: 200, y: 305, text: "The \"AI Slop\" problem",
+            font: '600 24px "DM Sans", sans-serif', color: "#cc4444", textAlign: "left", revealAt: 0.06 },
+          { type: "text", x: 200, y: 345, text: "Agents replicate existing patterns —",
+            font: '400 20px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.09 },
+          { type: "text", x: 200, y: 375, text: "including suboptimal ones, leading to drift",
+            font: '400 20px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.12 },
+          // "every Friday, twenty percent" ~8s => 0.24
+          { type: "text", x: 200, y: 415, text: "Initially: 20% of the week (Fridays) on cleanup",
+            font: '400 16px "JetBrains Mono", monospace', color: "#cc8844", textAlign: "left", revealAt: 0.22 },
+          // "didn't scale" ~10s => 0.30
+          { type: "text", x: 680, y: 415, text: "Didn't scale.",
+            font: '500 16px "DM Sans", sans-serif', color: "#cc4444", textAlign: "left", revealAt: 0.28 },
+          // Golden principles — narration at 318.12 => (318.12-299.47)/36.82 = 0.51
+          { type: "rect", x: 160, y: 480, w: 700, h: 170, radius: 8,
+            fill: "rgba(112,160,96,0.04)", stroke: "#282828", revealAt: 0.48 },
+          { type: "text", x: 200, y: 525, text: "Golden Principles",
+            font: '600 24px "DM Sans", sans-serif', color: "#70a060", textAlign: "left", revealAt: 0.48 },
+          { type: "text", x: 200, y: 565, text: "Encoded standards agents can see and follow",
+            font: '400 20px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.52 },
+          // examples ~22s => 0.61
+          { type: "text", x: 200, y: 605, text: "\"Prefer shared utilities over hand-rolled helpers\"",
+            font: '400 16px "JetBrains Mono", monospace', color: "#cc8844", textAlign: "left", revealAt: 0.60 },
+          { type: "text", x: 200, y: 638, text: "\"Don't probe data recklessly — use typed SDKs\"",
+            font: '400 16px "JetBrains Mono", monospace', color: "#cc8844", textAlign: "left", revealAt: 0.66 },
+          // Right side
+          { type: "rect", x: 1000, y: 320, w: 420, h: 140, radius: 10,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.72 },
+          { type: "text", x: 1040, y: 365, text: "Technical debt is a",
+            font: '300 26px "DM Sans", sans-serif', color: "#d0d0d0", textAlign: "left", revealAt: 0.72 },
+          { type: "text", x: 1040, y: 405, text: "high-interest loan.",
+            font: '300 26px "DM Sans", sans-serif', color: "#cc4444", textAlign: "left", revealAt: 0.75 },
+          { type: "text", x: 1040, y: 510, text: "Pay it down continuously",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.82 },
+          { type: "text", x: 1040, y: 550, text: "in small increments.",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", textAlign: "left", revealAt: 0.85 },
+        ],
+
+        // Scene 15: Garbage Collection (s=336.29, e=359.11, dur=22.82s)
+        // Narration: "background agent tasks run on a regular cadence...
+        // scanning for deviations... updating quality grades...
+        // opening targeted refactoring PRs... reviewable in under a minute...
+        // auto-merged... functions like garbage collection...
+        // high-interest loan... pay it down continuously"
+        "garbage-collection": [
+          { type: "glow", x: VW / 2, y: VH * 0.4, radius: 500, color: "rgba(204,68,68,0.06)" },
+          { type: "text", x: VW / 2, y: 190, text: "Garbage Collection",
+            font: '300 48px "DM Sans", sans-serif', color: "#d0d0d0" },
+          { type: "rule", x1: VW / 2 - 100, y1: 225, x2: VW / 2 + 100, y2: 225,
+            color: "#cc4444", width: 2, revealAt: 0.03 },
+          { type: "text", x: VW / 2, y: 265, text: "for code quality",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", revealAt: 0.06 },
+          // "background agent tasks" ~2s => 0.09
+          { type: "rect", x: 200, y: 310, w: 400, h: 150, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.09 },
+          { type: "text", x: 400, y: 360, text: "Scan",
+            font: '700 36px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.09 },
+          { type: "text", x: 400, y: 400, text: "for deviations on a",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.12 },
+          { type: "text", x: 400, y: 432, text: "regular cadence",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.12 },
+          // "updating quality grades" ~6s => 0.26
+          { type: "rect", x: 660, y: 310, w: 400, h: 150, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.26 },
+          { type: "text", x: 860, y: 360, text: "Grade",
+            font: '700 36px "DM Sans", sans-serif', color: "#cc8844", revealAt: 0.26 },
+          { type: "text", x: 860, y: 400, text: "update quality scores",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.29 },
+          { type: "text", x: 860, y: 432, text: "flag degradation",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.29 },
+          // "opening targeted refactoring PRs" ~9s => 0.39
+          { type: "rect", x: 1120, y: 310, w: 400, h: 150, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#282828", revealAt: 0.39 },
+          { type: "text", x: 1320, y: 360, text: "Refactor",
+            font: '700 36px "DM Sans", sans-serif', color: "#70a060", revealAt: 0.39 },
+          { type: "text", x: 1320, y: 400, text: "open targeted PRs",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.42 },
+          { type: "text", x: 1320, y: 432, text: "automatically",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.42 },
+          // "reviewable in under a minute" ~12s => 0.53
+          { type: "rect", x: VW / 2 - 250, y: 510, w: 500, h: 70, radius: 8,
+            fill: "rgba(112,160,96,0.04)", stroke: "#282828", revealAt: 0.53 },
+          { type: "text", x: VW / 2, y: 555, text: "< 1 minute to review, auto-mergeable",
+            font: '500 20px "JetBrains Mono", monospace', color: "#70a060", revealAt: 0.53 },
+          // "functions like garbage collection" ~15s => 0.66
+          { type: "text", x: VW / 2, y: 640, text: "Functions like garbage collection",
+            font: '400 22px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.66 },
+          // "continuous improvement" ~18s => 0.79
+          { type: "text", x: VW / 2, y: 700, text: "Continuous improvement",
+            font: '600 28px "DM Sans", sans-serif', color: "#cc8844", revealAt: 0.79 },
+          { type: "text", x: VW / 2, y: 745, text: "without human initiation",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", revealAt: 0.85 },
+        ],
+
+        // Scene 16: Full Autonomy (s=359.11, e=388.22, dur=29.11s)
+        // Narration at 360.31: "a single prompt can drive an entire feature...
+        // validates codebase state... reproduces a reported bug...
+        // records a video... implements a fix... validates the fix...
+        // records a second video... opens a pull request... responds to feedback...
+        // detects build failures... escalates only when judgment is required"
+        "autonomy": [
+          { type: "glow", x: VW / 2, y: VH * 0.35, radius: 550, color: "rgba(204,68,68,0.06)" },
+          // "single prompt can drive an entire feature" ~1s => (360.31+1-359.11)/29.11 = 0.04
+          { type: "text", x: VW / 2, y: 180, text: "The Full Loop",
+            font: '300 48px "DM Sans", sans-serif', color: "#d0d0d0" },
+          { type: "rule", x1: VW / 2 - 80, y1: 210, x2: VW / 2 + 80, y2: 210,
+            color: "#cc4444", width: 2, revealAt: 0.03 },
+          { type: "text", x: VW / 2, y: 250, text: "One prompt drives the entire feature",
+            font: '400 18px "DM Sans", sans-serif', color: "#606060", revealAt: 0.04 },
+          // Steps staggered through the narration
+          // "validates codebase state" ~3s => 0.13
+          { type: "rect", x: VW / 2 - 300, y: 290, w: 600, h: 46, radius: 6,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.10 },
+          { type: "text", x: VW / 2, y: 320, text: "1. Validate current codebase state",
+            font: '400 20px "JetBrains Mono", monospace', color: "#606060", revealAt: 0.10 },
+          // "reproduces a reported bug" ~5s => 0.20
+          { type: "rect", x: VW / 2 - 300, y: 346, w: 600, h: 46, radius: 6,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.18 },
+          { type: "text", x: VW / 2, y: 376, text: "2. Reproduce the reported bug",
+            font: '400 20px "JetBrains Mono", monospace', color: "#d0d0d0", revealAt: 0.18 },
+          // "records a video" ~7s => 0.27
+          { type: "rect", x: VW / 2 - 300, y: 402, w: 600, h: 46, radius: 6,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.25 },
+          { type: "text", x: VW / 2, y: 432, text: "3. Record video of the failure",
+            font: '400 20px "JetBrains Mono", monospace', color: "#606060", revealAt: 0.25 },
+          // "implements a fix" ~9s => 0.34
+          { type: "rect", x: VW / 2 - 300, y: 458, w: 600, h: 46, radius: 6,
+            fill: "rgba(204,68,68,0.04)", stroke: "#cc4444", revealAt: 0.32 },
+          { type: "text", x: VW / 2, y: 488, text: "4. Implement the fix",
+            font: '400 20px "JetBrains Mono", monospace', color: "#cc4444", revealAt: 0.32 },
+          // "validates the fix" ~11s => 0.41
+          { type: "rect", x: VW / 2 - 300, y: 514, w: 600, h: 46, radius: 6,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.39 },
+          { type: "text", x: VW / 2, y: 544, text: "5. Validate fix + record resolution video",
+            font: '400 20px "JetBrains Mono", monospace', color: "#606060", revealAt: 0.39 },
+          // "opens a pull request" ~14s => 0.51
+          { type: "rect", x: VW / 2 - 300, y: 570, w: 600, h: 46, radius: 6,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.48 },
+          { type: "text", x: VW / 2, y: 600, text: "6. Open PR, respond to review feedback",
+            font: '400 20px "JetBrains Mono", monospace', color: "#606060", revealAt: 0.48 },
+          // "detects build failures" ~17s => 0.61
+          { type: "rect", x: VW / 2 - 300, y: 626, w: 600, h: 46, radius: 6,
+            fill: "rgba(204,68,68,0.03)", stroke: "#282828", revealAt: 0.58 },
+          { type: "text", x: VW / 2, y: 656, text: "7. Detect build failures, retry",
+            font: '400 20px "JetBrains Mono", monospace', color: "#606060", revealAt: 0.58 },
+          // divider
+          { type: "rule", x1: VW / 2 - 200, y1: 700, x2: VW / 2 + 200, y2: 700,
+            color: "#282828", width: 1, revealAt: 0.68 },
+          // "escalates only when judgment is required" ~22s => 0.79
+          { type: "text", x: VW / 2, y: 750, text: "Escalate only when",
+            font: '600 28px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.75 },
+          { type: "text", x: VW / 2, y: 795, text: "judgment is required",
+            font: '600 28px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.79 },
+        ],
+
+        // Scene 17: Takeaway (s=388.22, e=412, dur=23.78s)
+        // Narration at 389.42: "building software still demands discipline...
+        // discipline shows up more in the scaffolding rather than the code...
+        // engineer's value shifts from writing correct code...
+        // to designing systems that make correct code the path of least resistance"
+        "takeaway": [
+          { type: "glow", x: VW / 2, y: VH / 2, radius: 600, color: "rgba(204,68,68,0.08)" },
+          // "building software still demands discipline" ~2s => (389.42+2-388.22)/23.78 = 0.13
+          { type: "text", x: VW / 2, y: 250, text: "Software still demands",
+            font: '300 36px "DM Sans", sans-serif', color: "#606060", revealAt: 0.05 },
+          { type: "text", x: VW / 2, y: 295, text: "discipline",
+            font: '300 52px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.10 },
+          // "shows up more in the scaffolding" ~5s => 0.26
+          { type: "text", x: VW / 2, y: 380, text: "Discipline in scaffolding,",
+            font: '300 56px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.22 },
+          // "rather than the code" ~7s => 0.34
+          { type: "text", x: VW / 2, y: 445, text: "not code.",
+            font: '300 56px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.32 },
+          { type: "rule", x1: VW / 2 - 80, y1: 485, x2: VW / 2 + 80, y2: 485,
+            color: "#cc4444", width: 2, revealAt: 0.38 },
+          // "engineer's value shifts" ~10s => 0.50
+          { type: "text", x: VW / 2, y: 550, text: "The engineer's value shifts",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", revealAt: 0.47 },
+          // "from writing correct code" ~12s => 0.55
+          { type: "text", x: VW / 2, y: 600, text: "from writing correct code",
+            font: '400 22px "DM Sans", sans-serif', color: "#606060", revealAt: 0.55 },
+          // "to designing systems" ~14s => 0.63
+          { type: "text", x: VW / 2, y: 660, text: "to designing systems that make correct code",
+            font: '400 22px "DM Sans", sans-serif', color: "#d0d0d0", revealAt: 0.63 },
+          // "path of least resistance" ~16s => 0.72
+          { type: "rect", x: VW / 2 - 300, y: 700, w: 600, h: 70, radius: 8,
+            fill: "rgba(204,68,68,0.04)", stroke: "#cc4444", revealAt: 0.72 },
+          { type: "text", x: VW / 2, y: 745, text: "the path of least resistance for agents",
+            font: '600 24px "DM Sans", sans-serif', color: "#cc4444", revealAt: 0.72 },
+        ],
+      };
+
+      // ===== RENDERER =====
+      const renderScene = createSceneRenderer(scenes, sceneElements, {
+        bg: "#0e0e0e",
+      });
+
+      // ===== BOOT =====
+      createLesson({
+        lessonId: "harness-engineering",
+        scenes,
+        IX,
+        render: renderScene,
+      });
+    </script>
+  </body>
+</html>
