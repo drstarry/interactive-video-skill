@@ -7,3 +7,4 @@ test-output/
 .claude/
 .superpowers/
 .playwright/
+.playwright-mcp/
