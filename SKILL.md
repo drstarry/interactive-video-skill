@@ -127,6 +127,11 @@ Use `run_in_background: true`. Audio only needs content.json.
 1. Read updated `content.json` for computed timing
 2. Patch HTML: scene `s`/`e` values + IX `time` values
 
+**Scene timing rules:**
+- First scene starts at `0`. Last scene ends at `meta.duration`.
+- Each scene's `s` equals the previous scene's `e`. **No gaps.** The audio `gap` (1.2s silence between segments) does NOT create scene gaps — scenes are wall-to-wall.
+- Use interaction `time` values and narration `t` values as guides for where to place boundaries, but always ensure contiguity.
+
 **Validate + serve in one command:**
 ```bash
 cd $SKILL_DIR && npx tsx scripts/validate.ts {lessonId} \
