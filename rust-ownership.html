@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="src/lesson.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <style>
       :root {
         --bg: #111111;
@@ -41,7 +41,7 @@
   </head>
   <body data-theme="clean-dark">
     <!-- Navigation -->
-                <nav class="site-nav">
+    <nav class="site-nav">
       <a class="site-nav-brand" href="https://github.com/drstarry/interactive-video-skill">Interactive Video Skill</a>
       <div class="site-nav-links">
         <a href="skill-onboarding.html">Onboarding [theme: Chalkboard]</a>
@@ -108,30 +108,43 @@
 
       // ===== SCENE DATA =====
       const scenes = [
-        { s: 0, e: 22.99, label: "The Problem", bg: "intro" },
-        { s: 22.99, e: 62.06, label: "Ownership & Moves", bg: "ownership" },
-        { s: 62.06, e: 79.75, label: "The Three Rules", bg: "rules" },
-        { s: 79.75, e: 115.32, label: "Borrowing", bg: "borrowing" },
-        { s: 115.32, e: 153.14, label: "Mutable References", bg: "mutref" },
-        { s: 153.14, e: 185.66, label: "Lifetimes", bg: "lifetimes" },
-        { s: 185.66, e: 209, label: "Summary", bg: "summary" },
+        { s: 0,      e: 24.77,  label: "The Memory Problem",        bg: "memProblem" },
+        { s: 24.77,  e: 55.32,  label: "Rust's Third Way",          bg: "thirdWay" },
+        { s: 55.32,  e: 92.26,  label: "Three Rules of Ownership",  bg: "threeRules" },
+        { s: 92.26,  e: 118.23, label: "Move Semantics",            bg: "moveSetup" },
+        { s: 118.23, e: 137.81, label: "Move Explained",            bg: "moveExplained" },
+        { s: 137.81, e: 156.1,  label: "Move in Memory",            bg: "moveMemory" },
+        { s: 156.1,  e: 191.54, label: "The Copy Trait",            bg: "copyTrait" },
+        { s: 191.54, e: 217.13, label: "Borrowing",                 bg: "borrowing" },
+        { s: 217.13, e: 240.24, label: "Borrowing Rules",           bg: "borrowRules" },
+        { s: 240.24, e: 270.34, label: "The Borrow Checker",        bg: "borrowChecker" },
+        { s: 270.34, e: 289.92, label: "Non-Lexical Lifetimes",     bg: "nll" },
+        { s: 289.92, e: 338.5,  label: "Lifetime Annotations",      bg: "lifetimes" },
+        { s: 338.5,  e: 388.68, label: "Bugs Prevented",            bg: "bugsPrevented" },
+        { s: 388.68, e: 431,    label: "Synthesis",                  bg: "synthesis" },
       ];
 
       const IX = [
         {
-          id: "try-ownership-rules",
-          time: 78.55,
-          cat: "try",
-          title: "Order the Ownership Rules",
-          desc: "Arrange Rust's three ownership rules in the correct order.",
+          id: "q-move", time: 118.23, cat: "q",
+          title: "Predict the Move",
+          desc: "You write: let s2 = s1; where s1 is a String. What happens next?",
+          options: [
+            { k: "A", c: false },
+            { k: "B", c: false },
+            { k: "C", c: true },
+          ],
+        },
+        {
+          id: "try-borrow-rules", time: 240.24, cat: "try",
+          title: "Valid or Invalid Borrows?",
+          desc: "Drag each code pattern into the correct category.",
           options: [],
         },
         {
-          id: "q-borrowing",
-          time: 114.12,
-          cat: "q",
-          title: "Borrowing Check",
-          desc: "What does a shared reference (&T) allow you to do?",
+          id: "q-borrow-checker", time: 289.92, cat: "q",
+          title: "Does This Compile?",
+          desc: "let mut v = vec![1,2,3];\nlet r1 = &mut v;\nr1.push(4);\nlet r2 = &v;\nprintln!(\"{}\", r2.len());",
           options: [
             { k: "A", c: false },
             { k: "B", c: true },
@@ -139,643 +152,1319 @@
           ],
         },
         {
-          id: "try-valid-code",
-          time: 151.94,
-          cat: "try",
-          title: "Valid or Invalid?",
-          desc: "Categorize each Rust code snippet as valid or invalid.",
+          id: "try-lifetime-scope", time: 338.5, cat: "try",
+          title: "Lifetime Scope Explorer",
+          desc: "Slide to see how reference lifetimes affect what compiles.",
           options: [],
         },
         {
-          id: "q-lifetimes",
-          time: 184.46,
-          cat: "q",
-          title: "Lifetime Check",
-          desc: "Why does Rust reject a function that returns a reference to a local variable?",
+          id: "try-bug-categories", time: 388.68, cat: "try",
+          title: "Match the Bug to the Fix",
+          desc: "Drag to order: which ownership rule prevents each bug?",
+          options: [],
+        },
+        {
+          id: "q-synthesis", time: 424.82, cat: "q",
+          title: "Why Is This Safe?",
+          desc: "fn process(data: &[u8]) { /* read-only work */ }\nlet buffer = vec![0u8; 1024];\nprocess(&buffer);\nprintln!(\"Buffer len: {}\", buffer.len());\n\nWhy does this code compile and run without any memory issues?",
           options: [
-            { k: "A", c: true },
-            { k: "B", c: false },
+            { k: "A", c: false },
+            { k: "B", c: true },
             { k: "C", c: false },
           ],
         },
       ];
 
+      // ===== HELPERS =====
+      const ease = t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+      const reveal = (p, delay, dur) => Math.max(0, Math.min(1, (p - delay) / (dur || 0.15)));
+      const COL = {
+        bg: "#111111", card: "#1a1a1a", el: "#222222",
+        text: "#e0e0e0", dim: "#666666", accent: "#999999",
+        red: "#cc4444", grn: "#55aa55", code: "#181818",
+        rust: "#dea584", kw: "#cc7832", str: "#6a8759",
+        type: "#b0a0d0", comment: "#5a6a5a",
+      };
+      const FONT = {
+        h1: '600 36px "DM Sans"', h2: '600 28px "DM Sans"',
+        h3: '600 22px "DM Sans"', body: '400 18px "DM Sans"',
+        bodySm: '400 16px "DM Sans"', code: '400 16px "JetBrains Mono"',
+        codeLg: '500 18px "JetBrains Mono"', label: '500 14px "DM Sans"',
+      };
+
+      function drawRoundedRect(ctx, x, y, w, h, r, fill, stroke, lw) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+        if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+        if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw || 2; ctx.stroke(); }
+      }
+
+      function drawArrow(ctx, x1, y1, x2, y2, color, lw) {
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        const hl = 12;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = lw || 2;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - hl * Math.cos(angle - 0.4), y2 - hl * Math.sin(angle - 0.4));
+        ctx.lineTo(x2 - hl * Math.cos(angle + 0.4), y2 - hl * Math.sin(angle + 0.4));
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+      }
+
+      function drawCodeBlock(ctx, x, y, w, lines, highlight, t) {
+        const lineH = 26;
+        const h = lines.length * lineH + 24;
+        drawRoundedRect(ctx, x, y, w, h, 8, COL.code, "#333", 1);
+        ctx.font = FONT.code;
+        for (let i = 0; i < lines.length; i++) {
+          const ly = y + 20 + i * lineH;
+          if (highlight !== undefined && highlight === i) {
+            ctx.fillStyle = "rgba(153,153,153,0.1)";
+            ctx.fillRect(x + 4, ly - 14, w - 8, lineH);
+          }
+          ctx.fillStyle = "#555";
+          ctx.textAlign = "right";
+          ctx.fillText((i+1).toString(), x + 30, ly);
+          ctx.textAlign = "left";
+          const line = lines[i];
+          if (typeof line === "string") {
+            ctx.fillStyle = COL.text;
+            ctx.fillText(line, x + 44, ly);
+          } else if (Array.isArray(line) && line.length === 0) {
+            // empty line
+          } else {
+            let cx = x + 44;
+            for (const seg of line) {
+              ctx.fillStyle = seg.c || COL.text;
+              ctx.fillText(seg.t, cx, ly);
+              cx += ctx.measureText(seg.t).width;
+            }
+          }
+        }
+        return h;
+      }
+
       // ===== DECLARATIVE ELEMENTS =====
       const sceneElements = {
-        intro: [
-          { type: "glow", x: 960, y: 540, radius: 450, color: "rgba(153,153,153,0.05)" },
-          {
-            type: "text", x: 960, y: 340,
-            text: "Memory Safety",
-            font: '600 52px "DM Sans"', color: "#e0e0e0",
-          },
-          {
-            type: "text", x: 960, y: 410,
-            text: "without a garbage collector",
-            font: '300 24px "DM Sans"', color: "#666666",
-            revealAt: 0.15,
-          },
-          {
-            type: "rule", x1: 860, y1: 450, x2: 1060, y2: 450,
-            color: "#999999", revealAt: 0.25,
-          },
-          {
-            type: "text", x: 560, y: 560,
-            text: "C / C++",
-            font: '500 22px "DM Sans"', color: "#cc4444",
-            revealAt: 0.35,
-          },
-          {
-            type: "text", x: 560, y: 600,
-            text: "Manual memory management",
-            font: '400 16px "DM Sans"', color: "#666666",
-            revealAt: 0.4,
-          },
-          {
-            type: "text", x: 960, y: 560,
-            text: "Java / Python",
-            font: '500 22px "DM Sans"', color: "#999999",
-            revealAt: 0.45,
-          },
-          {
-            type: "text", x: 960, y: 600,
-            text: "Garbage collector",
-            font: '400 16px "DM Sans"', color: "#666666",
-            revealAt: 0.5,
-          },
-          {
-            type: "text", x: 1360, y: 560,
-            text: "Rust",
-            font: '700 22px "DM Sans"', color: "#e0e0e0",
-            revealAt: 0.6,
-          },
-          {
-            type: "text", x: 1360, y: 600,
-            text: "Ownership system",
-            font: '400 16px "DM Sans"', color: "#999999",
-            revealAt: 0.65,
-          },
+        memProblem: [
+          { type: "glow", x: 960, y: 400, radius: 500, color: "rgba(153,153,153,0.04)" },
+          { type: "text", x: 960, y: 240, text: "The Memory Problem", font: '600 40px "DM Sans"', color: COL.text },
+          { type: "rule", x1: 860, y1: 280, x2: 1060, y2: 280, color: COL.accent, revealAt: 0.1 },
         ],
-        rules: [
-          { type: "glow", x: 960, y: 540, radius: 400, color: "rgba(153,153,153,0.04)" },
-          {
-            type: "text", x: 960, y: 260,
-            text: "The Three Rules of Ownership",
-            font: '600 36px "DM Sans"', color: "#e0e0e0",
-          },
-          {
-            type: "rule", x1: 810, y1: 300, x2: 1110, y2: 300,
-            color: "#999999", revealAt: 0.1,
-          },
-        ],
-        summary: [
+        synthesis: [
           { type: "glow", x: 960, y: 540, radius: 500, color: "rgba(153,153,153,0.04)" },
-          {
-            type: "text", x: 960, y: 300,
-            text: "Rust's Safety Guarantees",
-            font: '600 40px "DM Sans"', color: "#e0e0e0",
-          },
-          {
-            type: "rule", x1: 830, y1: 340, x2: 1090, y2: 340,
-            color: "#999999", revealAt: 0.1,
-          },
+          { type: "text", x: 960, y: 200, text: "Rust Ownership: The Full Picture", font: '600 36px "DM Sans"', color: COL.text },
+          { type: "rule", x1: 760, y1: 240, x2: 1160, y2: 240, color: COL.accent, revealAt: 0.1 },
         ],
       };
 
       // ===== CUSTOM DRAW =====
       const customDraw = {
-        ownership: (ctx, p, t) => {
-          const cx = VW / 2, cy = VH / 2;
 
-          // Title
-          const titleReveal = Math.max(0, Math.min(1, p / 0.1));
-          ctx.globalAlpha = titleReveal;
-          ctx.font = '600 36px "DM Sans"';
-          ctx.fillStyle = "#e0e0e0";
+        // --- Scene 1: The Memory Problem ---
+        memProblem: (ctx, p, t) => {
+          // Two columns: Manual vs GC
+          const r1 = reveal(p, 0.15, 0.15);
+          const r2 = reveal(p, 0.5, 0.15);
+
+          // Left column: Manual
+          ctx.globalAlpha = r1;
+          const lx = 280, ly = 360;
+          drawRoundedRect(ctx, lx, ly, 360, 260, 10, "rgba(204,68,68,0.08)", COL.red, 1.5);
+          ctx.font = FONT.h3;
           ctx.textAlign = "center";
-          ctx.fillText("Ownership & Move Semantics", cx, 200);
+          ctx.fillStyle = COL.red;
+          ctx.fillText("Manual (C/C++)", lx + 180, ly + 36);
+          ctx.font = FONT.body;
+          ctx.fillStyle = COL.dim;
+          const manLines = ["malloc / free", "Full control", "Use-after-free risk", "Double-free risk"];
+          manLines.forEach((l, i) => {
+            const lr = reveal(p, 0.2 + i * 0.06, 0.12);
+            ctx.globalAlpha = r1 * lr;
+            ctx.fillText(l, lx + 180, ly + 86 + i * 42);
+          });
 
-          // Code block background
-          const codeReveal = Math.max(0, Math.min(1, (p - 0.15) / 0.15));
-          ctx.globalAlpha = codeReveal;
-          const bx = 360, by = 280, bw = 600, bh = 260;
-          ctx.fillStyle = "#1a1a1a";
-          ctx.beginPath();
-          ctx.roundRect(bx, by, bw, bh, 12);
-          ctx.fill();
-          ctx.strokeStyle = "#2a2a2a";
-          ctx.lineWidth = 1;
-          ctx.stroke();
+          // Right column: GC
+          ctx.globalAlpha = r2;
+          const rx = 1280, ry = 360;
+          drawRoundedRect(ctx, rx, ry, 360, 260, 10, "rgba(153,153,153,0.06)", COL.accent, 1.5);
+          ctx.font = FONT.h3;
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("Garbage Collector", rx + 180, ry + 36);
+          ctx.font = FONT.body;
+          ctx.fillStyle = COL.dim;
+          const gcLines = ["Java / Python / Go", "Auto cleanup", "Unpredictable pauses", "Higher memory usage"];
+          gcLines.forEach((l, i) => {
+            const lr = reveal(p, 0.55 + i * 0.06, 0.12);
+            ctx.globalAlpha = r2 * lr;
+            ctx.fillText(l, rx + 180, ry + 86 + i * 42);
+          });
 
-          // Code lines
-          const lines = [
-            'let s1 = String::from("hello");',
-            'let s2 = s1;  // s1 is moved!',
-            '',
-            '// println!("{}", s1);  // ERROR!',
-            'println!("{}", s2);     // OK',
+          // "vs" divider
+          ctx.globalAlpha = Math.min(r1, r2);
+          ctx.font = '300 24px "DM Sans"';
+          ctx.fillStyle = COL.dim;
+          ctx.fillText("vs", 960, 490);
+
+          ctx.globalAlpha = 1;
+        },
+
+        // --- Scene 2: Rust's Third Way ---
+        thirdWay: (ctx, p, t) => {
+          ctx.textAlign = "center";
+
+          const r0 = reveal(p, 0, 0.1);
+          ctx.globalAlpha = r0;
+          ctx.font = '600 36px "DM Sans"';
+          ctx.fillStyle = COL.text;
+          ctx.fillText("Rust's Third Way: Ownership", 960, 200);
+
+          // Central concept box
+          const r1 = reveal(p, 0.1, 0.15);
+          ctx.globalAlpha = r1;
+          const bx = 560, by = 260, bw = 800, bh = 200;
+          drawRoundedRect(ctx, bx, by, bw, bh, 12, "rgba(153,153,153,0.06)", COL.accent, 2);
+
+          const phrases = [
+            { text: "Compiler tracks ownership", y: 310, delay: 0.15 },
+            { text: "Inserts cleanup at compile time", y: 355, delay: 0.3 },
+            { text: "Zero runtime cost", y: 400, delay: 0.45 },
           ];
-          ctx.font = '400 18px "JetBrains Mono"';
-          ctx.textAlign = "left";
-          lines.forEach((line, i) => {
-            const lineReveal = Math.max(0, Math.min(1, (p - 0.2 - i * 0.06) / 0.1));
-            ctx.globalAlpha = lineReveal;
-            if (line.startsWith('//')) {
-              ctx.fillStyle = "#cc4444";
-            } else if (line.includes('moved')) {
-              ctx.fillStyle = "#999999";
-            } else {
-              ctx.fillStyle = "#e0e0e0";
-            }
-            ctx.fillText(line, bx + 24, by + 40 + i * 32);
+          phrases.forEach(ph => {
+            const r = reveal(p, ph.delay, 0.12);
+            ctx.globalAlpha = r;
+            ctx.font = FONT.h3;
+            ctx.fillStyle = COL.text;
+            ctx.fillText(ph.text, 960, ph.y);
           });
 
-          // Move diagram on the right
-          const diagReveal = Math.max(0, Math.min(1, (p - 0.55) / 0.15));
-          ctx.globalAlpha = diagReveal;
-
-          // s1 box
-          ctx.fillStyle = "#222222";
-          ctx.beginPath();
-          ctx.roundRect(1100, 320, 120, 50, 8);
-          ctx.fill();
-          ctx.strokeStyle = "#666666";
-          ctx.lineWidth = 1;
-          ctx.stroke();
-          ctx.font = '500 18px "JetBrains Mono"';
-          ctx.fillStyle = "#666666";
-          ctx.textAlign = "center";
-          ctx.fillText("s1", 1160, 352);
-
-          // Arrow
-          const arrowP = Math.max(0, Math.min(1, (p - 0.65) / 0.1));
-          ctx.globalAlpha = diagReveal * arrowP;
-          ctx.strokeStyle = "#999999";
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.moveTo(1160, 370);
-          ctx.lineTo(1160, 420);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(1150, 410);
-          ctx.lineTo(1160, 425);
-          ctx.lineTo(1170, 410);
-          ctx.fill();
-
-          // s2 box
-          const s2Reveal = Math.max(0, Math.min(1, (p - 0.7) / 0.1));
-          ctx.globalAlpha = diagReveal * s2Reveal;
-          ctx.fillStyle = "#222222";
-          ctx.beginPath();
-          ctx.roundRect(1100, 430, 120, 50, 8);
-          ctx.fill();
-          ctx.strokeStyle = "#e0e0e0";
-          ctx.lineWidth = 1;
-          ctx.stroke();
-          ctx.font = '500 18px "JetBrains Mono"';
-          ctx.fillStyle = "#e0e0e0";
-          ctx.textAlign = "center";
-          ctx.fillText("s2", 1160, 462);
-
-          // "moved" label
-          ctx.font = '400 14px "DM Sans"';
-          ctx.fillStyle = "#999999";
-          ctx.fillText("move", 1210, 400);
-
-          // Crossed out s1
-          const crossReveal = Math.max(0, Math.min(1, (p - 0.75) / 0.1));
-          ctx.globalAlpha = diagReveal * crossReveal;
-          ctx.strokeStyle = "#cc4444";
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.moveTo(1105, 325);
-          ctx.lineTo(1215, 365);
-          ctx.stroke();
-
-          ctx.globalAlpha = 1;
-        },
-
-        rules: (ctx, p, t) => {
-          const cx = VW / 2;
-          const rules = [
-            { num: "1", text: "Each value has exactly one owner" },
-            { num: "2", text: "There can only be one owner at a time" },
-            { num: "3", text: "When the owner goes out of scope, the value is dropped" },
-          ];
-
-          rules.forEach((rule, i) => {
-            const reveal = Math.max(0, Math.min(1, (p - 0.2 - i * 0.15) / 0.15));
-            ctx.globalAlpha = reveal;
-
-            const ry = 380 + i * 100;
-
-            // Rule box
-            ctx.fillStyle = "#1a1a1a";
-            ctx.beginPath();
-            ctx.roundRect(cx - 340, ry, 680, 70, 10);
-            ctx.fill();
-            ctx.strokeStyle = "#2a2a2a";
-            ctx.lineWidth = 1;
-            ctx.stroke();
-
-            // Number circle
-            ctx.fillStyle = "#999999";
-            ctx.beginPath();
-            ctx.arc(cx - 290, ry + 35, 20, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.font = '600 18px "DM Sans"';
-            ctx.fillStyle = "#111111";
-            ctx.textAlign = "center";
-            ctx.fillText(rule.num, cx - 290, ry + 42);
-
-            // Rule text
-            ctx.font = '400 20px "DM Sans"';
-            ctx.fillStyle = "#e0e0e0";
-            ctx.textAlign = "left";
-            ctx.fillText(rule.text, cx - 250, ry + 42);
-          });
-
-          ctx.globalAlpha = 1;
-        },
-
-        borrowing: (ctx, p, t) => {
-          const cx = VW / 2;
-
-          // Title
-          const titleReveal = Math.max(0, Math.min(1, p / 0.1));
-          ctx.globalAlpha = titleReveal;
-          ctx.font = '600 36px "DM Sans"';
-          ctx.fillStyle = "#e0e0e0";
-          ctx.textAlign = "center";
-          ctx.fillText("Borrowing & References", cx, 200);
-
-          // Shared reference diagram
-          const sharedReveal = Math.max(0, Math.min(1, (p - 0.15) / 0.15));
-          ctx.globalAlpha = sharedReveal;
-
-          // Owner box
-          ctx.fillStyle = "#222222";
-          ctx.beginPath();
-          ctx.roundRect(440, 340, 160, 60, 8);
-          ctx.fill();
-          ctx.strokeStyle = "#999999";
-          ctx.lineWidth = 1;
-          ctx.stroke();
-          ctx.font = '500 18px "JetBrains Mono"';
-          ctx.fillStyle = "#e0e0e0";
-          ctx.textAlign = "center";
-          ctx.fillText("s: String", 520, 377);
-
-          // &s references
-          const refs = ["&s (r1)", "&s (r2)", "&s (r3)"];
-          refs.forEach((ref, i) => {
-            const refReveal = Math.max(0, Math.min(1, (p - 0.3 - i * 0.08) / 0.1));
-            ctx.globalAlpha = sharedReveal * refReveal;
-
-            const rx = 340 + i * 120, ry = 460;
-            ctx.fillStyle = "#1a1a1a";
-            ctx.beginPath();
-            ctx.roundRect(rx, ry, 110, 45, 6);
-            ctx.fill();
-            ctx.strokeStyle = "#666666";
-            ctx.lineWidth = 1;
-            ctx.stroke();
-            ctx.font = '400 14px "JetBrains Mono"';
-            ctx.fillStyle = "#999999";
-            ctx.textAlign = "center";
-            ctx.fillText(ref, rx + 55, ry + 28);
-
-            // Arrow up to owner
-            ctx.strokeStyle = "#666666";
-            ctx.setLineDash([4, 4]);
-            ctx.lineDashOffset = -t * 15;
-            ctx.beginPath();
-            ctx.moveTo(rx + 55, ry);
-            ctx.lineTo(520, 400);
-            ctx.stroke();
-            ctx.setLineDash([]);
-          });
-
-          // Label
-          ctx.globalAlpha = sharedReveal;
-          ctx.font = '400 16px "DM Sans"';
-          ctx.fillStyle = "#666666";
-          ctx.textAlign = "center";
-          ctx.fillText("Multiple shared references (&T) — read only", 520, 540);
-
-          // Mutable reference side
-          const mutReveal = Math.max(0, Math.min(1, (p - 0.55) / 0.15));
-          ctx.globalAlpha = mutReveal;
-
-          // Owner box (right side)
-          ctx.fillStyle = "#222222";
-          ctx.beginPath();
-          ctx.roundRect(1180, 340, 180, 60, 8);
-          ctx.fill();
-          ctx.strokeStyle = "#999999";
-          ctx.lineWidth = 1;
-          ctx.stroke();
-          ctx.font = '500 18px "JetBrains Mono"';
-          ctx.fillStyle = "#e0e0e0";
-          ctx.textAlign = "center";
-          ctx.fillText("s: String", 1270, 377);
-
-          // Single &mut s
-          const mutRefReveal = Math.max(0, Math.min(1, (p - 0.65) / 0.1));
-          ctx.globalAlpha = mutReveal * mutRefReveal;
-          ctx.fillStyle = "#1a1a1a";
-          ctx.beginPath();
-          ctx.roundRect(1210, 460, 120, 45, 6);
-          ctx.fill();
-          ctx.strokeStyle = "#e0e0e0";
-          ctx.lineWidth = 1;
-          ctx.stroke();
-          ctx.font = '400 14px "JetBrains Mono"';
-          ctx.fillStyle = "#e0e0e0";
-          ctx.textAlign = "center";
-          ctx.fillText("&mut s", 1270, 488);
-
-          // Arrow
-          ctx.strokeStyle = "#e0e0e0";
-          ctx.lineWidth = 2;
-          ctx.beginPath();
-          ctx.moveTo(1270, 460);
-          ctx.lineTo(1270, 400);
-          ctx.stroke();
-
-          // Label
-          ctx.globalAlpha = mutReveal;
-          ctx.font = '400 16px "DM Sans"';
-          ctx.fillStyle = "#666666";
-          ctx.textAlign = "center";
-          ctx.fillText("One mutable reference (&mut T) — read + write", 1270, 540);
-
-          // VS divider
-          const vsReveal = Math.max(0, Math.min(1, (p - 0.5) / 0.1));
-          ctx.globalAlpha = vsReveal;
-          ctx.font = '300 20px "DM Sans"';
-          ctx.fillStyle = "#666666";
-          ctx.textAlign = "center";
-          ctx.fillText("OR", 880, 420);
-
-          ctx.globalAlpha = 1;
-        },
-
-        mutref: (ctx, p, t) => {
-          const cx = VW / 2;
-
-          // Title
-          const titleReveal = Math.max(0, Math.min(1, p / 0.1));
-          ctx.globalAlpha = titleReveal;
-          ctx.font = '600 36px "DM Sans"';
-          ctx.fillStyle = "#e0e0e0";
-          ctx.textAlign = "center";
-          ctx.fillText("The Borrowing Rule", cx, 200);
-
-          // The rule box
-          const ruleReveal = Math.max(0, Math.min(1, (p - 0.1) / 0.15));
-          ctx.globalAlpha = ruleReveal;
-          ctx.fillStyle = "#1a1a1a";
-          ctx.beginPath();
-          ctx.roundRect(cx - 380, 250, 760, 60, 10);
-          ctx.fill();
-          ctx.strokeStyle = "#999999";
-          ctx.lineWidth = 1;
-          ctx.stroke();
-          ctx.font = '400 18px "DM Sans"';
-          ctx.fillStyle = "#e0e0e0";
-          ctx.textAlign = "center";
-          ctx.fillText("Either ONE &mut  OR  any number of &T  — never both at once", cx, 286);
-
-          // Data race scenario
-          const scenarioReveal = Math.max(0, Math.min(1, (p - 0.4) / 0.15));
-          ctx.globalAlpha = scenarioReveal;
-
+          // Bottom tagline
+          const r2 = reveal(p, 0.6, 0.15);
+          ctx.globalAlpha = r2;
           ctx.font = '500 20px "DM Sans"';
-          ctx.fillStyle = "#cc4444";
-          ctx.textAlign = "center";
-          ctx.fillText("Without this rule: data race!", cx, 400);
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("If it compiles, memory bugs can't happen.", 960, 540);
 
-          // Thread boxes
-          const t1Reveal = Math.max(0, Math.min(1, (p - 0.5) / 0.1));
-          ctx.globalAlpha = scenarioReveal * t1Reveal;
-
-          // Thread 1
-          ctx.fillStyle = "#222222";
+          // Flowing accent line
+          const r3 = reveal(p, 0.7, 0.1);
+          ctx.globalAlpha = r3 * (0.5 + 0.3 * Math.sin(t * 2));
           ctx.beginPath();
-          ctx.roundRect(cx - 280, 440, 200, 100, 8);
-          ctx.fill();
-          ctx.strokeStyle = "#cc4444";
-          ctx.lineWidth = 1;
-          ctx.stroke();
-          ctx.font = '500 16px "DM Sans"';
-          ctx.fillStyle = "#cc4444";
-          ctx.textAlign = "center";
-          ctx.fillText("Thread A", cx - 180, 470);
-          ctx.font = '400 14px "JetBrains Mono"';
-          ctx.fillStyle = "#e0e0e0";
-          ctx.fillText("writes to data", cx - 180, 510);
-
-          // Thread 2
-          ctx.fillStyle = "#222222";
-          ctx.beginPath();
-          ctx.roundRect(cx + 80, 440, 200, 100, 8);
-          ctx.fill();
-          ctx.strokeStyle = "#cc4444";
-          ctx.lineWidth = 1;
-          ctx.stroke();
-          ctx.font = '500 16px "DM Sans"';
-          ctx.fillStyle = "#cc4444";
-          ctx.textAlign = "center";
-          ctx.fillText("Thread B", cx + 180, 470);
-          ctx.font = '400 14px "JetBrains Mono"';
-          ctx.fillStyle = "#e0e0e0";
-          ctx.fillText("reads from data", cx + 180, 510);
-
-          // Shared data
-          const dataReveal = Math.max(0, Math.min(1, (p - 0.6) / 0.1));
-          ctx.globalAlpha = scenarioReveal * dataReveal;
-          ctx.fillStyle = "#1a1a1a";
-          ctx.beginPath();
-          ctx.roundRect(cx - 70, 580, 140, 50, 8);
-          ctx.fill();
-          ctx.strokeStyle = "#2a2a2a";
-          ctx.lineWidth = 1;
-          ctx.stroke();
-          ctx.font = '500 16px "JetBrains Mono"';
-          ctx.fillStyle = "#e0e0e0";
-          ctx.textAlign = "center";
-          ctx.fillText("data", cx, 612);
-
-          // Arrows from threads to data
-          ctx.strokeStyle = "#cc4444";
-          ctx.setLineDash([4, 4]);
-          ctx.lineDashOffset = -t * 20;
+          ctx.setLineDash([12, 8]);
+          ctx.lineDashOffset = -t * 40;
+          ctx.moveTo(560, 570);
+          ctx.lineTo(1360, 570);
+          ctx.strokeStyle = COL.accent;
           ctx.lineWidth = 1.5;
-          ctx.beginPath();
-          ctx.moveTo(cx - 180, 540);
-          ctx.lineTo(cx - 30, 580);
-          ctx.stroke();
-          ctx.beginPath();
-          ctx.moveTo(cx + 180, 540);
-          ctx.lineTo(cx + 30, 580);
           ctx.stroke();
           ctx.setLineDash([]);
 
-          // Rust prevents this
-          const preventReveal = Math.max(0, Math.min(1, (p - 0.75) / 0.1));
-          ctx.globalAlpha = scenarioReveal * preventReveal;
-          ctx.font = '500 20px "DM Sans"';
-          ctx.fillStyle = "#999999";
-          ctx.fillText("Rust prevents this at compile time", cx, 690);
+          // Three bottom pillars preview
+          const pillars = [
+            { text: "No GC", x: 680 },
+            { text: "No runtime cost", x: 960 },
+            { text: "No memory bugs", x: 1240 },
+          ];
+          pillars.forEach((pl, i) => {
+            const r = reveal(p, 0.75 + i * 0.06, 0.1);
+            ctx.globalAlpha = r;
+            drawRoundedRect(ctx, pl.x - 120, 620, 240, 50, 8, COL.el, COL.accent, 1);
+            ctx.font = FONT.body;
+            ctx.fillStyle = COL.text;
+            ctx.fillText(pl.text, pl.x, 650);
+          });
 
           ctx.globalAlpha = 1;
         },
 
-        lifetimes: (ctx, p, t) => {
-          const cx = VW / 2;
-
-          // Title
-          const titleReveal = Math.max(0, Math.min(1, p / 0.1));
-          ctx.globalAlpha = titleReveal;
-          ctx.font = '600 36px "DM Sans"';
-          ctx.fillStyle = "#e0e0e0";
+        // --- Scene 3: Three Rules of Ownership ---
+        threeRules: (ctx, p, t) => {
           ctx.textAlign = "center";
-          ctx.fillText("Lifetimes", cx, 200);
 
-          // Dangling pointer example
-          const codeReveal = Math.max(0, Math.min(1, (p - 0.15) / 0.15));
-          ctx.globalAlpha = codeReveal;
+          const r0 = reveal(p, 0, 0.08);
+          ctx.globalAlpha = r0;
+          ctx.font = '600 34px "DM Sans"';
+          ctx.fillStyle = COL.text;
+          ctx.fillText("Three Rules of Ownership", 960, 180);
 
-          const bx = cx - 280, by = 260, bw = 560, bh = 220;
-          ctx.fillStyle = "#1a1a1a";
+          const rules = [
+            { num: "1", title: "Each value has one owner", desc: "One variable owns the data at any time", delay: 0.08, y: 280 },
+            { num: "2", title: "One owner at a time", desc: "Transfer invalidates the previous owner", delay: 0.35, y: 480 },
+            { num: "3", title: "Owner out of scope = drop", desc: "Rust calls drop automatically — no GC needed", delay: 0.62, y: 680 },
+          ];
+
+          rules.forEach((rule, i) => {
+            const r = reveal(p, rule.delay, 0.12);
+            ctx.globalAlpha = r;
+
+            const rx = 360, rw = 1200, rh = 140;
+            drawRoundedRect(ctx, rx, rule.y, rw, rh, 10, COL.el, COL.accent, 1);
+
+            // Number badge with pulse
+            const pulse = 0.7 + 0.3 * Math.sin(t * 2 + i * 1.2);
+            ctx.globalAlpha = r * pulse;
+            ctx.beginPath();
+            ctx.arc(rx + 50, rule.y + 70, 28, 0, Math.PI * 2);
+            ctx.fillStyle = COL.accent;
+            ctx.fill();
+            ctx.font = '700 24px "DM Sans"';
+            ctx.fillStyle = COL.bg;
+            ctx.fillText(rule.num, rx + 50, rule.y + 78);
+
+            ctx.globalAlpha = r;
+            ctx.font = FONT.h3;
+            ctx.fillStyle = COL.text;
+            ctx.textAlign = "left";
+            ctx.fillText(rule.title, rx + 100, rule.y + 58);
+
+            ctx.font = FONT.body;
+            ctx.fillStyle = COL.dim;
+            ctx.fillText(rule.desc, rx + 100, rule.y + 98);
+
+            ctx.textAlign = "center";
+          });
+
+          ctx.globalAlpha = 1;
+        },
+
+        // --- Scene 4: Move Semantics Setup ---
+        moveSetup: (ctx, p, t) => {
+          ctx.textAlign = "center";
+
+          const r0 = reveal(p, 0, 0.1);
+          ctx.globalAlpha = r0;
+          ctx.font = '600 32px "DM Sans"';
+          ctx.fillStyle = COL.text;
+          ctx.fillText("What happens with let s2 = s1?", 960, 180);
+
+          // Code block
+          const r1 = reveal(p, 0.1, 0.15);
+          ctx.globalAlpha = r1;
+          ctx.textAlign = "left";
+          const codeLines = [
+            [{ t: "let ", c: COL.kw }, { t: "s1 ", c: COL.text }, { t: "= ", c: COL.dim }, { t: "String", c: COL.type }, { t: "::", c: COL.dim }, { t: "from", c: COL.text }, { t: "(", c: COL.dim }, { t: '"hello"', c: COL.str }, { t: ")", c: COL.dim }, { t: ";", c: COL.dim }],
+            [{ t: "let ", c: COL.kw }, { t: "s2 ", c: COL.text }, { t: "= ", c: COL.dim }, { t: "s1", c: COL.text }, { t: ";", c: COL.dim }],
+            [],
+            [{ t: "// Can we still use s1?", c: COL.comment }],
+          ];
+          drawCodeBlock(ctx, 480, 240, 500, codeLines, undefined, t);
+
+          // The question
+          ctx.textAlign = "center";
+          const r2 = reveal(p, 0.4, 0.15);
+          ctx.globalAlpha = r2;
+          ctx.font = FONT.h3;
+          ctx.fillStyle = COL.text;
+          ctx.fillText("In most languages: both point to same data", 960, 500);
+
+          const r3 = reveal(p, 0.55, 0.15);
+          ctx.globalAlpha = r3;
+          ctx.font = FONT.body;
+          ctx.fillStyle = COL.red;
+          ctx.fillText("But then: double free on scope exit!", 960, 550);
+
+          // Two boxes pointing to same heap
+          const r4 = reveal(p, 0.65, 0.15);
+          ctx.globalAlpha = r4 * (0.6 + 0.3 * Math.sin(t * 3));
+          const s1x = 560, s2x = 1360, heapY = 720;
+          drawRoundedRect(ctx, s1x - 80, 620, 160, 50, 8, COL.el, COL.accent, 1.5);
+          ctx.font = FONT.codeLg;
+          ctx.fillStyle = COL.text;
+          ctx.fillText("s1", s1x, 650);
+
+          drawRoundedRect(ctx, s2x - 80, 620, 160, 50, 8, COL.el, COL.accent, 1.5);
+          ctx.fillText("s2", s2x, 650);
+
+          // Heap box
+          drawRoundedRect(ctx, 880, heapY, 160, 50, 8, COL.red + "30", COL.red, 1.5);
+          ctx.fillStyle = COL.red;
+          ctx.fillText('"hello"', 960, heapY + 30);
+
+          // Dashed arrows
+          ctx.setLineDash([6, 4]);
+          ctx.lineDashOffset = -t * 30;
           ctx.beginPath();
-          ctx.roundRect(bx, by, bw, bh, 12);
+          ctx.moveTo(s1x, 670);
+          ctx.lineTo(920, heapY);
+          ctx.strokeStyle = COL.red;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(s2x, 670);
+          ctx.lineTo(1000, heapY);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Danger label
+          ctx.font = FONT.label;
+          ctx.fillStyle = COL.red;
+          ctx.fillText("Double free!", 960, heapY + 80);
+
+          ctx.globalAlpha = 1;
+        },
+
+        // --- Scene 5: Move Explained ---
+        moveExplained: (ctx, p, t) => {
+          ctx.textAlign = "center";
+
+          const r0 = reveal(p, 0, 0.1);
+          ctx.globalAlpha = r0;
+          ctx.font = '600 30px "DM Sans"';
+          ctx.fillStyle = COL.text;
+          ctx.fillText("Rust Moves Ownership Instead", 960, 160);
+
+          // s1 box - fading out
+          const r1 = reveal(p, 0.1, 0.15);
+          const fadeOut = Math.max(0.2, 1 - reveal(p, 0.4, 0.2));
+          ctx.globalAlpha = r1 * fadeOut;
+          drawRoundedRect(ctx, 300, 280, 260, 70, 10, COL.el, COL.red, 1.5);
+          ctx.font = FONT.codeLg;
+          ctx.fillStyle = COL.red;
+          ctx.fillText("s1 (invalidated)", 430, 322);
+
+          // X mark over s1
+          const rX = reveal(p, 0.45, 0.15);
+          ctx.globalAlpha = rX;
+          ctx.beginPath();
+          ctx.moveTo(340, 290);
+          ctx.lineTo(520, 340);
+          ctx.moveTo(520, 290);
+          ctx.lineTo(340, 340);
+          ctx.strokeStyle = COL.red;
+          ctx.lineWidth = 4;
+          ctx.stroke();
+
+          // Animated dashed arrow: s1 -> s2
+          const rArrow = reveal(p, 0.2, 0.2);
+          ctx.globalAlpha = rArrow;
+          ctx.setLineDash([10, 6]);
+          ctx.lineDashOffset = -t * 40;
+          ctx.beginPath();
+          ctx.moveTo(560, 315);
+          ctx.lineTo(1080, 315);
+          ctx.strokeStyle = COL.accent;
+          ctx.lineWidth = 2.5;
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.beginPath();
+          ctx.moveTo(1080, 315);
+          ctx.lineTo(1065, 305);
+          ctx.lineTo(1065, 325);
+          ctx.closePath();
+          ctx.fillStyle = COL.accent;
           ctx.fill();
-          ctx.strokeStyle = "#2a2a2a";
+
+          ctx.font = '500 16px "DM Sans"';
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("ownership moves", 820, 298);
+
+          // s2 box
+          const r2 = reveal(p, 0.3, 0.15);
+          ctx.globalAlpha = r2;
+          drawRoundedRect(ctx, 1100, 280, 260, 70, 10, COL.el, COL.accent, 2);
+          ctx.font = FONT.codeLg;
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("s2 (owner)", 1230, 322);
+
+          // Heap data below s2
+          const r3 = reveal(p, 0.4, 0.15);
+          ctx.globalAlpha = r3;
+          drawRoundedRect(ctx, 1140, 420, 180, 50, 8, "rgba(153,153,153,0.1)", COL.accent, 1);
+          ctx.font = FONT.code;
+          ctx.fillStyle = COL.text;
+          ctx.fillText('"hello"', 1230, 452);
+          drawArrow(ctx, 1230, 350, 1230, 420, COL.accent, 1.5);
+
+          // Compile error example
+          const r4 = reveal(p, 0.55, 0.15);
+          ctx.globalAlpha = r4;
+          ctx.textAlign = "left";
+          const errLines = [
+            [{ t: "println!", c: COL.text }, { t: "(", c: COL.dim }, { t: '"{}"', c: COL.str }, { t: ", s1", c: COL.text }, { t: ");", c: COL.dim }],
+            [{ t: "//  ^^^^^^ ", c: COL.comment }, { t: "error: value used after move", c: COL.red }],
+          ];
+          drawCodeBlock(ctx, 300, 500, 600, errLines, 0, t);
+
+          // Pulsing border on error
+          ctx.globalAlpha = r4 * (0.5 + 0.4 * Math.sin(t * 4));
+          drawRoundedRect(ctx, 296, 496, 608, 80, 10, null, COL.red, 2);
+
+          ctx.textAlign = "center";
+          const r5 = reveal(p, 0.75, 0.15);
+          ctx.globalAlpha = r5;
+          ctx.font = '500 18px "DM Sans"';
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("Compile error, not runtime crash", 960, 720);
+
+          ctx.globalAlpha = 1;
+        },
+
+        // --- Scene 6: Move in Memory ---
+        moveMemory: (ctx, p, t) => {
+          ctx.textAlign = "center";
+
+          const r0 = reveal(p, 0, 0.1);
+          ctx.globalAlpha = r0;
+          ctx.font = '600 28px "DM Sans"';
+          ctx.fillStyle = COL.text;
+          ctx.fillText("Before and After the Move", 960, 150);
+
+          // --- Before column ---
+          const r1 = reveal(p, 0.05, 0.15);
+          ctx.globalAlpha = r1;
+          ctx.font = FONT.h3;
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("Before: let s2 = s1", 480, 210);
+
+          // Stack: s1
+          const sx1 = 280, sy1 = 260;
+          drawRoundedRect(ctx, sx1, sy1, 400, 180, 8, COL.el, COL.accent, 1);
+          ctx.font = FONT.label;
+          ctx.fillStyle = COL.dim;
+          ctx.fillText("STACK", sx1 + 200, sy1 + 20);
+          ctx.textAlign = "left";
+          ctx.font = FONT.code;
+          ctx.fillStyle = COL.text;
+          ctx.fillText("s1.ptr  -> 0x7fa3", sx1 + 30, sy1 + 60);
+          ctx.fillText("s1.len  = 5", sx1 + 30, sy1 + 92);
+          ctx.fillText("s1.cap  = 5", sx1 + 30, sy1 + 124);
+          ctx.textAlign = "center";
+
+          // Heap
+          const hx1 = 320, hy1 = 480;
+          drawRoundedRect(ctx, hx1, hy1, 320, 60, 8, "rgba(153,153,153,0.08)", COL.accent, 1);
+          ctx.font = FONT.label;
+          ctx.fillStyle = COL.dim;
+          ctx.fillText("HEAP", hx1 + 160, hy1 - 8);
+          ctx.font = FONT.code;
+          ctx.fillStyle = COL.text;
+          ctx.fillText("h  e  l  l  o", hx1 + 160, hy1 + 38);
+
+          // Arrow stack->heap
+          ctx.setLineDash([6, 4]);
+          ctx.lineDashOffset = -t * 25;
+          ctx.beginPath();
+          ctx.moveTo(sx1 + 200, sy1 + 180);
+          ctx.lineTo(hx1 + 160, hy1);
+          ctx.strokeStyle = COL.accent;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // --- After column ---
+          const r2 = reveal(p, 0.4, 0.15);
+          ctx.globalAlpha = r2;
+          ctx.font = FONT.h3;
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("After: s1 is invalid", 1440, 210);
+
+          // Stack: s1 ghosted
+          const sx2 = 1080, sy2 = 260;
+          ctx.globalAlpha = r2 * 0.25;
+          drawRoundedRect(ctx, sx2, sy2, 180, 180, 8, COL.el, COL.red, 1);
+          ctx.font = FONT.label;
+          ctx.textAlign = "center";
+          ctx.fillStyle = COL.red;
+          ctx.fillText("s1", sx2 + 90, sy2 + 100);
+
+          // Stack: s2
+          ctx.globalAlpha = r2;
+          const sx3 = 1300, sy3 = 260;
+          drawRoundedRect(ctx, sx3, sy3, 380, 180, 8, COL.el, COL.accent, 2);
+          ctx.font = FONT.label;
+          ctx.fillStyle = COL.dim;
+          ctx.fillText("STACK", sx3 + 190, sy3 + 20);
+          ctx.textAlign = "left";
+          ctx.font = FONT.code;
+          ctx.fillStyle = COL.text;
+          ctx.fillText("s2.ptr  -> 0x7fa3", sx3 + 30, sy3 + 60);
+          ctx.fillText("s2.len  = 5", sx3 + 30, sy3 + 92);
+          ctx.fillText("s2.cap  = 5", sx3 + 30, sy3 + 124);
+          ctx.textAlign = "center";
+
+          // Heap for after
+          const hx2 = 1280, hy2 = 480;
+          drawRoundedRect(ctx, hx2, hy2, 320, 60, 8, "rgba(153,153,153,0.08)", COL.accent, 1);
+          ctx.font = FONT.label;
+          ctx.fillStyle = COL.dim;
+          ctx.fillText("HEAP", hx2 + 160, hy2 - 8);
+          ctx.font = FONT.code;
+          ctx.fillStyle = COL.text;
+          ctx.fillText("h  e  l  l  o", hx2 + 160, hy2 + 38);
+
+          // Arrow s2->heap
+          ctx.setLineDash([6, 4]);
+          ctx.lineDashOffset = -t * 25;
+          ctx.beginPath();
+          ctx.moveTo(sx3 + 190, sy3 + 180);
+          ctx.lineTo(hx2 + 160, hy2);
+          ctx.strokeStyle = COL.accent;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Key insight
+          const r3 = reveal(p, 0.7, 0.15);
+          ctx.globalAlpha = r3;
+          ctx.font = '500 18px "DM Sans"';
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("Only s2 can access the heap data now", 960, 600);
+
+          // Gentle pulsing glow on s2 box
+          ctx.globalAlpha = r2 * (0.15 + 0.1 * Math.sin(t * 2));
+          ctx.shadowColor = COL.accent;
+          ctx.shadowBlur = 20;
+          drawRoundedRect(ctx, sx3, sy3, 380, 180, 8, null, COL.accent, 2);
+          ctx.shadowBlur = 0;
+
+          ctx.globalAlpha = 1;
+        },
+
+        // --- Scene 7: The Copy Trait ---
+        copyTrait: (ctx, p, t) => {
+          ctx.textAlign = "center";
+
+          const r0 = reveal(p, 0, 0.1);
+          ctx.globalAlpha = r0;
+          ctx.font = '600 32px "DM Sans"';
+          ctx.fillStyle = COL.text;
+          ctx.fillText("The Copy Trait", 960, 160);
+
+          // Left: Copy types
+          const r1 = reveal(p, 0.1, 0.15);
+          ctx.globalAlpha = r1;
+          const lx = 180, ly = 230;
+          drawRoundedRect(ctx, lx, ly, 480, 340, 10, "rgba(85,170,85,0.06)", COL.grn, 1.5);
+          ctx.font = FONT.h3;
+          ctx.fillStyle = COL.grn;
+          ctx.fillText("Copy (stack-only)", lx + 240, ly + 40);
+
+          ctx.textAlign = "left";
+          const copyTypes = ["i32, f64, bool, char", "Tuples of Copy types", "Fixed-size arrays"];
+          copyTypes.forEach((txt, i) => {
+            const r = reveal(p, 0.15 + i * 0.08, 0.12);
+            ctx.globalAlpha = r1 * r;
+            ctx.font = FONT.body;
+            ctx.fillStyle = COL.text;
+            ctx.fillText(txt, lx + 40, ly + 100 + i * 40);
+          });
+
+          // Code example: copy
+          const r1c = reveal(p, 0.35, 0.15);
+          ctx.globalAlpha = r1c;
+          const copyCode = [
+            [{ t: "let ", c: COL.kw }, { t: "x", c: COL.text }, { t: ": ", c: COL.dim }, { t: "i32", c: COL.type }, { t: " = 5;", c: COL.dim }],
+            [{ t: "let ", c: COL.kw }, { t: "y ", c: COL.text }, { t: "= x;", c: COL.dim }],
+            [{ t: "// both x and y are valid!", c: COL.grn }],
+          ];
+          drawCodeBlock(ctx, lx + 30, ly + 210, 420, copyCode, undefined, t);
+          ctx.textAlign = "center";
+
+          // Right: Move types
+          const r2 = reveal(p, 0.45, 0.15);
+          ctx.globalAlpha = r2;
+          const rx = 1260, ry = 230;
+          drawRoundedRect(ctx, rx, ry, 480, 340, 10, "rgba(204,68,68,0.06)", COL.red, 1.5);
+          ctx.font = FONT.h3;
+          ctx.fillStyle = COL.red;
+          ctx.fillText("Move (heap-allocating)", rx + 240, ry + 40);
+
+          ctx.textAlign = "left";
+          const moveTypes = ["String, Vec<T>", "Box<T>, HashMap", "Any custom struct"];
+          moveTypes.forEach((txt, i) => {
+            const r = reveal(p, 0.5 + i * 0.08, 0.12);
+            ctx.globalAlpha = r2 * r;
+            ctx.font = FONT.body;
+            ctx.fillStyle = COL.text;
+            ctx.fillText(txt, rx + 40, ry + 100 + i * 40);
+          });
+
+          // Code example: move
+          const r2c = reveal(p, 0.65, 0.15);
+          ctx.globalAlpha = r2c;
+          const moveCode = [
+            [{ t: "let ", c: COL.kw }, { t: "s1 ", c: COL.text }, { t: "= ", c: COL.dim }, { t: "String", c: COL.type }, { t: "::", c: COL.dim }, { t: 'from("hi");', c: COL.str }],
+            [{ t: "let ", c: COL.kw }, { t: "s2 ", c: COL.text }, { t: "= s1;", c: COL.dim }],
+            [{ t: "// s1 is INVALID now", c: COL.red }],
+          ];
+          drawCodeBlock(ctx, rx + 30, ry + 210, 420, moveCode, undefined, t);
+          ctx.textAlign = "center";
+
+          // Rule at bottom
+          const r3 = reveal(p, 0.8, 0.15);
+          ctx.globalAlpha = r3;
+          ctx.font = '500 20px "DM Sans"';
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("Stack-only + cheap to copy = Copy.  Heap allocation = Must move.", 960, 680);
+
+          // Animated divider
+          ctx.globalAlpha = r3 * (0.4 + 0.3 * Math.sin(t * 2));
+          ctx.beginPath();
+          ctx.setLineDash([8, 6]);
+          ctx.lineDashOffset = -t * 30;
+          ctx.moveTo(960, 240);
+          ctx.lineTo(960, 570);
+          ctx.strokeStyle = COL.dim;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          ctx.globalAlpha = 1;
+        },
+
+        // --- Scene 8: Borrowing ---
+        borrowing: (ctx, p, t) => {
+          ctx.textAlign = "center";
+
+          const r0 = reveal(p, 0, 0.1);
+          ctx.globalAlpha = r0;
+          ctx.font = '600 32px "DM Sans"';
+          ctx.fillStyle = COL.text;
+          ctx.fillText("Borrowing: References Without Ownership", 960, 160);
+
+          // Shared references - left
+          const r1 = reveal(p, 0.15, 0.15);
+          ctx.globalAlpha = r1;
+          const lx = 180, ly = 240;
+          drawRoundedRect(ctx, lx, ly, 520, 300, 10, "rgba(153,153,153,0.06)", COL.accent, 1.5);
+          ctx.font = FONT.h3;
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("Shared: &T", lx + 260, ly + 40);
+
+          ctx.textAlign = "left";
+          ctx.font = FONT.body;
+          ctx.fillStyle = COL.text;
+          const sharedPts = ["Read-only access", "Many references allowed", "Owner keeps ownership"];
+          sharedPts.forEach((txt, i) => {
+            const r = reveal(p, 0.2 + i * 0.08, 0.12);
+            ctx.globalAlpha = r1 * r;
+            ctx.fillText(txt, lx + 40, ly + 100 + i * 40);
+          });
+          ctx.textAlign = "center";
+
+          // Animated fanning shared refs
+          const r1a = reveal(p, 0.35, 0.15);
+          ctx.globalAlpha = r1a;
+          const ownerX = lx + 260, ownerY = ly + 270;
+          drawRoundedRect(ctx, ownerX - 40, ownerY + 30, 80, 30, 6, COL.el, COL.accent, 1);
+          ctx.font = FONT.code;
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("data", ownerX, ownerY + 50);
+
+          for (let i = 0; i < 3; i++) {
+            const angle = -0.4 + i * 0.4;
+            const refX = ownerX + Math.sin(angle) * 80;
+            const refY = ownerY - 60 + Math.abs(Math.cos(angle)) * -20;
+            ctx.setLineDash([6, 4]);
+            ctx.lineDashOffset = -t * 25;
+            ctx.beginPath();
+            ctx.moveTo(ownerX, ownerY + 30);
+            ctx.lineTo(refX, refY + 20);
+            ctx.strokeStyle = COL.accent;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.font = FONT.label;
+            ctx.fillStyle = COL.accent;
+            ctx.fillText("&r" + (i+1), refX, refY + 10);
+          }
+
+          // Mutable reference - right
+          const r2 = reveal(p, 0.5, 0.15);
+          ctx.globalAlpha = r2;
+          const rx = 1220, ry2 = 240;
+          drawRoundedRect(ctx, rx, ry2, 520, 300, 10, "rgba(204,68,68,0.06)", COL.red, 1.5);
+          ctx.font = FONT.h3;
+          ctx.fillStyle = COL.red;
+          ctx.fillText("Mutable: &mut T", rx + 260, ry2 + 40);
+
+          ctx.textAlign = "left";
+          ctx.font = FONT.body;
+          ctx.fillStyle = COL.text;
+          const mutPts = ["Read and write access", "Only ONE at a time", "No shared refs allowed"];
+          mutPts.forEach((txt, i) => {
+            const r = reveal(p, 0.55 + i * 0.08, 0.12);
+            ctx.globalAlpha = r2 * r;
+            ctx.fillText(txt, rx + 40, ry2 + 100 + i * 40);
+          });
+          ctx.textAlign = "center";
+
+          // Single mutable ref line
+          const r2a = reveal(p, 0.7, 0.15);
+          ctx.globalAlpha = r2a;
+          const mOwnerX = rx + 260, mOwnerY = ry2 + 270;
+          drawRoundedRect(ctx, mOwnerX - 40, mOwnerY + 30, 80, 30, 6, COL.el, COL.red, 1);
+          ctx.font = FONT.code;
+          ctx.fillStyle = COL.red;
+          ctx.fillText("data", mOwnerX, mOwnerY + 50);
+
+          const pulse = 0.6 + 0.4 * Math.sin(t * 3);
+          ctx.globalAlpha = r2a * pulse;
+          ctx.setLineDash([8, 5]);
+          ctx.lineDashOffset = -t * 35;
+          ctx.beginPath();
+          ctx.moveTo(mOwnerX, mOwnerY + 30);
+          ctx.lineTo(mOwnerX, mOwnerY - 40);
+          ctx.strokeStyle = COL.red;
+          ctx.lineWidth = 2.5;
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.font = FONT.label;
+          ctx.globalAlpha = r2a;
+          ctx.fillStyle = COL.red;
+          ctx.fillText("&mut r", mOwnerX, mOwnerY - 50);
+
+          // Bottom rule
+          const r3 = reveal(p, 0.85, 0.15);
+          ctx.globalAlpha = r3;
+          ctx.font = '500 20px "DM Sans"';
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("Many readers OR one writer — never both at the same time.", 960, 640);
+
+          ctx.globalAlpha = 1;
+        },
+
+        // --- Scene 9: Borrowing Rules ---
+        borrowRules: (ctx, p, t) => {
+          ctx.textAlign = "center";
+
+          const r0 = reveal(p, 0, 0.1);
+          ctx.globalAlpha = r0;
+          ctx.font = '600 30px "DM Sans"';
+          ctx.fillStyle = COL.text;
+          ctx.fillText("The Borrowing Rule", 960, 160);
+
+          ctx.font = '400 22px "DM Sans"';
+          ctx.fillStyle = COL.accent;
+          const r0b = reveal(p, 0.08, 0.1);
+          ctx.globalAlpha = r0b;
+          ctx.fillText("Many readers OR one writer — never both.", 960, 210);
+
+          // Valid examples - left
+          const r1 = reveal(p, 0.15, 0.15);
+          ctx.globalAlpha = r1;
+          drawRoundedRect(ctx, 140, 270, 560, 320, 10, "rgba(85,170,85,0.06)", COL.grn, 1.5);
+          ctx.font = FONT.h3;
+          ctx.fillStyle = COL.grn;
+          ctx.fillText("Compiles", 420, 310);
+
+          ctx.textAlign = "left";
+          const validCode = [
+            [{ t: "let ", c: COL.kw }, { t: "r1 = ", c: COL.text }, { t: "&data;", c: COL.accent }],
+            [{ t: "let ", c: COL.kw }, { t: "r2 = ", c: COL.text }, { t: "&data;", c: COL.accent }],
+            [{ t: "let ", c: COL.kw }, { t: "r3 = ", c: COL.text }, { t: "&data;", c: COL.accent }],
+            [{ t: "// All shared — OK!", c: COL.grn }],
+          ];
+          drawCodeBlock(ctx, 180, 340, 480, validCode, undefined, t);
+          ctx.textAlign = "center";
+
+          // Invalid examples - right
+          const r2 = reveal(p, 0.45, 0.15);
+          ctx.globalAlpha = r2;
+          drawRoundedRect(ctx, 1220, 270, 560, 320, 10, "rgba(204,68,68,0.06)", COL.red, 1.5);
+          ctx.font = FONT.h3;
+          ctx.fillStyle = COL.red;
+          ctx.fillText("Rejected", 1500, 310);
+
+          ctx.textAlign = "left";
+          const invalidCode = [
+            [{ t: "let ", c: COL.kw }, { t: "r1 = ", c: COL.text }, { t: "&mut data;", c: COL.red }],
+            [{ t: "let ", c: COL.kw }, { t: "r2 = ", c: COL.text }, { t: "&data;", c: COL.accent }],
+            [{ t: "// shared + mutable = ERROR", c: COL.red }],
+          ];
+          drawCodeBlock(ctx, 1260, 340, 480, invalidCode, undefined, t);
+          ctx.textAlign = "center";
+
+          // Pulsing red border
+          ctx.globalAlpha = r2 * (0.5 + 0.4 * Math.sin(t * 4));
+          drawRoundedRect(ctx, 1256, 336, 488, 112, 10, null, COL.red, 2.5);
+
+          // Bottom note
+          const r3 = reveal(p, 0.75, 0.15);
+          ctx.globalAlpha = r3;
+          ctx.font = '500 18px "DM Sans"';
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("This prevents data races at compile time — no runtime locks needed.", 960, 680);
+
+          ctx.globalAlpha = 1;
+        },
+
+        // --- Scene 10: The Borrow Checker ---
+        borrowChecker: (ctx, p, t) => {
+          ctx.textAlign = "center";
+
+          const r0 = reveal(p, 0, 0.1);
+          ctx.globalAlpha = r0;
+          ctx.font = '600 30px "DM Sans"';
+          ctx.fillStyle = COL.text;
+          ctx.fillText("The Borrow Checker", 960, 150);
+
+          // Failing code - left
+          const r1 = reveal(p, 0.08, 0.15);
+          ctx.globalAlpha = r1;
+          ctx.font = FONT.h3;
+          ctx.fillStyle = COL.red;
+          ctx.fillText("Rejected:", 480, 210);
+
+          ctx.textAlign = "left";
+          const failCode = [
+            [{ t: "let mut ", c: COL.kw }, { t: "v = ", c: COL.text }, { t: "vec![1,2,3];", c: COL.type }],
+            [{ t: "let ", c: COL.kw }, { t: "r1 = ", c: COL.text }, { t: "&mut v;", c: COL.red }],
+            [{ t: "let ", c: COL.kw }, { t: "r2 = ", c: COL.text }, { t: "&v;", c: COL.accent }],
+            [{ t: "r1.push(4);", c: COL.text }],
+            [{ t: "println!", c: COL.text }, { t: '("{}", r2.len());', c: COL.str }],
+          ];
+          drawCodeBlock(ctx, 200, 240, 560, failCode, 2, t);
+          ctx.textAlign = "center";
+
+          // Pulsing red border on fail
+          ctx.globalAlpha = r1 * (0.4 + 0.4 * Math.sin(t * 4));
+          drawRoundedRect(ctx, 196, 236, 568, failCode.length * 26 + 28, 10, null, COL.red, 2.5);
+
+          // Passing code - right (NLL)
+          const r2 = reveal(p, 0.4, 0.15);
+          ctx.globalAlpha = r2;
+          ctx.font = FONT.h3;
+          ctx.fillStyle = COL.grn;
+          ctx.fillText("Compiles (NLL):", 1400, 210);
+
+          ctx.textAlign = "left";
+          const passCode = [
+            [{ t: "let mut ", c: COL.kw }, { t: "v = ", c: COL.text }, { t: "vec![1,2,3];", c: COL.type }],
+            [{ t: "let ", c: COL.kw }, { t: "r1 = ", c: COL.text }, { t: "&mut v;", c: COL.red }],
+            [{ t: "r1.push(4);", c: COL.text }, { t: " // r1 last used here", c: COL.comment }],
+            [{ t: "let ", c: COL.kw }, { t: "r2 = ", c: COL.text }, { t: "&v;", c: COL.accent }, { t: " // OK", c: COL.grn }],
+            [{ t: "println!", c: COL.text }, { t: '("{}", r2.len());', c: COL.str }],
+          ];
+          drawCodeBlock(ctx, 1120, 240, 600, passCode, undefined, t);
+          ctx.textAlign = "center";
+
+          // Green border on pass
+          ctx.globalAlpha = r2 * (0.5 + 0.3 * Math.sin(t * 2));
+          drawRoundedRect(ctx, 1116, 236, 608, passCode.length * 26 + 28, 10, null, COL.grn, 2);
+
+          // Timeline showing borrow lifetimes
+          const r3 = reveal(p, 0.6, 0.2);
+          ctx.globalAlpha = r3;
+          const ty = 520;
+          ctx.font = FONT.label;
+          ctx.fillStyle = COL.dim;
+          ctx.fillText("Borrow Lifetimes (NLL)", 960, ty);
+
+          ctx.beginPath();
+          ctx.moveTo(400, ty + 40);
+          ctx.lineTo(1520, ty + 40);
+          ctx.strokeStyle = COL.dim;
           ctx.lineWidth = 1;
           ctx.stroke();
 
-          const codeLines = [
-            { text: "fn dangle() -> &String {", color: "#e0e0e0" },
-            { text: "    let s = String::from(\"hello\");", color: "#e0e0e0" },
-            { text: "    &s  // ERROR: s is dropped here!", color: "#cc4444" },
-            { text: "}", color: "#e0e0e0" },
-            { text: "// reference would point to freed memory", color: "#666666" },
-          ];
+          // r1 lifetime bar
+          const r1bar = reveal(p, 0.65, 0.12);
+          ctx.globalAlpha = r3 * r1bar;
+          drawRoundedRect(ctx, 500, ty + 50, 400, 30, 4, COL.red + "40", COL.red, 1.5);
+          ctx.font = FONT.label;
+          ctx.fillStyle = COL.red;
+          ctx.fillText("&mut r1", 700, ty + 72);
 
-          ctx.font = '400 16px "JetBrains Mono"';
-          ctx.textAlign = "left";
-          codeLines.forEach((line, i) => {
-            const lineReveal = Math.max(0, Math.min(1, (p - 0.2 - i * 0.06) / 0.1));
-            ctx.globalAlpha = codeReveal * lineReveal;
-            ctx.fillStyle = line.color;
-            ctx.fillText(line.text, bx + 20, by + 40 + i * 32);
-          });
+          // r2 lifetime bar
+          const r2bar = reveal(p, 0.75, 0.12);
+          ctx.globalAlpha = r3 * r2bar;
+          drawRoundedRect(ctx, 1000, ty + 100, 400, 30, 4, COL.accent + "30", COL.accent, 1.5);
+          ctx.font = FONT.label;
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("&r2", 1200, ty + 122);
 
-          // Scope visualization
-          const scopeReveal = Math.max(0, Math.min(1, (p - 0.55) / 0.15));
-          ctx.globalAlpha = scopeReveal;
-
-          // Scope bar for s
-          ctx.fillStyle = "#222222";
-          ctx.beginPath();
-          ctx.roundRect(cx - 280, 540, 560, 40, 6);
-          ctx.fill();
-
-          // s lifetime bar
-          const barW = 350;
-          ctx.fillStyle = "#cc4444";
-          ctx.globalAlpha = scopeReveal * 0.5;
-          ctx.beginPath();
-          ctx.roundRect(cx - 260, 548, barW, 24, 4);
-          ctx.fill();
-          ctx.globalAlpha = scopeReveal;
-          ctx.font = '400 14px "JetBrains Mono"';
-          ctx.fillStyle = "#e0e0e0";
-          ctx.textAlign = "left";
-          ctx.fillText("s lives here", cx - 250, 566);
-
-          // Drop marker
-          ctx.fillStyle = "#cc4444";
-          ctx.font = '600 14px "DM Sans"';
-          ctx.textAlign = "center";
-          ctx.fillText("dropped!", cx - 260 + barW + 10, 566);
-
-          // Reference extends beyond
-          const refReveal = Math.max(0, Math.min(1, (p - 0.7) / 0.15));
-          ctx.globalAlpha = scopeReveal * refReveal;
-          ctx.fillStyle = "#222222";
-          ctx.beginPath();
-          ctx.roundRect(cx - 280, 600, 560, 40, 6);
-          ctx.fill();
-          ctx.fillStyle = "#999999";
-          ctx.globalAlpha = scopeReveal * refReveal * 0.4;
-          ctx.beginPath();
-          ctx.roundRect(cx - 260, 608, 500, 24, 4);
-          ctx.fill();
-          ctx.globalAlpha = scopeReveal * refReveal;
-          ctx.font = '400 14px "JetBrains Mono"';
-          ctx.fillStyle = "#e0e0e0";
-          ctx.textAlign = "left";
-          ctx.fillText("&s tries to live here — dangling!", cx - 250, 626);
+          // No overlap label
+          const r4 = reveal(p, 0.85, 0.12);
+          ctx.globalAlpha = r4;
+          ctx.font = '500 18px "DM Sans"';
+          ctx.fillStyle = COL.grn;
+          ctx.fillText("No overlap = compiles!", 960, ty + 170);
 
           ctx.globalAlpha = 1;
         },
 
-        summary: (ctx, p, t) => {
-          const cx = VW / 2;
-          const items = [
-            { label: "Ownership", desc: "Deterministic cleanup", icon: "1" },
-            { label: "Move Semantics", desc: "No double frees", icon: "2" },
-            { label: "Borrowing Rules", desc: "No data races", icon: "3" },
-            { label: "Lifetimes", desc: "No dangling pointers", icon: "4" },
+        // --- Scene 11: Non-Lexical Lifetimes ---
+        nll: (ctx, p, t) => {
+          ctx.textAlign = "center";
+
+          const r0 = reveal(p, 0, 0.1);
+          ctx.globalAlpha = r0;
+          ctx.font = '600 30px "DM Sans"';
+          ctx.fillStyle = COL.text;
+          ctx.fillText("Non-Lexical Lifetimes (NLL)", 960, 160);
+
+          // Old way
+          const r1 = reveal(p, 0.1, 0.15);
+          ctx.globalAlpha = r1;
+          ctx.font = FONT.h3;
+          ctx.fillStyle = COL.red;
+          ctx.fillText("Before NLL (Rust 2015)", 480, 220);
+
+          ctx.textAlign = "left";
+          const oldCode = [
+            [{ t: "let ", c: COL.kw }, { t: "r1 = &mut v;", c: COL.text }],
+            [{ t: "r1.push(4);", c: COL.text }],
+            [{ t: "// r1 scope extends to }", c: COL.comment }],
+            [{ t: "let ", c: COL.kw }, { t: "r2 = &v;", c: COL.text }, { t: " // ERROR", c: COL.red }],
           ];
+          drawCodeBlock(ctx, 200, 260, 560, oldCode, 3, t);
+          ctx.textAlign = "center";
 
-          items.forEach((item, i) => {
-            const reveal = Math.max(0, Math.min(1, (p - 0.15 - i * 0.12) / 0.15));
-            ctx.globalAlpha = reveal;
+          // Scope bracket (old)
+          const r1b = reveal(p, 0.2, 0.15);
+          ctx.globalAlpha = r1b;
+          ctx.strokeStyle = COL.red;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(770, 280);
+          ctx.lineTo(790, 280);
+          ctx.lineTo(790, 380);
+          ctx.lineTo(770, 380);
+          ctx.stroke();
+          ctx.font = FONT.label;
+          ctx.fillStyle = COL.red;
+          ctx.fillText("r1 lives here", 860, 330);
 
-            const iy = 400 + i * 85;
+          // New way
+          const r2 = reveal(p, 0.4, 0.15);
+          ctx.globalAlpha = r2;
+          ctx.font = FONT.h3;
+          ctx.fillStyle = COL.grn;
+          ctx.fillText("After NLL (Rust 2018+)", 1440, 220);
 
-            // Box
-            ctx.fillStyle = "#1a1a1a";
-            ctx.beginPath();
-            ctx.roundRect(cx - 300, iy, 600, 65, 8);
-            ctx.fill();
-            ctx.strokeStyle = "#2a2a2a";
-            ctx.lineWidth = 1;
-            ctx.stroke();
+          ctx.textAlign = "left";
+          const newCode = [
+            [{ t: "let ", c: COL.kw }, { t: "r1 = &mut v;", c: COL.text }],
+            [{ t: "r1.push(4);", c: COL.text }, { t: " // last use of r1", c: COL.grn }],
+            [{ t: "// r1 borrow ends here (NLL)", c: COL.grn }],
+            [{ t: "let ", c: COL.kw }, { t: "r2 = &v;", c: COL.text }, { t: " // OK!", c: COL.grn }],
+          ];
+          drawCodeBlock(ctx, 1160, 260, 560, newCode, undefined, t);
+          ctx.textAlign = "center";
 
-            // Number circle
-            ctx.fillStyle = "#999999";
-            ctx.beginPath();
-            ctx.arc(cx - 250, iy + 32, 18, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.font = '600 16px "DM Sans"';
-            ctx.fillStyle = "#111111";
-            ctx.textAlign = "center";
-            ctx.fillText(item.icon, cx - 250, iy + 38);
+          // Scope bracket (new) - shorter
+          const r2b = reveal(p, 0.55, 0.15);
+          ctx.globalAlpha = r2b;
+          ctx.strokeStyle = COL.grn;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(1730, 280);
+          ctx.lineTo(1750, 280);
+          ctx.lineTo(1750, 326);
+          ctx.lineTo(1730, 326);
+          ctx.stroke();
+          ctx.font = FONT.label;
+          ctx.fillStyle = COL.grn;
+          ctx.fillText("r1", 1770, 303);
 
-            // Label
-            ctx.font = '500 20px "DM Sans"';
-            ctx.fillStyle = "#e0e0e0";
-            ctx.textAlign = "left";
-            ctx.fillText(item.label, cx - 210, iy + 30);
+          // Key insight
+          const r3 = reveal(p, 0.65, 0.2);
+          ctx.globalAlpha = r3;
+          ctx.font = '500 20px "DM Sans"';
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("NLL: borrow ends at last use, not at end of scope", 960, 540);
 
-            // Desc
-            ctx.font = '400 15px "DM Sans"';
-            ctx.fillStyle = "#666666";
-            ctx.fillText(item.desc, cx - 210, iy + 56);
+          // Flowing line
+          ctx.globalAlpha = r3 * (0.4 + 0.3 * Math.sin(t * 2));
+          ctx.setLineDash([10, 6]);
+          ctx.lineDashOffset = -t * 30;
+          ctx.beginPath();
+          ctx.moveTo(400, 570);
+          ctx.lineTo(1520, 570);
+          ctx.strokeStyle = COL.accent;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          ctx.globalAlpha = 1;
+        },
+
+        // --- Scene 12: Lifetime Annotations ---
+        lifetimes: (ctx, p, t) => {
+          ctx.textAlign = "center";
+
+          const r0 = reveal(p, 0, 0.08);
+          ctx.globalAlpha = r0;
+          ctx.font = '600 30px "DM Sans"';
+          ctx.fillStyle = COL.text;
+          ctx.fillText("Lifetime Annotations", 960, 140);
+
+          const r1 = reveal(p, 0.06, 0.1);
+          ctx.globalAlpha = r1;
+          ctx.font = FONT.body;
+          ctx.fillStyle = COL.dim;
+          ctx.fillText("How long does a returned reference live?", 960, 185);
+
+          // Function signature
+          const r2 = reveal(p, 0.12, 0.12);
+          ctx.globalAlpha = r2;
+          ctx.textAlign = "left";
+          const sigCode = [
+            [{ t: "fn ", c: COL.kw }, { t: "longest", c: COL.text }, { t: "<'a>", c: COL.rust }, { t: "(", c: COL.dim }],
+            [{ t: "    x: ", c: COL.text }, { t: "&'a str", c: COL.rust }, { t: ",", c: COL.dim }],
+            [{ t: "    y: ", c: COL.text }, { t: "&'a str", c: COL.rust }],
+            [{ t: ") -> ", c: COL.dim }, { t: "&'a str", c: COL.rust }, { t: " {", c: COL.dim }],
+            [{ t: "    if x.len() > y.len() { x } else { y }", c: COL.text }],
+            [{ t: "}", c: COL.dim }],
+          ];
+          drawCodeBlock(ctx, 300, 220, 600, sigCode, undefined, t);
+          ctx.textAlign = "center";
+
+          // Scope bracket animation
+          const r3 = reveal(p, 0.25, 0.12);
+          ctx.globalAlpha = r3;
+          ctx.strokeStyle = COL.rust;
+          ctx.lineWidth = 2;
+          const bracketLen = 60 + 20 * Math.sin(t * 0.8);
+          ctx.beginPath();
+          ctx.moveTo(930, 260);
+          ctx.lineTo(950, 260);
+          ctx.lineTo(950, 260 + bracketLen);
+          ctx.lineTo(930, 260 + bracketLen);
+          ctx.stroke();
+          ctx.font = FONT.label;
+          ctx.fillStyle = COL.rust;
+          ctx.fillText("'a", 965, 290);
+
+          // Right side explanation
+          const r4 = reveal(p, 0.3, 0.12);
+          ctx.globalAlpha = r4;
+          const ex = 1200, ey = 240;
+          drawRoundedRect(ctx, ex, ey, 520, 200, 10, COL.el, COL.accent, 1);
+          ctx.textAlign = "left";
+          ctx.font = FONT.body;
+          ctx.fillStyle = COL.text;
+          const explainLines = [
+            "'a is a lifetime parameter",
+            "Means: output lives as long",
+            "as the shorter of x and y",
+            "Compiler verifies this!"
+          ];
+          explainLines.forEach((l, i) => {
+            const r = reveal(p, 0.32 + i * 0.05, 0.1);
+            ctx.globalAlpha = r4 * r;
+            ctx.fillText(l, ex + 24, ey + 40 + i * 40);
+          });
+          ctx.textAlign = "center";
+
+          // Elision rules
+          const r5 = reveal(p, 0.55, 0.15);
+          ctx.globalAlpha = r5;
+          ctx.font = FONT.h3;
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("Lifetime Elision Rules", 960, 510);
+
+          const elisionRules = [
+            { text: "1. Each input ref gets its own lifetime", y: 560, delay: 0.58 },
+            { text: "2. One input -> output gets same lifetime", y: 600, delay: 0.65 },
+            { text: "3. &self input -> output gets self's lifetime", y: 640, delay: 0.72 },
+          ];
+          elisionRules.forEach(rule => {
+            const r = reveal(p, rule.delay, 0.1);
+            ctx.globalAlpha = r5 * r;
+            ctx.font = FONT.body;
+            ctx.fillStyle = COL.text;
+            ctx.fillText(rule.text, 960, rule.y);
           });
 
-          // Bottom text
-          const bottomReveal = Math.max(0, Math.min(1, (p - 0.7) / 0.15));
-          ctx.globalAlpha = bottomReveal;
-          ctx.font = '300 20px "DM Sans"';
-          ctx.fillStyle = "#999999";
+          // Bottom note
+          const r6 = reveal(p, 0.82, 0.12);
+          ctx.globalAlpha = r6;
+          ctx.font = '500 16px "DM Sans"';
+          ctx.fillStyle = COL.dim;
+          ctx.fillText("Most of the time, Rust infers lifetimes. The compiler tells you when it can't.", 960, 700);
+
+          // Gentle pulsing on 'a
+          ctx.globalAlpha = r2 * (0.3 + 0.2 * Math.sin(t * 2.5));
+          ctx.shadowColor = COL.rust;
+          ctx.shadowBlur = 15;
+          ctx.font = FONT.codeLg;
+          ctx.fillStyle = COL.rust;
+          ctx.fillText("'a", 960, 500);
+          ctx.shadowBlur = 0;
+
+          ctx.globalAlpha = 1;
+        },
+
+        // --- Scene 13: Bugs Prevented ---
+        bugsPrevented: (ctx, p, t) => {
           ctx.textAlign = "center";
-          ctx.fillText("All checked at compile time — zero runtime cost", cx, 770);
+
+          const r0 = reveal(p, 0, 0.08);
+          ctx.globalAlpha = r0;
+          ctx.font = '600 32px "DM Sans"';
+          ctx.fillStyle = COL.text;
+          ctx.fillText("Bugs Ownership Prevents", 960, 150);
+
+          const bugs = [
+            {
+              name: "Dangling Pointers", desc: "Using a reference after data is freed",
+              fix: "References can't outlive their data",
+              y: 230, delay: 0.08, color: COL.red,
+            },
+            {
+              name: "Double Free", desc: "Freeing the same memory twice",
+              fix: "Exactly one owner calls drop",
+              y: 420, delay: 0.32, color: "#cc8844",
+            },
+            {
+              name: "Data Races", desc: "Two threads: one writes while others access",
+              fix: "One writer XOR many readers — at compile time",
+              y: 610, delay: 0.56, color: "#8866aa",
+            },
+          ];
+
+          bugs.forEach((bug, i) => {
+            const r = reveal(p, bug.delay, 0.12);
+            ctx.globalAlpha = r;
+
+            drawRoundedRect(ctx, 200, bug.y, 1520, 140, 10, COL.el, bug.color, 1.5);
+
+            ctx.font = FONT.h3;
+            ctx.fillStyle = bug.color;
+            ctx.fillText(bug.name, 500, bug.y + 40);
+
+            ctx.font = FONT.body;
+            ctx.fillStyle = COL.dim;
+            ctx.fillText(bug.desc, 500, bug.y + 80);
+
+            // Fix text
+            const rFix = reveal(p, bug.delay + 0.12, 0.1);
+            ctx.globalAlpha = r * rFix;
+            ctx.font = '500 18px "DM Sans"';
+            ctx.fillStyle = COL.grn;
+            ctx.fillText(bug.fix, 1300, bug.y + 60);
+
+            // Animated X mark
+            const rX = reveal(p, bug.delay + 0.18, 0.1);
+            ctx.globalAlpha = r * rX;
+            const xC = 260, yC = bug.y + 70;
+            ctx.beginPath();
+            ctx.moveTo(xC - 20, yC - 20);
+            ctx.lineTo(xC + 20, yC + 20);
+            ctx.moveTo(xC + 20, yC - 20);
+            ctx.lineTo(xC - 20, yC + 20);
+            ctx.strokeStyle = COL.red;
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            // Pulsing X glow
+            ctx.globalAlpha = r * rX * (0.3 + 0.2 * Math.sin(t * 3 + i));
+            ctx.beginPath();
+            ctx.moveTo(xC - 20, yC - 20);
+            ctx.lineTo(xC + 20, yC + 20);
+            ctx.moveTo(xC + 20, yC - 20);
+            ctx.lineTo(xC - 20, yC + 20);
+            ctx.strokeStyle = COL.red;
+            ctx.lineWidth = 6;
+            ctx.stroke();
+          });
+
+          // Connecting line
+          const r4 = reveal(p, 0.8, 0.1);
+          ctx.globalAlpha = r4 * (0.4 + 0.2 * Math.sin(t * 2));
+          ctx.setLineDash([8, 6]);
+          ctx.lineDashOffset = -t * 30;
+          ctx.beginPath();
+          ctx.moveTo(260, 370);
+          ctx.lineTo(260, 610);
+          ctx.strokeStyle = COL.dim;
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          // Bottom note
+          const r5 = reveal(p, 0.88, 0.1);
+          ctx.globalAlpha = r5;
+          ctx.font = '500 18px "DM Sans"';
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("All caught at compile time — zero runtime cost.", 960, 800);
+
+          ctx.globalAlpha = 1;
+        },
+
+        // --- Scene 14: Synthesis ---
+        synthesis: (ctx, p, t) => {
+          ctx.textAlign = "center";
+
+          // Four pillars
+          const pillars = [
+            { title: "Own", desc: "One owner at a time", x: 280, delay: 0.1 },
+            { title: "Move", desc: "Transfer invalidates", x: 660, delay: 0.2 },
+            { title: "Borrow", desc: "&T or &mut T", x: 1040, delay: 0.3 },
+            { title: "Lifetimes", desc: "Compiler-checked", x: 1420, delay: 0.4 },
+          ];
+
+          pillars.forEach((pl, i) => {
+            const r = reveal(p, pl.delay, 0.12);
+            ctx.globalAlpha = r;
+            drawRoundedRect(ctx, pl.x - 140, 300, 280, 200, 10, COL.el, COL.accent, 1.5);
+            ctx.font = FONT.h2;
+            ctx.fillStyle = COL.text;
+            ctx.fillText(pl.title, pl.x, 380);
+            ctx.font = FONT.body;
+            ctx.fillStyle = COL.dim;
+            ctx.fillText(pl.desc, pl.x, 430);
+
+            // Pulsing glow
+            ctx.globalAlpha = r * (0.1 + 0.08 * Math.sin(t * 2 + i * 1.5));
+            ctx.shadowColor = COL.accent;
+            ctx.shadowBlur = 20;
+            drawRoundedRect(ctx, pl.x - 140, 300, 280, 200, 10, null, COL.accent, 2);
+            ctx.shadowBlur = 0;
+          });
+
+          // Connecting flowing arrows
+          const rArrow = reveal(p, 0.5, 0.15);
+          ctx.globalAlpha = rArrow * (0.5 + 0.3 * Math.sin(t * 2));
+          ctx.setLineDash([8, 5]);
+          ctx.lineDashOffset = -t * 35;
+          for (let i = 0; i < 3; i++) {
+            ctx.beginPath();
+            ctx.moveTo(pillars[i].x + 140, 400);
+            ctx.lineTo(pillars[i+1].x - 140, 400);
+            ctx.strokeStyle = COL.accent;
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+          }
+          ctx.setLineDash([]);
+
+          // Result box
+          const r2 = reveal(p, 0.55, 0.15);
+          ctx.globalAlpha = r2;
+          drawRoundedRect(ctx, 460, 580, 1000, 80, 10, "rgba(153,153,153,0.08)", COL.accent, 2);
+          ctx.font = '500 24px "DM Sans"';
+          ctx.fillStyle = COL.text;
+          ctx.fillText("Memory safety without a garbage collector", 960, 628);
+
+          // Final tagline
+          const r3 = reveal(p, 0.7, 0.15);
+          ctx.globalAlpha = r3;
+          ctx.font = '400 20px "DM Sans"';
+          ctx.fillStyle = COL.accent;
+          ctx.fillText("If it compiles, it's safe. That's Rust's ownership promise.", 960, 720);
+
+          // Pulsing glow on result box
+          ctx.globalAlpha = r2 * (0.15 + 0.1 * Math.sin(t * 1.5));
+          ctx.shadowColor = COL.accent;
+          ctx.shadowBlur = 30;
+          drawRoundedRect(ctx, 460, 580, 1000, 80, 10, null, COL.accent, 2);
+          ctx.shadowBlur = 0;
 
           ctx.globalAlpha = 1;
         },

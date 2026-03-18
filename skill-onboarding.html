@@ -40,7 +40,8 @@
     </style>
   </head>
   <body data-theme="chalkboard">
-                <nav class="site-nav">
+    <!-- Navigation -->
+    <nav class="site-nav">
       <a class="site-nav-brand" href="https://github.com/drstarry/interactive-video-skill">Interactive Video Skill</a>
       <div class="site-nav-links">
         <a href="skill-onboarding.html" class="active">Onboarding [theme: Chalkboard]</a>
@@ -54,6 +55,7 @@
       </div>
     </nav>
 
+    <!-- Page Content -->
     <div class="wrap">
       <div class="hdr">
         <h1>Interactive Video Skill</h1>
@@ -64,6 +66,7 @@
         <canvas id="cvs"></canvas>
         <div class="scn-label" id="scn-label"></div>
         <div class="math-layer" id="math-layer"></div>
+        <!-- Overlay inside vid-wrap so it's visible in fullscreen -->
         <div class="ov" id="ov">
           <div class="top-badge" id="badge"></div>
           <div class="card" id="card"></div>
@@ -104,20 +107,41 @@
       import { createSceneRenderer } from "./src/engine/scene-renderer.js";
       import { VW, VH } from "./src/engine/canvas.js";
 
+      // ===== SCENE DATA =====
       const scenes = [
-        { s: 0, e: 33.7, label: "What It Is", bg: "intro" },
-        { s: 33.7, e: 74.38, label: "Who It's For", bg: "usecases" },
-        { s: 74.38, e: 100.9, label: "Install", bg: "install" },
-        { s: 100.9, e: 136.08, label: "How to Use", bg: "workflow" },
-        { s: 136.08, e: 183.31, label: "What You Get", bg: "features" },
-        { s: 183.31, e: 220, label: "Get Started", bg: "recap" },
+        { s: 0,   e: 26,  label: "What Is This Skill?",              bg: "intro" },
+        { s: 26,  e: 58,  label: "What You Get",                     bg: "output" },
+        { s: 58,  e: 93,  label: "Source Inputs",                    bg: "sources" },
+        { s: 93,  e: 126, label: "The Configurator",                 bg: "config" },
+        { s: 126, e: 155, label: "Pipeline: Parse & Structure",      bg: "pipeline1" },
+        { s: 155, e: 180, label: "Pipeline: Generate & Finalize",    bg: "pipeline2" },
+        { s: 180, e: 210, label: "Engine Architecture",              bg: "engine" },
+        { s: 210, e: 240, label: "content.json Schema",              bg: "contentjson" },
+        { s: 240, e: 264, label: "content.json Interactions",        bg: "ixdata" },
+        { s: 264, e: 300, label: "Scene Definitions",                bg: "scenesdef" },
+        { s: 300, e: 336, label: "Custom Draw Functions",            bg: "customdraw" },
+        { s: 336, e: 357, label: "Interaction Types: Quiz & Sort",   bg: "ixtypes1" },
+        { s: 357, e: 377, label: "Interaction Types: Widgets",       bg: "ixtypes2" },
+        { s: 377, e: 400, label: "Theme System",                     bg: "themes1" },
+        { s: 400, e: 423, label: "Theme Palette",                    bg: "themes2" },
+        { s: 423, e: 457, label: "The Full Picture",                 bg: "wrapup" },
       ];
 
       const IX = [
         {
-          id: "q-what-it-is", time: 33.7, cat: "q",
-          title: "What Does It Produce?",
-          desc: "What is the output format of the Interactive Video Skill?",
+          id: "try-source-types", time: 92.59, cat: "try",
+          title: "Classify the Source Types",
+          desc: "Drag each example into the right input category.",
+        },
+        {
+          id: "try-phase-order", time: 179.78, cat: "try",
+          title: "Order the Pipeline Phases",
+          desc: "Drag to arrange from first to last.",
+        },
+        {
+          id: "q-interactions-type", time: 264.02, cat: "q",
+          title: "Content Schema Check",
+          desc: "In content.json, how is the \u2018interactions\u2019 field structured?",
           options: [
             { k: "A", c: false },
             { k: "B", c: true },
@@ -125,263 +149,712 @@
           ],
         },
         {
-          id: "try-use-cases", time: 74.38, cat: "try",
-          title: "Match the Use Cases",
-          desc: "Drag each scenario into the right category.",
-          options: [],
+          id: "try-interaction-explore", time: 376.44, cat: "try",
+          title: "Explore Interaction Types",
+          desc: "Tap each type to learn when to use it.",
         },
         {
-          id: "q-install", time: 100.9, cat: "q",
-          title: "Install Check",
-          desc: "How do you install the Interactive Video Skill?",
+          id: "q-theme-vars", time: 422.59, cat: "q",
+          title: "Theme Best Practice",
+          desc: "Why should you use CSS variables from styles.json instead of hardcoding colors?",
           options: [
             { k: "A", c: false },
             { k: "B", c: true },
             { k: "C", c: false },
           ],
-        },
-        {
-          id: "try-workflow", time: 136.08, cat: "try",
-          title: "Order the Workflow",
-          desc: "Drag to arrange the steps from first to last.",
-          options: [],
-        },
-        {
-          id: "try-features", time: 183.31, cat: "try",
-          title: "Explore the Features",
-          desc: "Tap each feature to learn what it does.",
-          options: [],
         },
       ];
 
+      // ===== DECLARATIVE ELEMENTS =====
       const sceneElements = {
+
+        // ── Scene 1: What Is This Skill? (0–26s) ──
+        // Narration t=1.2: "You have documentation, a codebase, a blog post..."
         intro: [
-          { type: "glow", x: 960, y: 400, radius: 500, color: "rgba(232,216,120,0.05)" },
-          { type: "text", x: 960, y: 340, text: "Interactive Video Skill", font: '600 54px "DM Sans"', color: "#e8d878" },
-          { type: "text", x: 960, y: 410, text: "A Claude Code Skill", font: '400 26px "DM Sans"', color: "#88aab0", revealAt: 0.15 },
-          { type: "rule", x1: 760, y1: 450, x2: 1160, y2: 450, color: "#e8d878", revealAt: 0.25 },
-          { type: "text", x: 960, y: 510, text: "One command. Any source. Interactive HTML output.", font: '300 22px "DM Sans"', color: "#d8d8c8", revealAt: 0.35 },
-          { type: "text", x: 960, y: 560, text: "No video editing  \u00b7  No API keys  \u00b7  No manual setup", font: '400 18px "DM Sans"', color: "#6a7a68", revealAt: 0.5 },
+          { type: "glow", x: 960, y: 480, radius: 420, color: "rgba(232,216,120,0.06)" },
+          { type: "text", x: 960, y: 340, text: "Interactive Video Skill",
+            font: '600 48px "DM Sans"', color: "#e8d878" },
+          // ~t=3 "documentation, codebase, blog post"  revealAt=(3-0)/26=0.12
+          { type: "text", x: 960, y: 420, text: "Docs \u2022 Codebase \u2022 Blog Post \u2022 Idea",
+            font: '400 22px "DM Sans"', color: "#d8d8c8", revealAt: 0.12 },
+          // ~t=8 "self-contained HTML page"  revealAt=(8-0)/26=0.31
+          { type: "rule", x1: 760, y1: 460, x2: 1160, y2: 460,
+            color: "#e8d878", revealAt: 0.31 },
+          // ~t=11 "narrated canvas animations, quizzes, widgets"  revealAt=(11-0)/26=0.42
+          { type: "text", x: 960, y: 510, text: "Narrated Animations \u2022 Quizzes \u2022 Widgets",
+            font: '400 20px "DM Sans"', color: "#88aab0", revealAt: 0.42 },
+          // ~t=17 "No video files, no hosting"  revealAt=(17-0)/26=0.65
+          { type: "text", x: 960, y: 560, text: "No video files \u2022 No hosting dependencies",
+            font: '400 18px "DM Sans"', color: "#6a7a68", revealAt: 0.65 },
+          // ~t=21 "One HTML file"  revealAt=(21-0)/26=0.81
+          { type: "text", x: 960, y: 610, text: "One HTML file + supporting assets",
+            font: '500 20px "DM Sans"', color: "#88b870", revealAt: 0.81 },
         ],
-        recap: [
-          { type: "glow", x: 960, y: 440, radius: 450, color: "rgba(232,216,120,0.05)" },
-          { type: "text", x: 960, y: 340, text: "Get Started", font: '600 48px "DM Sans"', color: "#e8d878" },
-          { type: "rule", x1: 830, y1: 380, x2: 1090, y2: 380, color: "#e8d878", revealAt: 0.15 },
-          { type: "text", x: 960, y: 440, text: "1. Install  \u2192  2. /interactive-video  \u2192  3. Configure  \u2192  4. Done", font: '500 22px "DM Sans"', color: "#d8d8c8", revealAt: 0.25 },
-          { type: "text", x: 960, y: 510, text: "Point it at anything. Let Claude do the rest.", font: '300 20px "DM Sans"', color: "#88aab0", revealAt: 0.45 },
-          { type: "text", x: 960, y: 570, text: "Happy teaching.", font: '500 24px "DM Sans"', color: "#e8d878", revealAt: 0.65 },
+
+        // ── Scene 2: What You Get (26–58s) ──
+        // Narration t=26.74: "The output is a single HTML page..."
+        output: [
+          { type: "glow", x: 960, y: 400, radius: 350, color: "rgba(232,216,120,0.05)" },
+          { type: "text", x: 960, y: 200, text: "What You Get",
+            font: '600 36px "DM Sans"', color: "#e8d878" },
+          // ~t=29 "canvas-based animation engine"  revealAt=(29-26)/32=0.09
+          { type: "rect", x: 160, y: 280, w: 700, h: 220,
+            fill: "rgba(136,184,112,0.08)", stroke: "#88b870" },
+          { type: "text", x: 510, y: 320, text: "Canvas Animation Engine",
+            font: '500 22px "DM Sans"', color: "#88b870", revealAt: 0.09 },
+          { type: "text", x: 510, y: 360, text: "Draws scenes frame-by-frame",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.13 },
+          // ~t=33 "narrated audio segments"  revealAt=(33-26)/32=0.22
+          { type: "text", x: 510, y: 395, text: "Synced with narrated audio (edge-tts)",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.22 },
+          // ~t=40 "Quizzes pause the timeline"  revealAt=(40-26)/32=0.44
+          { type: "rect", x: 1060, y: 280, w: 700, h: 220,
+            fill: "rgba(232,216,120,0.08)", stroke: "#e8d878", revealAt: 0.44 },
+          { type: "text", x: 1410, y: 320, text: "Quiz Overlays",
+            font: '500 22px "DM Sans"', color: "#e8d878", revealAt: 0.47 },
+          { type: "text", x: 1410, y: 360, text: "Pause timeline, show overlay",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.5 },
+          // ~t=45 "Widgets like sliders, sort"  revealAt=(45-26)/32=0.59
+          { type: "rect", x: 160, y: 560, w: 700, h: 220,
+            fill: "rgba(136,170,176,0.08)", stroke: "#88aab0", revealAt: 0.59 },
+          { type: "text", x: 510, y: 600, text: "Interactive Widgets",
+            font: '500 22px "DM Sans"', color: "#88aab0", revealAt: 0.62 },
+          { type: "text", x: 510, y: 640, text: "Sliders \u2022 Sort \u2022 Categorize",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.66 },
+          { type: "text", x: 510, y: 675, text: "Do things, not just watch",
+            font: '400 17px "DM Sans"', color: "#6a7a68", revealAt: 0.69 },
+          // ~t=53 "Runs locally, offline"  revealAt=(53-26)/32=0.84
+          { type: "rect", x: 1060, y: 560, w: 700, h: 220,
+            fill: "rgba(208,104,72,0.08)", stroke: "#d06848", revealAt: 0.84 },
+          { type: "text", x: 1410, y: 600, text: "Fully Offline",
+            font: '500 22px "DM Sans"', color: "#d06848", revealAt: 0.86 },
+          { type: "text", x: 1410, y: 640, text: "Runs from a file:// URL",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.89 },
+          { type: "text", x: 1410, y: 675, text: "No server required",
+            font: '400 17px "DM Sans"', color: "#6a7a68", revealAt: 0.92 },
+        ],
+
+        // ── Scene 3: Source Inputs (58–93s) ──
+        // Narration t=58.73: "The skill accepts four types of source input..."
+        sources: [
+          { type: "text", x: 960, y: 170, text: "Four Source Types",
+            font: '600 34px "DM Sans"', color: "#e8d878" },
+          // ~t=62 "First, a URL"  revealAt=(62-58)/35=0.11
+          { type: "rect", x: 110, y: 240, w: 400, h: 300,
+            fill: "rgba(136,184,112,0.08)", stroke: "#88b870", revealAt: 0.11 },
+          { type: "text", x: 310, y: 290, text: "URL",
+            font: '600 26px "DM Sans"', color: "#88b870", revealAt: 0.13 },
+          { type: "text", x: 310, y: 340, text: "Fetch page content",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.16 },
+          { type: "text", x: 310, y: 375, text: "Search for supplementary",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.2 },
+          { type: "text", x: 310, y: 410, text: "context automatically",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.2 },
+          // ~t=68 "Second, a file path"  revealAt=(68-58)/35=0.29
+          { type: "rect", x: 560, y: 240, w: 400, h: 300,
+            fill: "rgba(136,170,176,0.08)", stroke: "#88aab0", revealAt: 0.29 },
+          { type: "text", x: 760, y: 290, text: "File Path",
+            font: '600 26px "DM Sans"', color: "#88aab0", revealAt: 0.31 },
+          { type: "text", x: 760, y: 340, text: "Read the file directly",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.34 },
+          { type: "text", x: 760, y: 375, text: "Research frameworks it",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.37 },
+          { type: "text", x: 760, y: 410, text: "references",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.37 },
+          // ~t=74 "Third, codebase"  revealAt=(74-58)/35=0.46
+          { type: "rect", x: 1010, y: 240, w: 400, h: 300,
+            fill: "rgba(232,216,120,0.08)", stroke: "#e8d878", revealAt: 0.46 },
+          { type: "text", x: 1210, y: 290, text: "Codebase",
+            font: '600 26px "DM Sans"', color: "#e8d878", revealAt: 0.48 },
+          { type: "text", x: 1210, y: 340, text: "Glob, Grep, Read",
+            font: '400 17px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.51 },
+          { type: "text", x: 1210, y: 375, text: "Explore patterns and",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.54 },
+          { type: "text", x: 1210, y: 410, text: "architecture",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.54 },
+          // ~t=82 "Fourth, topic string"  revealAt=(82-58)/35=0.69
+          { type: "rect", x: 1460, y: 240, w: 400, h: 300,
+            fill: "rgba(208,104,72,0.08)", stroke: "#d06848", revealAt: 0.69 },
+          { type: "text", x: 1660, y: 290, text: "Topic String",
+            font: '600 26px "DM Sans"', color: "#d06848", revealAt: 0.71 },
+          { type: "text", x: 1660, y: 340, text: "Parallel agent research",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.74 },
+          { type: "text", x: 1660, y: 375, text: "Extract natural structure",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.77 },
+          // ~t=88 summary  revealAt=(88-58)/35=0.86
+          { type: "text", x: 960, y: 620, text: "Any source \u2192 structured lesson content",
+            font: '400 20px "DM Sans"', color: "#6a7a68", revealAt: 0.86 },
+        ],
+
+        // ── Scene 4: The Configurator (93–126s) ──
+        // Narration t=93.79: "Before generation begins, you configure..."
+        config: [
+          { type: "glow", x: 960, y: 440, radius: 380, color: "rgba(232,216,120,0.05)" },
+          { type: "text", x: 960, y: 180, text: "The Configurator",
+            font: '600 34px "DM Sans"', color: "#e8d878" },
+          // ~t=97 "runs locally in your browser"  revealAt=(97-93)/33=0.12
+          { type: "rect", x: 260, y: 240, w: 1400, h: 520,
+            fill: "rgba(40,50,46,0.6)", stroke: "#304038" },
+          { type: "text", x: 960, y: 290, text: "Runs locally in your browser",
+            font: '400 18px "DM Sans"', color: "#6a7a68", revealAt: 0.12 },
+          // ~t=101 "pick the topics"  revealAt=(101-93)/33=0.24
+          { type: "rect", x: 310, y: 330, w: 380, h: 180,
+            fill: "rgba(136,184,112,0.08)", stroke: "#88b870", revealAt: 0.24 },
+          { type: "text", x: 500, y: 370, text: "Topics",
+            font: '500 22px "DM Sans"', color: "#88b870", revealAt: 0.26 },
+          { type: "text", x: 500, y: 410, text: "Pick from extracted list",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.29 },
+          // ~t=106 "audience level"  revealAt=(106-93)/33=0.39
+          { type: "rect", x: 770, y: 330, w: 380, h: 180,
+            fill: "rgba(136,170,176,0.08)", stroke: "#88aab0", revealAt: 0.39 },
+          { type: "text", x: 960, y: 370, text: "Audience & Length",
+            font: '500 22px "DM Sans"', color: "#88aab0", revealAt: 0.41 },
+          { type: "text", x: 960, y: 410, text: "Quick \u2022 Standard \u2022 Deep",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.44 },
+          // ~t=112 "visual theme from eight options"  revealAt=(112-93)/33=0.58
+          { type: "rect", x: 1230, y: 330, w: 380, h: 180,
+            fill: "rgba(232,216,120,0.08)", stroke: "#e8d878", revealAt: 0.58 },
+          { type: "text", x: 1420, y: 370, text: "Theme & Voice",
+            font: '500 22px "DM Sans"', color: "#e8d878", revealAt: 0.6 },
+          { type: "text", x: 1420, y: 410, text: "8 themes \u2022 Live previews",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.63 },
+          // ~t=119 "only point where the skill asks"  revealAt=(119-93)/33=0.79
+          { type: "rule", x1: 460, y1: 580, x2: 1460, y2: 580,
+            color: "#e8d878", revealAt: 0.79 },
+          { type: "text", x: 960, y: 630, text: "Your only input \u2014 then it runs to completion",
+            font: '500 20px "DM Sans"', color: "#e8d878", revealAt: 0.82 },
+          // ~t=123 "paste preferences"  revealAt=(123-93)/33=0.91
+          { type: "text", x: 960, y: 680, text: "Paste preferences \u2192 fully automated pipeline",
+            font: '400 18px "DM Sans"', color: "#6a7a68", revealAt: 0.91 },
+        ],
+
+        // ── Scene 5: Pipeline: Parse & Structure (126–155s) ──
+        // Narration t=126.43: "four phases, and the order matters..."
+        pipeline1: [
+          { type: "text", x: 960, y: 170, text: "The Four-Phase Pipeline",
+            font: '600 34px "DM Sans"', color: "#e8d878" },
+          // ~t=131 "Phase one, Parse"  revealAt=(131-126)/29=0.17
+          { type: "rect", x: 160, y: 260, w: 380, h: 320,
+            fill: "rgba(136,184,112,0.1)", stroke: "#88b870", revealAt: 0.17 },
+          { type: "text", x: 350, y: 310, text: "1. Parse",
+            font: '600 26px "DM Sans"', color: "#88b870", revealAt: 0.19 },
+          { type: "text", x: 350, y: 360, text: "Read configurator output",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.22 },
+          { type: "text", x: 350, y: 395, text: "Extract: audience, length,",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.26 },
+          { type: "text", x: 350, y: 425, text: "theme, voice, topics",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.26 },
+          // ~t=140 "Phase two, Structure"  revealAt=(140-126)/29=0.48
+          { type: "rule", x1: 545, y1: 420, x2: 595, y2: 420,
+            color: "#6a7a68", revealAt: 0.47 },
+          { type: "rect", x: 600, y: 260, w: 380, h: 320,
+            fill: "rgba(136,170,176,0.1)", stroke: "#88aab0", revealAt: 0.48 },
+          { type: "text", x: 790, y: 310, text: "2. Structure",
+            font: '600 26px "DM Sans"', color: "#88aab0", revealAt: 0.5 },
+          { type: "text", x: 790, y: 360, text: "Classify by knowledge type",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.53 },
+          { type: "text", x: 790, y: 395, text: "Sequence: epitomize,",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.57 },
+          { type: "text", x: 790, y: 425, text: "elaborate, summarize",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.57 },
+          { type: "text", x: 790, y: 465, text: "Assign modality",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.62 },
+          // Greyed-out Phase 3 & 4
+          { type: "rule", x1: 985, y1: 420, x2: 1035, y2: 420,
+            color: "#304038", revealAt: 0.72 },
+          { type: "rect", x: 1040, y: 260, w: 380, h: 320,
+            fill: "rgba(106,122,104,0.05)", stroke: "#304038", revealAt: 0.72 },
+          { type: "text", x: 1230, y: 370, text: "3. Generate",
+            font: '500 22px "DM Sans"', color: "#304038", revealAt: 0.74 },
+          { type: "rule", x1: 1425, y1: 420, x2: 1475, y2: 420,
+            color: "#304038", revealAt: 0.72 },
+          { type: "rect", x: 1480, y: 260, w: 380, h: 320,
+            fill: "rgba(106,122,104,0.05)", stroke: "#304038", revealAt: 0.72 },
+          { type: "text", x: 1670, y: 370, text: "4. Finalize",
+            font: '500 22px "DM Sans"', color: "#304038", revealAt: 0.74 },
+        ],
+
+        // ── Scene 6: Pipeline: Generate & Finalize (155–180s) ──
+        // Narration continues from scene 5
+        pipeline2: [
+          { type: "text", x: 960, y: 170, text: "The Four-Phase Pipeline",
+            font: '600 34px "DM Sans"', color: "#e8d878" },
+          // Greyed-out Phase 1 & 2
+          { type: "rect", x: 160, y: 260, w: 380, h: 320,
+            fill: "rgba(106,122,104,0.05)", stroke: "#304038" },
+          { type: "text", x: 350, y: 370, text: "1. Parse",
+            font: '500 22px "DM Sans"', color: "#304038" },
+          { type: "rule", x1: 545, y1: 420, x2: 595, y2: 420, color: "#304038" },
+          { type: "rect", x: 600, y: 260, w: 380, h: 320,
+            fill: "rgba(106,122,104,0.05)", stroke: "#304038" },
+          { type: "text", x: 790, y: 370, text: "2. Structure",
+            font: '500 22px "DM Sans"', color: "#304038" },
+          // ~t=157 "Phase three, Generate"  revealAt=(157-155)/25=0.08
+          { type: "rule", x1: 985, y1: 420, x2: 1035, y2: 420,
+            color: "#6a7a68", revealAt: 0.06 },
+          { type: "rect", x: 1040, y: 260, w: 380, h: 320,
+            fill: "rgba(232,216,120,0.1)", stroke: "#e8d878", revealAt: 0.08 },
+          { type: "text", x: 1230, y: 310, text: "3. Generate",
+            font: '600 26px "DM Sans"', color: "#e8d878", revealAt: 0.1 },
+          { type: "text", x: 1230, y: 360, text: "Write content.json",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.14 },
+          // ~t=162 "audio in background"  revealAt=(162-155)/25=0.28
+          { type: "text", x: 1230, y: 395, text: "Audio in background",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.28 },
+          // ~t=165 "write HTML in parallel"  revealAt=(165-155)/25=0.40
+          { type: "text", x: 1230, y: 430, text: "Write HTML in parallel",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.40 },
+          // ~t=170 "Phase four, Finalize"  revealAt=(170-155)/25=0.60
+          { type: "rule", x1: 1425, y1: 420, x2: 1475, y2: 420,
+            color: "#6a7a68", revealAt: 0.58 },
+          { type: "rect", x: 1480, y: 260, w: 380, h: 320,
+            fill: "rgba(136,184,112,0.1)", stroke: "#88b870", revealAt: 0.60 },
+          { type: "text", x: 1670, y: 310, text: "4. Finalize",
+            font: '600 26px "DM Sans"', color: "#88b870", revealAt: 0.62 },
+          // ~t=172 "read computed timing"  revealAt=(172-155)/25=0.68
+          { type: "text", x: 1670, y: 360, text: "Read computed timing",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.68 },
+          // ~t=175 "patch HTML"  revealAt=(175-155)/25=0.80
+          { type: "text", x: 1670, y: 395, text: "Patch HTML with real s/e",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.80 },
+          { type: "text", x: 1670, y: 430, text: "Validate + serve",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.86 },
+          // Bottom note
+          { type: "text", x: 960, y: 680, text: "Audio builds while HTML generates \u2014 no wasted time",
+            font: '400 18px "DM Sans"', color: "#6a7a68", revealAt: 0.92 },
+        ],
+
+        // ── Scene 7: Engine Architecture (180–210s) ──
+        // Narration t=180.98: "the engine architecture..."
+        engine: [
+          { type: "text", x: 960, y: 150, text: "Engine Architecture",
+            font: '600 34px "DM Sans"', color: "#e8d878" },
+          // ~t=184 "output directory"  revealAt=(184-180)/30=0.13
+          { type: "text", x: 400, y: 230, text: "lesson.html",
+            font: '500 20px "JetBrains Mono"', color: "#e8d878", revealAt: 0.13 },
+          // ~t=188 "src/ with lesson.css"  revealAt=(188-180)/30=0.27
+          { type: "text", x: 400, y: 280, text: "src/",
+            font: '500 20px "JetBrains Mono"', color: "#88b870", revealAt: 0.27 },
+          { type: "text", x: 440, y: 320, text: "lesson.css",
+            font: '400 18px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.3 },
+          { type: "text", x: 440, y: 360, text: "engine/",
+            font: '500 18px "JetBrains Mono"', color: "#88aab0", revealAt: 0.33 },
+          { type: "text", x: 440, y: 400, text: "content/{id}/content.json",
+            font: '400 18px "JetBrains Mono"', color: "#6a7a68", revealAt: 0.36 },
+          // ~t=192 "lesson.js handles boot"  revealAt=(192-180)/30=0.40
+          { type: "rect", x: 800, y: 220, w: 500, h: 60,
+            fill: "rgba(232,216,120,0.08)", stroke: "#e8d878", revealAt: 0.40 },
+          { type: "text", x: 1050, y: 256, text: "lesson.js \u2014 boot, quiz, scoring",
+            font: '400 16px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.42 },
+          // ~t=195 "player.js"  revealAt=(195-180)/30=0.50
+          { type: "rect", x: 800, y: 300, w: 500, h: 60,
+            fill: "rgba(136,170,176,0.08)", stroke: "#88aab0", revealAt: 0.50 },
+          { type: "text", x: 1050, y: 336, text: "player.js \u2014 playback, timeline",
+            font: '400 16px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.52 },
+          // ~t=198 "audio.js"  revealAt=(198-180)/30=0.60
+          { type: "rect", x: 800, y: 380, w: 500, h: 60,
+            fill: "rgba(136,184,112,0.08)", stroke: "#88b870", revealAt: 0.60 },
+          { type: "text", x: 1050, y: 416, text: "audio.js \u2014 TTS cascade, MP3",
+            font: '400 16px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.62 },
+          // ~t=202 "canvas.js"  revealAt=(202-180)/30=0.73
+          { type: "rect", x: 800, y: 460, w: 500, h: 60,
+            fill: "rgba(208,104,72,0.08)", stroke: "#d06848", revealAt: 0.73 },
+          { type: "text", x: 1050, y: 496, text: "canvas.js \u2014 DPI, VW/VH",
+            font: '400 16px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.75 },
+          // ~t=205 "scene-renderer.js"  revealAt=(205-180)/30=0.83
+          { type: "rect", x: 800, y: 540, w: 500, h: 60,
+            fill: "rgba(176,168,80,0.08)", stroke: "#b0a850", revealAt: 0.83 },
+          { type: "text", x: 1050, y: 576, text: "scene-renderer.js \u2014 draw",
+            font: '400 16px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.85 },
+          // Audio directory
+          { type: "text", x: 400, y: 460, text: "audio/",
+            font: '500 20px "JetBrains Mono"', color: "#88b870", revealAt: 0.67 },
+          { type: "text", x: 440, y: 500, text: "lessons/{id}/seg*.mp3",
+            font: '400 18px "JetBrains Mono"', color: "#6a7a68", revealAt: 0.7 },
+        ],
+
+        // ── Scene 8: content.json Schema (210–240s) ──
+        // Narration t=225.67: "content.json is the data backbone..."
+        // Note: narration starts at 225.67 but scene starts at 210, so early part is silent
+        contentjson: [
+          { type: "text", x: 960, y: 150, text: "content.json Schema",
+            font: '600 34px "DM Sans"', color: "#e8d878" },
+          // ~t=228 "three sections"  revealAt=(228-210)/30=0.60
+          // But let's start showing structure earlier in the silent gap
+          // Meta block: show early  revealAt=0.1
+          { type: "rect", x: 160, y: 220, w: 500, h: 250,
+            fill: "rgba(232,216,120,0.08)", stroke: "#e8d878", revealAt: 0.1 },
+          { type: "text", x: 410, y: 265, text: "meta {}",
+            font: '500 22px "JetBrains Mono"', color: "#e8d878", revealAt: 0.13 },
+          { type: "text", x: 410, y: 310, text: "lessonId, voice, rate",
+            font: '400 16px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.18 },
+          { type: "text", x: 410, y: 345, text: "gap, duration",
+            font: '400 16px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.23 },
+          // ~t=234 "narration array"  revealAt=(234-210)/30=0.80
+          // Show narration block a bit earlier for balance
+          { type: "rect", x: 710, y: 220, w: 500, h: 250,
+            fill: "rgba(136,184,112,0.08)", stroke: "#88b870", revealAt: 0.35 },
+          { type: "text", x: 960, y: 265, text: "narration []",
+            font: '500 22px "JetBrains Mono"', color: "#88b870", revealAt: 0.38 },
+          { type: "text", x: 960, y: 310, text: "{ t, text }",
+            font: '400 16px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.43 },
+          { type: "text", x: 960, y: 345, text: "endsBeforeIx: links to IX",
+            font: '400 16px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.50 },
+          // ~t=237 "interactions object keyed by ID"
+          { type: "rect", x: 1260, y: 220, w: 500, h: 250,
+            fill: "rgba(208,104,72,0.08)", stroke: "#d06848", revealAt: 0.65 },
+          { type: "text", x: 1510, y: 265, text: "interactions {}",
+            font: '500 22px "JetBrains Mono"', color: "#d06848", revealAt: 0.68 },
+          { type: "text", x: 1510, y: 310, text: "Object keyed by ID",
+            font: '400 16px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.73 },
+          { type: "text", x: 1510, y: 345, text: "NOT an array",
+            font: '600 16px "JetBrains Mono"', color: "#d06848", revealAt: 0.80 },
+          // Bottom note
+          { type: "text", x: 960, y: 560, text: "build_audio.ts fills t and duration automatically",
+            font: '400 18px "DM Sans"', color: "#6a7a68", revealAt: 0.88 },
+        ],
+
+        // ── Scene 9: content.json Interactions (240–264s) ──
+        // Continues narration about interactions
+        ixdata: [
+          { type: "glow", x: 960, y: 440, radius: 350, color: "rgba(208,104,72,0.06)" },
+          { type: "text", x: 960, y: 180, text: "Interactions: Object, Not Array",
+            font: '600 32px "DM Sans"', color: "#d06848" },
+          // ~t=242 "engine looks up by ID"  revealAt=(242-240)/24=0.08
+          { type: "rect", x: 260, y: 260, w: 1400, h: 200,
+            fill: "rgba(40,50,46,0.6)", stroke: "#304038", revealAt: 0.08 },
+          { type: "text", x: 960, y: 320, text: "CONTENT.interactions[ix.id]",
+            font: '500 28px "JetBrains Mono"', color: "#e8d878", revealAt: 0.13 },
+          { type: "text", x: 960, y: 370, text: "Engine looks up each interaction by its ID string",
+            font: '400 18px "DM Sans"', color: "#d8d8c8", revealAt: 0.21 },
+          // ~t=250 "most common mistake"  revealAt=(250-240)/24=0.42
+          { type: "rect", x: 310, y: 520, w: 1300, h: 160,
+            fill: "rgba(208,104,72,0.06)", stroke: "#d06848", revealAt: 0.42 },
+          { type: "text", x: 960, y: 565, text: "Most common mistake:",
+            font: '500 20px "DM Sans"', color: "#d06848", revealAt: 0.46 },
+          { type: "text", x: 960, y: 610, text: "Writing interactions as an array instead of an object",
+            font: '400 18px "DM Sans"', color: "#d8d8c8", revealAt: 0.54 },
+          // ~t=258 visual contrast  revealAt=(258-240)/24=0.75
+          { type: "text", x: 600, y: 760, text: "interactions: [ ... ]",
+            font: '400 20px "JetBrains Mono"', color: "#d06848", revealAt: 0.75 },
+          { type: "text", x: 960, y: 760, text: "\u2192",
+            font: '400 24px "DM Sans"', color: "#6a7a68", revealAt: 0.79 },
+          { type: "text", x: 1320, y: 760, text: "interactions: { id: ... }",
+            font: '400 20px "JetBrains Mono"', color: "#88b870", revealAt: 0.83 },
+        ],
+
+        // ── Scene 10: Scene Definitions (264–300s) ──
+        // Narration t=265.22: "Every scene on the canvas is defined twice..."
+        scenesdef: [
+          { type: "text", x: 960, y: 150, text: "Scene Definitions",
+            font: '600 34px "DM Sans"', color: "#e8d878" },
+          // ~t=268 "once in HTML as JS object"  revealAt=(268-264)/36=0.11
+          { type: "rect", x: 110, y: 220, w: 800, h: 280,
+            fill: "rgba(232,216,120,0.08)", stroke: "#e8d878", revealAt: 0.11 },
+          { type: "text", x: 510, y: 265, text: "Scene Object (in HTML)",
+            font: '500 22px "DM Sans"', color: "#e8d878", revealAt: 0.13 },
+          { type: "text", x: 510, y: 310, text: "{ s: 0, e: 20, label, bg }",
+            font: '400 18px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.17 },
+          { type: "text", x: 510, y: 350, text: "Start time, end time, label, bg key",
+            font: '400 16px "DM Sans"', color: "#6a7a68", revealAt: 0.22 },
+          // ~t=275 "scene elements map"  revealAt=(275-264)/36=0.31
+          { type: "rect", x: 1010, y: 220, w: 800, h: 280,
+            fill: "rgba(136,170,176,0.08)", stroke: "#88aab0", revealAt: 0.31 },
+          { type: "text", x: 1410, y: 265, text: "Scene Elements Map",
+            font: '500 22px "DM Sans"', color: "#88aab0", revealAt: 0.33 },
+          { type: "text", x: 1410, y: 310, text: "{ bg: [ elements... ] }",
+            font: '400 18px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.37 },
+          { type: "text", x: 1410, y: 350, text: "Declarative drawing instructions",
+            font: '400 16px "DM Sans"', color: "#6a7a68", revealAt: 0.42 },
+          // ~t=282 "text, rect, rule, glow, pipeline"  revealAt=(282-264)/36=0.50
+          { type: "text", x: 960, y: 570, text: "Element Types",
+            font: '500 22px "DM Sans"', color: "#e8d878", revealAt: 0.50 },
+          { type: "text", x: 480, y: 620, text: "text",
+            font: '500 18px "JetBrains Mono"', color: "#88b870", revealAt: 0.53 },
+          { type: "text", x: 680, y: 620, text: "rect",
+            font: '500 18px "JetBrains Mono"', color: "#88aab0", revealAt: 0.56 },
+          { type: "text", x: 880, y: 620, text: "rule",
+            font: '500 18px "JetBrains Mono"', color: "#e8d878", revealAt: 0.58 },
+          { type: "text", x: 1080, y: 620, text: "glow",
+            font: '500 18px "JetBrains Mono"', color: "#d06848", revealAt: 0.61 },
+          { type: "text", x: 1280, y: 620, text: "pipeline",
+            font: '500 18px "JetBrains Mono"', color: "#b0a850", revealAt: 0.64 },
+          // ~t=290 "revealAt"  revealAt=(290-264)/36=0.72
+          { type: "rect", x: 310, y: 680, w: 1300, h: 120,
+            fill: "rgba(136,184,112,0.06)", stroke: "#88b870", revealAt: 0.72 },
+          { type: "text", x: 960, y: 720, text: "revealAt: 0.0 \u2192 1.0",
+            font: '500 22px "JetBrains Mono"', color: "#88b870", revealAt: 0.75 },
+          { type: "text", x: 960, y: 760, text: "Progressive reveal \u2014 content appears as narrator mentions it",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.81 },
+        ],
+
+        // ── Scene 11: Custom Draw Functions (300–336s) ──
+        // Narration t=300.72: "For scenes that need more than static elements..."
+        customdraw: [
+          { type: "text", x: 960, y: 150, text: "Custom Draw Functions",
+            font: '600 34px "DM Sans"', color: "#e8d878" },
+          // ~t=304 "signature ctx, p, t"  revealAt=(304-300)/36=0.11
+          { type: "rect", x: 260, y: 220, w: 1400, h: 120,
+            fill: "rgba(40,50,46,0.6)", stroke: "#304038", revealAt: 0.11 },
+          { type: "text", x: 960, y: 285, text: "(ctx, p, t)  \u2192  context, progress, time",
+            font: '500 24px "JetBrains Mono"', color: "#e8d878", revealAt: 0.14 },
+          // ~t=310 "VW and VH"  revealAt=(310-300)/36=0.28
+          { type: "rect", x: 260, y: 380, w: 660, h: 200,
+            fill: "rgba(136,184,112,0.08)", stroke: "#88b870", revealAt: 0.28 },
+          { type: "text", x: 590, y: 425, text: "VW = 1920  VH = 1080",
+            font: '500 22px "JetBrains Mono"', color: "#88b870", revealAt: 0.31 },
+          { type: "text", x: 590, y: 470, text: "Virtual coordinate space",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.36 },
+          { type: "text", x: 590, y: 505, text: "Works on any screen resolution",
+            font: '400 17px "DM Sans"', color: "#6a7a68", revealAt: 0.39 },
+          // ~t=318 "Never use ctx.canvas.width"  revealAt=(318-300)/36=0.50
+          { type: "rect", x: 1000, y: 380, w: 660, h: 200,
+            fill: "rgba(208,104,72,0.06)", stroke: "#d06848", revealAt: 0.50 },
+          { type: "text", x: 1330, y: 425, text: "ctx.canvas.width",
+            font: '500 20px "JetBrains Mono"', color: "#d06848", revealAt: 0.53 },
+          { type: "text", x: 1330, y: 470, text: "Returns DPR-scaled pixels",
+            font: '400 17px "DM Sans"', color: "#d8d8c8", revealAt: 0.58 },
+          { type: "text", x: 1330, y: 505, text: "Breaks on retina displays!",
+            font: '500 17px "DM Sans"', color: "#d06848", revealAt: 0.61 },
+          // ~t=328 "mix declarative and custom"  revealAt=(328-300)/36=0.78
+          { type: "rect", x: 410, y: 640, w: 1100, h: 120,
+            fill: "rgba(232,216,120,0.06)", stroke: "#e8d878", revealAt: 0.78 },
+          { type: "text", x: 960, y: 690, text: "Declarative elements + custom draw = same scene",
+            font: '500 20px "DM Sans"', color: "#e8d878", revealAt: 0.81 },
+          { type: "text", x: 960, y: 725, text: "Renderer handles both automatically",
+            font: '400 17px "DM Sans"', color: "#6a7a68", revealAt: 0.86 },
+        ],
+
+        // ── Scene 12: Interaction Types: Quiz & Sort (336–357s) ──
+        // Narration t=336.48: "six interaction categories... Quiz... Sort... Categorize..."
+        ixtypes1: [
+          { type: "text", x: 960, y: 150, text: "Interaction Types",
+            font: '600 34px "DM Sans"', color: "#e8d878" },
+          // ~t=340 "Quiz, cat Q"  revealAt=(340-336)/21=0.19
+          { type: "rect", x: 160, y: 230, w: 520, h: 280,
+            fill: "rgba(232,216,120,0.08)", stroke: "#e8d878", revealAt: 0.19 },
+          { type: "text", x: 420, y: 280, text: "Quiz (cat: q)",
+            font: '600 24px "DM Sans"', color: "#e8d878", revealAt: 0.22 },
+          { type: "text", x: 420, y: 325, text: "3 options, single-letter badges",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.27 },
+          { type: "text", x: 420, y: 360, text: "Each distractor = misconception",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.33 },
+          { type: "text", x: 420, y: 395, text: "Feedback explains why",
+            font: '400 16px "DM Sans"', color: "#6a7a68", revealAt: 0.38 },
+          // ~t=346 "Sort"  revealAt=(346-336)/21=0.48
+          { type: "rect", x: 740, y: 230, w: 520, h: 280,
+            fill: "rgba(136,184,112,0.08)", stroke: "#88b870", revealAt: 0.48 },
+          { type: "text", x: 1000, y: 280, text: "Sort (cat: try)",
+            font: '600 24px "DM Sans"', color: "#88b870", revealAt: 0.51 },
+          { type: "text", x: 1000, y: 325, text: "Drag into correct sequence",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.56 },
+          { type: "text", x: 1000, y: 360, text: "Best for 4\u20137 items",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.62 },
+          { type: "text", x: 1000, y: 395, text: "Order matters",
+            font: '400 16px "DM Sans"', color: "#6a7a68", revealAt: 0.67 },
+          // ~t=350 "Categorize"  revealAt=(350-336)/21=0.67
+          { type: "rect", x: 1320, y: 230, w: 520, h: 280,
+            fill: "rgba(136,170,176,0.08)", stroke: "#88aab0", revealAt: 0.71 },
+          { type: "text", x: 1580, y: 280, text: "Categorize (cat: try)",
+            font: '600 24px "DM Sans"', color: "#88aab0", revealAt: 0.74 },
+          { type: "text", x: 1580, y: 325, text: "Drag chips into buckets",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.79 },
+          { type: "text", x: 1580, y: 360, text: "2\u20133 categories, 3\u20135 items",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.84 },
+          { type: "text", x: 1580, y: 395, text: "Things look similar but differ",
+            font: '400 16px "DM Sans"', color: "#6a7a68", revealAt: 0.90 },
+        ],
+
+        // ── Scene 13: Interaction Types: Widgets (357–377s) ──
+        // Narration continues: "Slider... Hotspot... Code..."
+        ixtypes2: [
+          { type: "text", x: 960, y: 150, text: "Interaction Types",
+            font: '600 34px "DM Sans"', color: "#e8d878" },
+          // ~t=358 "Slider"  revealAt=(358-357)/20=0.05
+          { type: "rect", x: 160, y: 230, w: 520, h: 280,
+            fill: "rgba(176,168,80,0.08)", stroke: "#b0a850", revealAt: 0.05 },
+          { type: "text", x: 420, y: 280, text: "Slider (cat: try)",
+            font: '600 24px "DM Sans"', color: "#b0a850", revealAt: 0.08 },
+          { type: "text", x: 420, y: 325, text: "Adjust value, see feedback",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.15 },
+          { type: "text", x: 420, y: 360, text: "Min 3 stops with descriptions",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.22 },
+          { type: "text", x: 420, y: 395, text: "Continuous variables",
+            font: '400 16px "DM Sans"', color: "#6a7a68", revealAt: 0.28 },
+          // ~t=365 "Hotspot"  revealAt=(365-357)/20=0.40
+          { type: "rect", x: 740, y: 230, w: 520, h: 280,
+            fill: "rgba(208,104,72,0.08)", stroke: "#d06848", revealAt: 0.40 },
+          { type: "text", x: 1000, y: 280, text: "Hotspot (cat: try)",
+            font: '600 24px "DM Sans"', color: "#d06848", revealAt: 0.43 },
+          { type: "text", x: 1000, y: 325, text: "Explore all items to unlock",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.50 },
+          { type: "text", x: 1000, y: 360, text: "Gates progress",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.55 },
+          { type: "text", x: 1000, y: 395, text: "Systems with parts to map",
+            font: '400 16px "DM Sans"', color: "#6a7a68", revealAt: 0.60 },
+          // ~t=371 "Code"  revealAt=(371-357)/20=0.70
+          { type: "rect", x: 1320, y: 230, w: 520, h: 280,
+            fill: "rgba(106,122,104,0.08)", stroke: "#6a7a68", revealAt: 0.70 },
+          { type: "text", x: 1580, y: 280, text: "Code (cat: code)",
+            font: '600 24px "DM Sans"', color: "#88aab0", revealAt: 0.73 },
+          { type: "text", x: 1580, y: 325, text: "Shows code snippet",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.80 },
+          { type: "text", x: 1580, y: 360, text: "Just a Finish button",
+            font: '400 16px "DM Sans"', color: "#d8d8c8", revealAt: 0.85 },
+          { type: "text", x: 1580, y: 395, text: "Use sparingly",
+            font: '400 16px "DM Sans"', color: "#6a7a68", revealAt: 0.90 },
+        ],
+
+        // ── Scene 14: Theme System (377–400s) ──
+        // Narration t=377.64: "eight visual themes..."
+        themes1: [
+          { type: "glow", x: 960, y: 440, radius: 380, color: "rgba(232,216,120,0.05)" },
+          { type: "text", x: 960, y: 170, text: "Eight Visual Themes",
+            font: '600 34px "DM Sans"', color: "#e8d878" },
+          // ~t=380 "defined in styles.json"  revealAt=(380-377)/23=0.13
+          { type: "text", x: 960, y: 230, text: "Defined in styles.json \u2014 same CSS custom properties",
+            font: '400 18px "DM Sans"', color: "#6a7a68", revealAt: 0.13 },
+          // ~t=382 theme grid  revealAt=(382-377)/23=0.22
+          { type: "rect", x: 160, y: 290, w: 360, h: 100,
+            fill: "rgba(26,36,32,0.8)", stroke: "#e8d878", revealAt: 0.22 },
+          { type: "text", x: 340, y: 345, text: "Chalkboard",
+            font: '500 20px "DM Sans"', color: "#e8d878", revealAt: 0.24 },
+          { type: "rect", x: 570, y: 290, w: 360, h: 100,
+            fill: "rgba(26,24,22,0.8)", stroke: "#d4a054", revealAt: 0.3 },
+          { type: "text", x: 750, y: 345, text: "Terminal",
+            font: '500 20px "DM Sans"', color: "#d4a054", revealAt: 0.32 },
+          { type: "rect", x: 980, y: 290, w: 360, h: 100,
+            fill: "rgba(250,246,238,0.8)", stroke: "#c0392b", revealAt: 0.38 },
+          { type: "text", x: 1160, y: 345, text: "Notebook",
+            font: '500 20px "DM Sans"', color: "#c0392b", revealAt: 0.40 },
+          { type: "rect", x: 1390, y: 290, w: 360, h: 100,
+            fill: "rgba(12,24,36,0.8)", stroke: "#5a90b8", revealAt: 0.46 },
+          { type: "text", x: 1570, y: 345, text: "Blueprint",
+            font: '500 20px "DM Sans"', color: "#5a90b8", revealAt: 0.48 },
+          // Second row
+          { type: "rect", x: 160, y: 430, w: 360, h: 100,
+            fill: "rgba(17,17,17,0.8)", stroke: "#999999", revealAt: 0.54 },
+          { type: "text", x: 340, y: 485, text: "Clean Dark",
+            font: '500 20px "DM Sans"', color: "#999999", revealAt: 0.56 },
+          { type: "rect", x: 570, y: 430, w: 360, h: 100,
+            fill: "rgba(232,232,232,0.8)", stroke: "#1a6a6a", revealAt: 0.60 },
+          { type: "text", x: 750, y: 485, text: "Clean Light",
+            font: '500 20px "DM Sans"', color: "#1a6a6a", revealAt: 0.62 },
+          { type: "rect", x: 980, y: 430, w: 360, h: 100,
+            fill: "rgba(226,214,192,0.8)", stroke: "#c85a28", revealAt: 0.66 },
+          { type: "text", x: 1160, y: 485, text: "Studio",
+            font: '500 20px "DM Sans"', color: "#c85a28", revealAt: 0.68 },
+          { type: "rect", x: 1390, y: 430, w: 360, h: 100,
+            fill: "rgba(14,14,14,0.8)", stroke: "#cc4444", revealAt: 0.72 },
+          { type: "text", x: 1570, y: 485, text: "Focus",
+            font: '500 20px "DM Sans"', color: "#cc4444", revealAt: 0.74 },
+          // ~t=396 "same lesson content, any theme"
+          { type: "text", x: 960, y: 600, text: "Same lesson content \u2192 any theme",
+            font: '500 20px "DM Sans"', color: "#88b870", revealAt: 0.87 },
+        ],
+
+        // ── Scene 15: Theme Palette (400–423s) ──
+        // Narration continues: "Background, card, text, accent..."
+        themes2: [
+          { type: "text", x: 960, y: 150, text: "Theme CSS Variables",
+            font: '600 34px "DM Sans"', color: "#e8d878" },
+          // ~t=402 "same set of CSS custom properties"  revealAt=(402-400)/23=0.09
+          { type: "rect", x: 210, y: 240, w: 280, h: 100,
+            fill: "#1a2420", stroke: "#304038", revealAt: 0.09 },
+          { type: "text", x: 350, y: 295, text: "--bg",
+            font: '400 18px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.11 },
+          { type: "rect", x: 540, y: 240, w: 280, h: 100,
+            fill: "#202a26", stroke: "#304038", revealAt: 0.17 },
+          { type: "text", x: 680, y: 295, text: "--bg-card",
+            font: '400 18px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.19 },
+          { type: "rect", x: 870, y: 240, w: 280, h: 100,
+            fill: "#28322e", stroke: "#304038", revealAt: 0.24 },
+          { type: "text", x: 1010, y: 295, text: "--surface",
+            font: '400 18px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.26 },
+          { type: "rect", x: 1200, y: 240, w: 280, h: 100,
+            fill: "#304038", stroke: "#6a7a68", revealAt: 0.30 },
+          { type: "text", x: 1340, y: 295, text: "--border",
+            font: '400 18px "JetBrains Mono"', color: "#d8d8c8", revealAt: 0.32 },
+          // ~t=408 "accent, green, warm, cool, red"  revealAt=(408-400)/23=0.35
+          { type: "text", x: 960, y: 410, text: "Semantic Color Tokens",
+            font: '500 22px "DM Sans"', color: "#d8d8c8", revealAt: 0.35 },
+          { type: "rect", x: 210, y: 450, w: 200, h: 80,
+            fill: "rgba(232,216,120,0.2)", stroke: "#e8d878", revealAt: 0.39 },
+          { type: "text", x: 310, y: 495, text: "--accent",
+            font: '400 16px "JetBrains Mono"', color: "#e8d878", revealAt: 0.41 },
+          { type: "rect", x: 460, y: 450, w: 200, h: 80,
+            fill: "rgba(136,184,112,0.2)", stroke: "#88b870", revealAt: 0.46 },
+          { type: "text", x: 560, y: 495, text: "--grn",
+            font: '400 16px "JetBrains Mono"', color: "#88b870", revealAt: 0.48 },
+          { type: "rect", x: 710, y: 450, w: 200, h: 80,
+            fill: "rgba(232,216,120,0.2)", stroke: "#e8d878", revealAt: 0.52 },
+          { type: "text", x: 810, y: 495, text: "--warm",
+            font: '400 16px "JetBrains Mono"', color: "#e8d878", revealAt: 0.54 },
+          { type: "rect", x: 960, y: 450, w: 200, h: 80,
+            fill: "rgba(136,170,176,0.2)", stroke: "#88aab0", revealAt: 0.58 },
+          { type: "text", x: 1060, y: 495, text: "--cool",
+            font: '400 16px "JetBrains Mono"', color: "#88aab0", revealAt: 0.60 },
+          { type: "rect", x: 1210, y: 450, w: 200, h: 80,
+            fill: "rgba(208,104,72,0.2)", stroke: "#d06848", revealAt: 0.64 },
+          { type: "text", x: 1310, y: 495, text: "--red",
+            font: '400 16px "JetBrains Mono"', color: "#d06848", revealAt: 0.66 },
+          // ~t=415 "never hardcode colors"  revealAt=(415-400)/23=0.65
+          { type: "rule", x1: 360, y1: 600, x2: 1560, y2: 600,
+            color: "#e8d878", revealAt: 0.70 },
+          { type: "text", x: 960, y: 650, text: "Never hardcode colors \u2014 pull from the theme palette",
+            font: '500 20px "DM Sans"', color: "#e8d878", revealAt: 0.74 },
+          // ~t=418 font stacks  revealAt=(418-400)/23=0.78
+          { type: "text", x: 460, y: 720, text: "--sans: DM Sans",
+            font: '400 17px "DM Sans"', color: "#6a7a68", revealAt: 0.83 },
+          { type: "text", x: 960, y: 720, text: "--mono: JetBrains Mono",
+            font: '400 17px "JetBrains Mono"', color: "#6a7a68", revealAt: 0.87 },
+          { type: "text", x: 1460, y: 720, text: "--serif: theme-specific",
+            font: '400 17px "DM Sans"', color: "#6a7a68", revealAt: 0.91 },
+        ],
+
+        // ── Scene 16: The Full Picture (423–457s) ──
+        // Narration t=423.79: "That's the full picture..."
+        wrapup: [
+          { type: "glow", x: 960, y: 480, radius: 450, color: "rgba(232,216,120,0.06)" },
+          { type: "text", x: 960, y: 280, text: "The Full Picture",
+            font: '600 42px "DM Sans"', color: "#e8d878" },
+          // ~t=427 "any source"  revealAt=(427-423)/34=0.12
+          { type: "text", x: 960, y: 370, text: "Any Source",
+            font: '400 22px "DM Sans"', color: "#d8d8c8", revealAt: 0.12 },
+          // ~t=430 "four-phase pipeline"  revealAt=(430-423)/34=0.21
+          { type: "text", x: 960, y: 420, text: "Parse \u2192 Structure \u2192 Generate \u2192 Finalize",
+            font: '500 24px "DM Sans"', color: "#88b870", revealAt: 0.21 },
+          // ~t=435 "self-contained HTML"  revealAt=(435-423)/34=0.35
+          { type: "rule", x1: 660, y1: 460, x2: 1260, y2: 460,
+            color: "#e8d878", revealAt: 0.35 },
+          { type: "text", x: 960, y: 510, text: "Self-contained HTML walkthrough",
+            font: '500 24px "DM Sans"', color: "#e8d878", revealAt: 0.38 },
+          // ~t=440 "narrated animations, interactive exercises"  revealAt=(440-423)/34=0.50
+          { type: "text", x: 960, y: 570, text: "Narrated animations \u2022 Interactive exercises",
+            font: '400 20px "DM Sans"', color: "#88aab0", revealAt: 0.50 },
+          // ~t=448 "modular, swappable, declarative"  revealAt=(448-423)/34=0.74
+          { type: "text", x: 640, y: 640, text: "Modular engine",
+            font: '400 18px "DM Sans"', color: "#6a7a68", revealAt: 0.74 },
+          { type: "text", x: 960, y: 640, text: "Swappable themes",
+            font: '400 18px "DM Sans"', color: "#6a7a68", revealAt: 0.77 },
+          { type: "text", x: 1280, y: 640, text: "Declarative format",
+            font: '400 18px "DM Sans"', color: "#6a7a68", revealAt: 0.80 },
+          // ~t=453 "interactive lesson in minutes"  revealAt=(453-423)/34=0.88
+          { type: "text", x: 960, y: 720, text: "Start with anything \u2192 interactive lesson in minutes",
+            font: '500 22px "DM Sans"', color: "#88b870", revealAt: 0.88 },
         ],
       };
 
-      const customDraw = {
-        usecases: (ctx, p, t) => {
-          const cases = [
-            { icon: "\ud83d\udcd6", label: "Onboarding & Compliance", desc: "20-page doc \u2192 5-min walkthrough" },
-            { icon: "\ud83c\udf31", label: "Beginner Overviews", desc: "Big picture + practice to remember" },
-            { icon: "\ud83d\udce6", label: "Open Source Projects", desc: "Regenerate docs each release" },
-            { icon: "\ud83e\udde0", label: "Knowledge Transfer", desc: "Notes \u2192 something a replacement can absorb" },
-            { icon: "\u270d\ufe0f", label: "Blog & Talk Companions", desc: "Interactive version alongside written post" },
-          ];
-          const startY = 220, gap = 130, boxW = 680, boxH = 100, cx = VW / 2;
-          cases.forEach((c, i) => {
-            const delay = i * 0.12;
-            const r = Math.max(0, Math.min(1, (p - delay) / 0.15));
-            if (r <= 0) return;
-            ctx.globalAlpha = r;
-            const y = startY + i * gap;
-            ctx.fillStyle = "#28322e";
-            ctx.beginPath();
-            ctx.roundRect(cx - boxW / 2, y, boxW, boxH, 12);
-            ctx.fill();
-            ctx.strokeStyle = "#304038";
-            ctx.lineWidth = 1;
-            ctx.stroke();
-            ctx.font = '32px "DM Sans"';
-            ctx.textAlign = "left";
-            ctx.textBaseline = "middle";
-            ctx.fillStyle = "#e8d878";
-            ctx.fillText(c.icon, cx - boxW / 2 + 24, y + boxH / 2);
-            ctx.font = '500 22px "DM Sans"';
-            ctx.fillStyle = "#d8d8c8";
-            ctx.fillText(c.label, cx - boxW / 2 + 76, y + 36);
-            ctx.font = '300 17px "DM Sans"';
-            ctx.fillStyle = "#6a7a68";
-            ctx.fillText(c.desc, cx - boxW / 2 + 76, y + 66);
-          });
-          ctx.globalAlpha = 1;
-        },
+      // ===== CUSTOM DRAW (not needed for this lesson) =====
+      const customDraw = {};
 
-        install: (ctx, p, t) => {
-          const cx = VW / 2, cy = VH / 2 - 40;
-          const headR = Math.max(0, Math.min(1, p / 0.15));
-          ctx.globalAlpha = headR;
-          ctx.font = '500 32px "DM Sans"';
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillStyle = "#e8d878";
-          ctx.fillText("One Line Install", cx, cy - 120);
-          const codeR = Math.max(0, Math.min(1, (p - 0.15) / 0.2));
-          ctx.globalAlpha = codeR;
-          const codeW = 900, codeH = 120;
-          ctx.fillStyle = "#161e1a";
-          ctx.beginPath();
-          ctx.roundRect(cx - codeW / 2, cy - 50, codeW, codeH, 10);
-          ctx.fill();
-          ctx.strokeStyle = "#304038";
-          ctx.lineWidth = 1.5;
-          ctx.stroke();
-          ctx.font = '400 17px "JetBrains Mono"';
-          ctx.textAlign = "left";
-          ctx.fillStyle = "#88b870";
-          ctx.fillText("Claude Code:", cx - codeW / 2 + 24, cy - 16);
-          ctx.fillStyle = "#d8d8c8";
-          ctx.font = '400 15px "JetBrains Mono"';
-          ctx.fillText("Install the interactive-video skill from", cx - codeW / 2 + 24, cy + 16);
-          ctx.fillStyle = "#88aab0";
-          ctx.fillText("github.com/drstarry/interactive-video-skill", cx - codeW / 2 + 24, cy + 42);
-          const doneR = Math.max(0, Math.min(1, (p - 0.5) / 0.15));
-          ctx.globalAlpha = doneR;
-          ctx.font = '400 20px "DM Sans"';
-          ctx.textAlign = "center";
-          ctx.fillStyle = "#88b870";
-          ctx.fillText("\u2193", cx, cy + 110);
-          ctx.fillText("Claude clones, sets up, done.", cx, cy + 145);
-          const tipR = Math.max(0, Math.min(1, (p - 0.7) / 0.15));
-          ctx.globalAlpha = tipR;
-          ctx.font = '300 17px "DM Sans"';
-          ctx.fillStyle = "#6a7a68";
-          ctx.fillText("No npm  \u00b7  No zip  \u00b7  No manual config", cx, cy + 190);
-          ctx.globalAlpha = 1;
-        },
-
-        workflow: (ctx, p, t) => {
-          const steps = [
-            { num: "1", label: "/interactive-video", desc: "Type command + source" },
-            { num: "2", label: "Research", desc: "Claude reads & researches" },
-            { num: "3", label: "Configurator", desc: "Pick preferences in browser" },
-            { num: "4", label: "Paste Output", desc: "Copy config back to CLI" },
-            { num: "5", label: "Generate", desc: "Claude builds everything" },
-          ];
-          const startX = 160, stepW = 280, arrowW = 40, cy = VH / 2 - 20, boxW = 240, boxH = 140;
-          steps.forEach((s, i) => {
-            const delay = i * 0.12;
-            const r = Math.max(0, Math.min(1, (p - delay) / 0.15));
-            if (r <= 0) return;
-            ctx.globalAlpha = r;
-            const x = startX + i * stepW;
-            ctx.fillStyle = "#28322e";
-            ctx.beginPath();
-            ctx.roundRect(x, cy - boxH / 2, boxW, boxH, 10);
-            ctx.fill();
-            const activeStep = Math.min(4, Math.floor(p * 6));
-            if (i === activeStep) { ctx.strokeStyle = "#e8d878"; ctx.lineWidth = 2; }
-            else { ctx.strokeStyle = "#304038"; ctx.lineWidth = 1; }
-            ctx.stroke();
-            ctx.fillStyle = i === activeStep ? "#e8d878" : "#6a7a68";
-            ctx.beginPath();
-            ctx.arc(x + boxW / 2, cy - 30, 18, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.font = '600 16px "DM Sans"';
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillStyle = "#1a2420";
-            ctx.fillText(s.num, x + boxW / 2, cy - 29);
-            ctx.font = '500 18px "DM Sans"';
-            ctx.fillStyle = "#d8d8c8";
-            ctx.fillText(s.label, x + boxW / 2, cy + 14);
-            ctx.font = '300 14px "DM Sans"';
-            ctx.fillStyle = "#6a7a68";
-            ctx.fillText(s.desc, x + boxW / 2, cy + 40);
-            if (i < steps.length - 1) {
-              const arrowR = Math.max(0, Math.min(1, (p - delay - 0.08) / 0.1));
-              ctx.globalAlpha = arrowR;
-              ctx.strokeStyle = "#e8d878";
-              ctx.lineWidth = 2;
-              ctx.setLineDash([6, 4]);
-              ctx.lineDashOffset = -t * 30;
-              ctx.beginPath();
-              ctx.moveTo(x + boxW + 6, cy);
-              ctx.lineTo(x + boxW + arrowW - 6, cy);
-              ctx.stroke();
-              ctx.setLineDash([]);
-              ctx.fillStyle = "#e8d878";
-              ctx.beginPath();
-              ctx.moveTo(x + boxW + arrowW - 6, cy - 6);
-              ctx.lineTo(x + boxW + arrowW + 4, cy);
-              ctx.lineTo(x + boxW + arrowW - 6, cy + 6);
-              ctx.fill();
-            }
-          });
-          ctx.globalAlpha = 1;
-        },
-
-        features: (ctx, p, t) => {
-          const feats = [
-            { icon: "\ud83c\udfa8", label: "Canvas Animations", color: "#e8d878" },
-            { icon: "\ud83d\udd0a", label: "400+ Voices, 50+ Languages", color: "#88aab0" },
-            { icon: "\u2753", label: "Misconception-Based Quizzes", color: "#88b870" },
-            { icon: "\ud83e\udde9", label: "Interactive Widgets", color: "#e8d878" },
-            { icon: "\ud83c\udfad", label: "8 Visual Themes", color: "#88aab0" },
-          ];
-          const titleR = Math.max(0, Math.min(1, p / 0.1));
-          ctx.globalAlpha = titleR;
-          ctx.font = '500 34px "DM Sans"';
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillStyle = "#e8d878";
-          ctx.fillText("What You Get", VW / 2, 180);
-          const cols = 3, cardW = 380, cardH = 160, gapX = 60, gapY = 40;
-          const gridW = cols * cardW + (cols - 1) * gapX;
-          const startX = (VW - gridW) / 2, startY = 260;
-          feats.forEach((f, i) => {
-            const row = Math.floor(i / cols), col = i % cols;
-            const delay = 0.08 + i * 0.1;
-            const r = Math.max(0, Math.min(1, (p - delay) / 0.12));
-            if (r <= 0) return;
-            ctx.globalAlpha = r;
-            let x = startX + col * (cardW + gapX);
-            const y = startY + row * (cardH + gapY);
-            if (row === 1) {
-              const bottomItems = feats.length - cols;
-              const bottomW = bottomItems * cardW + (bottomItems - 1) * gapX;
-              x = (VW - bottomW) / 2 + (i - cols) * (cardW + gapX);
-            }
-            ctx.fillStyle = "#28322e";
-            ctx.beginPath();
-            ctx.roundRect(x, y, cardW, cardH, 12);
-            ctx.fill();
-            ctx.strokeStyle = f.color + "40";
-            ctx.lineWidth = 1;
-            ctx.stroke();
-            ctx.font = '36px "DM Sans"';
-            ctx.textAlign = "center";
-            ctx.fillText(f.icon, x + cardW / 2, y + 55);
-            ctx.font = '500 19px "DM Sans"';
-            ctx.fillStyle = f.color;
-            ctx.fillText(f.label, x + cardW / 2, y + 105);
-            const pulse = 0.6 + 0.4 * Math.sin(t * 1.5 + i * 1.2);
-            ctx.globalAlpha = r * pulse * 0.15;
-            const grd = ctx.createRadialGradient(x + cardW / 2, y + cardH / 2, 0, x + cardW / 2, y + cardH / 2, cardW / 2);
-            grd.addColorStop(0, f.color);
-            grd.addColorStop(1, "transparent");
-            ctx.fillStyle = grd;
-            ctx.fillRect(x, y, cardW, cardH);
-          });
-          const badgeR = Math.max(0, Math.min(1, (p - 0.65) / 0.1));
-          ctx.globalAlpha = badgeR;
-          ctx.font = '300 18px "DM Sans"';
-          ctx.textAlign = "center";
-          ctx.fillStyle = "#6a7a68";
-          ctx.fillText("Self-contained HTML  \u00b7  Zero dependencies  \u00b7  Works in any browser", VW / 2, 710);
-          ctx.globalAlpha = 1;
-        },
-      };
-
+      // ===== RENDERER =====
       const renderScene = createSceneRenderer(scenes, sceneElements, {
         bg: "#1a2420",
         draw: customDraw,
       });
 
+      // ===== BOOT =====
       createLesson({
         lessonId: "skill-onboarding",
         scenes,

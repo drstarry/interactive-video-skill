@@ -4,199 +4,217 @@
     "voice": "en-US-AndrewNeural",
     "rate": "+5%",
     "gap": 1.2,
-    "duration": 234,
+    "duration": 436,
     "audioGenerated": true
   },
   "narration": [
     {
       "t": 1.2,
-      "text": "Your body is under constant attack. Every day, bacteria, viruses, and other pathogens try to invade. But you have a built-in defense system that's been evolving for millions of years: your immune system."
+      "text": "Right now, inside your body, billions of cells are standing guard. Your immune system runs twenty-four seven, and it's remarkably sophisticated. But here's what's surprising: it has a memory. And vaccines are the hack that lets us write to that memory — without ever getting sick. Let's see how that works."
     },
     {
-      "t": 14.81,
-      "text": "Your immune system has two layers. The first is your innate immune system. It's fast, non-specific, and always on patrol. Think of it as the front-line guards. Skin, mucus, fever, and inflammation are all part of this innate response."
+      "t": 19.68,
+      "text": "Your body's first line of defense is called innate immunity. Think of it as the security perimeter. Your skin is a physical wall. Your mucous membranes trap invaders. And if something does break through, inflammation kicks in — blood flow increases, and generalist soldiers called phagocytes rush to the site to engulf and destroy anything that looks foreign. This response is fast, happening within minutes. But here's the catch: it's generic. Phagocytes don't distinguish between a flu virus and a bacterial infection. They attack everything the same way."
     },
     {
-      "t": 30.84,
-      "text": "The second layer is your adaptive immune system. It's slower to respond the first time, but incredibly precise. It learns to recognize specific invaders and remembers them for years, sometimes for life."
+      "t": 53.45,
+      "text": "When innate immunity isn't enough, your body activates a second, more powerful system — adaptive immunity. This is where things get specific. Every pathogen carries unique molecules on its surface called antigens. Think of antigens like a fingerprint — no two pathogens have exactly the same ones. Your adaptive immune system can learn to recognize specific antigens. But this precision comes at a cost: it's slow. The first time your body encounters a new antogen, it takes days to mount a targeted response."
     },
     {
-      "t": 44.06,
-      "text": "Here's how the adaptive response works. When a pathogen enters your body, it carries unique molecules on its surface called antigens. These antigens are like a fingerprint that identifies the invader."
+      "t": 85.37,
+      "text": "So what happens when your body faces a pathogen it's never seen? Let's think about that.",
+      "endsBeforeIx": "q-first-encounter"
     },
     {
-      "t": 56.59,
-      "text": "Special cells called antigen-presenting cells capture the pathogen and display fragments of its antigens. This activates two key players: B cells, which produce antibodies, and T cells, which coordinate the attack and destroy infected cells."
+      "t": 91.18,
+      "text": "Exactly. The first encounter is a race against time. Your adaptive immune system has to figure out what it's dealing with — and that takes days, not minutes. Now let's look at the key players. B cells are your antibody factories. When a B cell encounters an antigen that matches its receptor, it activates and begins producing antibodies — Y-shaped proteins that lock onto that specific antigen like a key fitting a lock. These antibodies tag the pathogen for destruction. They can also neutralize it directly by blocking the sites it uses to infect your cells. A single activated B cell can pump out thousands of antibodies per second."
     },
     {
-      "t": 73.06,
-      "text": "Let's explore the key components of your adaptive immune system and what each one does.",
-      "endsBeforeIx": "try-immune-components"
+      "t": 128.83,
+      "text": "T cells are the coordinators and the killers. Helper T cells are like field commanders — they recognize infected cells and release chemical signals called cytokines that amplify the entire immune response. They tell B cells to produce more antibodies. They recruit more phagocytes. And they activate killer T cells. Killer T cells, also called cytotoxic T cells, do exactly what the name suggests. They find cells that have already been infected by the pathogen and destroy them — eliminating the virus factory before it can spread further."
     },
     {
-      "t": 78.96,
-      "text": "After the infection is cleared, most of those B cells and T cells die off. But a small group survives as memory cells. These memory cells patrol your body for years, ready to launch a rapid response if the same pathogen ever returns."
+      "t": 162.07,
+      "text": "Now let's test whether you can sort these roles correctly.",
+      "endsBeforeIx": "try-cell-roles"
     },
     {
-      "t": 94.56,
-      "text": "This is the key insight: the first time you encounter a pathogen, it takes your immune system one to two weeks to mount a full response. But with memory cells already in place, the second encounter triggers a response in just hours. The infection is crushed before you even feel sick."
+      "t": 166.13,
+      "text": "Good. Now here's where the real magic happens. During that first immune response, something critical occurs alongside all the fighting. Your body creates memory cells — specialized B cells and T cells that don't die off after the infection is cleared. Instead, they persist for years, sometimes for your entire life. These memory cells have already learned to recognize the pathogen's antigens. So if the same pathogen shows up again, the response is dramatically different."
     },
     {
-      "t": 112.39,
-      "text": "Now let's put the full immune response in order, from initial infection to long-term protection.",
-      "endsBeforeIx": "try-response-order"
+      "t": 194.81,
+      "text": "The second time around, memory cells recognize the antigen within hours, not days. They multiply rapidly and produce antibodies at a much higher concentration. The pathogen is overwhelmed before it can establish an infection. You might not even notice you were exposed. This is immunological memory, and it's the entire foundation that vaccines are built on."
     },
     {
-      "t": 119.14,
-      "text": "Vaccines exploit this memory mechanism. Instead of waiting for a real infection, a vaccine introduces a harmless version of the antigen into your body. Your immune system mounts a response, creates memory cells, and you gain protection without ever getting sick."
+      "t": 217.46,
+      "text": "Can you put the steps of immune memory formation in the right order?",
+      "endsBeforeIx": "try-memory-steps"
     },
     {
-      "t": 135.86,
-      "text": "There are several types of vaccines, and they differ in how they present the antigen to your immune system. Live attenuated vaccines use a weakened form of the actual virus. Inactivated vaccines use a killed version of the pathogen. Subunit vaccines use just a piece of the pathogen, like a surface protein. And mRNA vaccines give your cells instructions to build the antigen protein themselves."
+      "t": 221.9,
+      "text": "Now for the key insight. Vaccines exploit immunological memory by giving your immune system a preview of the pathogen — without the danger. They introduce something that carries the pathogen's antigens but can't cause the actual disease. Your immune system responds as if it's a real infection: B cells produce antibodies, T cells coordinate the attack, and — crucially — memory cells are created. When the real pathogen shows up later, your body already has the playbook. The response is fast, massive, and the pathogen doesn't stand a chance."
     },
     {
-      "t": 160.25,
-      "text": "Each type has trade-offs in terms of strength of immune response, storage requirements, and how quickly they can be developed. Let's sort these vaccine types into their correct categories.",
-      "endsBeforeIx": "try-vaccine-types"
+      "t": 255.29,
+      "text": "There are four main types of vaccines, each using a different strategy to show your immune system the antigen. Live attenuated vaccines use a weakened version of the actual pathogen. It can still replicate, which triggers a strong, long-lasting immune response, but it's too weak to cause disease in healthy people. Examples include the M-M-R vaccine and the oral polio vaccine. Inactivated vaccines use a killed version of the pathogen. It can't replicate at all, so the immune response is weaker. That's why these often require booster shots. The flu shot is a common example."
     },
     {
-      "t": 171.43,
-      "text": "So why do some vaccines need boosters? Over time, memory cell populations can decline. A booster shot re-exposes your immune system to the antigen, refreshing and expanding the pool of memory cells. Think of it as a training drill that keeps your defenses sharp."
+      "t": 290.66,
+      "text": "Subunit vaccines skip the whole pathogen entirely. They use just a purified piece — usually a protein from the pathogen's surface. This is very safe because there's zero chance of infection, but the immune response can be modest, so adjuvants — chemical boosters — are often added. The hepatitis B vaccine works this way. And then there are mRNA vaccines — the newest approach. Instead of delivering the antigen directly, they deliver genetic instructions that tell your own cells to produce the antigen temporarily. Your immune system then responds to that self-made antigen. The mRNA degrades within days — it never enters the cell nucleus or alters your DNA. The COVID-19 vaccines from Pfizer and Moderna use this technology."
     },
     {
-      "t": 188.14,
-      "text": "Here's a question to test your understanding of how vaccines create immunity.",
-      "endsBeforeIx": "q-mechanism"
+      "t": 336.24,
+      "text": "Which vaccine type uses the pathogen's own genetic instructions to make your cells produce the antigen?",
+      "endsBeforeIx": "q-vaccine-type"
     },
     {
-      "t": 193.39,
-      "text": "Let's bring it all together. Vaccines work because your adaptive immune system can learn and remember. By introducing a harmless antigen, vaccines train your B cells and T cells to recognize a threat before it arrives. The result is immunological memory: a rapid, powerful response that stops disease before it starts."
+      "t": 342.91,
+      "text": "Now let's zoom out from individual immunity to population-level protection. Herd immunity occurs when enough people in a community are immune — through vaccination or prior infection — that the pathogen can't find enough vulnerable hosts to sustain its spread. Think of it like firebreaks in a forest. A few isolated trees on fire won't cause a wildfire if there are enough gaps. The critical threshold depends on how contagious the pathogen is. For measles, one of the most contagious diseases known, about ninety-five percent of the population needs to be immune. For less contagious diseases, the threshold might be seventy or eighty percent."
     },
     {
-      "t": 213.82,
-      "text": "This principle has eradicated smallpox, nearly eliminated polio, and continues to protect billions of people worldwide. Understanding how vaccines train your immune system is one of the most important pieces of health literacy you can have."
+      "t": 381.22,
+      "text": "Let's explore how vaccination rate affects outbreak spread.",
+      "endsBeforeIx": "try-herd-immunity"
+    },
+    {
+      "t": 385.94,
+      "text": "Let's pull it all together. Your immune system has two layers: innate immunity responds fast but generically, and adaptive immunity responds specifically but slowly on the first encounter. The adaptive system's secret weapon is memory — B cells and T cells that remember pathogens for years. Vaccines exploit this by showing your immune system the antigen without the disease, creating memory cells that provide rapid protection when the real threat arrives. And when enough people are vaccinated, herd immunity protects even those who can't be vaccinated — like infants or immunocompromised individuals. It's one of the most elegant hacks in medicine: training your body's own defense system with a harmless preview, so it's ready for the real thing."
     }
   ],
   "interactions": {
-    "try-immune-components": {
-      "time": 77.76,
-      "title": "Immune System Components",
-      "desc": "Tap each component to learn what it does in the adaptive immune response.",
-      "widget": "hotspot",
-      "hotspots": [
-        {
-          "label": "B Cells",
-          "icon": "B",
-          "explanation": "B cells produce antibodies — Y-shaped proteins that bind to specific antigens and neutralize pathogens or tag them for destruction."
-        },
-        {
-          "label": "T Helper Cells",
-          "icon": "Th",
-          "explanation": "T helper cells coordinate the immune response by releasing chemical signals called cytokines that activate B cells and killer T cells."
-        },
-        {
-          "label": "Killer T Cells",
-          "icon": "Tk",
-          "explanation": "Killer T cells (cytotoxic T cells) directly destroy cells that have been infected by a virus, preventing the pathogen from replicating."
-        },
-        {
-          "label": "Memory Cells",
-          "icon": "M",
-          "explanation": "Memory B and T cells persist after infection is cleared. They enable a faster, stronger response if the same pathogen is encountered again."
-        }
+    "q-first-encounter": {
+      "time": 89.98,
+      "title": "First Encounter",
+      "desc": "Your body encounters a pathogen it has never seen before. What happens in the first few hours?",
+      "options": [
+        "Antibodies immediately neutralize the pathogen within minutes",
+        "The innate system responds fast, but adaptive immunity takes days to produce targeted antibodies",
+        "T cells instantly recognize and destroy all infected cells"
       ],
       "feedback": {
         "correct": {
-          "body": "These four components work together to identify, attack, and remember specific pathogens."
-        },
-        "wrong": {
-          "body": "Explore all components to continue."
-        }
-      }
-    },
-    "try-response-order": {
-      "time": 117.93,
-      "title": "Order the Immune Response",
-      "desc": "Drag to arrange the steps from initial infection to long-term immunity.",
-      "widget": "sort",
-      "sortItems": [
-        "Pathogen enters the body",
-        "Innate immune system responds (inflammation, fever)",
-        "Antigen-presenting cells capture and display antigens",
-        "B cells and T cells are activated",
-        "Antibodies neutralize the pathogen",
-        "Memory cells form for future protection"
-      ],
-      "feedback": {
-        "correct": {
-          "title": "Correct",
-          "body": "That's the complete cascade from infection to lasting immunity."
+          "title": "Correct!",
+          "body": "On first exposure, innate immunity buys time with its fast, generic response, while adaptive immunity needs days to identify the antigen and produce specific antibodies."
         },
         "wrong": {
           "title": "Not quite",
-          "body": "Remember: innate response comes first, then antigen presentation activates adaptive immunity, and memory cells form last."
+          "body": "That's a common misconception — specific antibodies and targeted T cell responses aren't instant. They require the adaptive immune system, which takes days to ramp up on a first encounter. Innate immunity provides the fast but generic initial defense."
         }
       }
     },
-    "try-vaccine-types": {
-      "time": 170.23,
-      "title": "Classify Vaccine Types",
-      "desc": "Drag each vaccine into the correct category based on what it contains.",
+    "try-cell-roles": {
+      "time": 164.93,
+      "title": "Immune Cell Roles",
+      "desc": "Drag each function to the correct cell type.",
       "widget": "categorize",
       "categories": [
         {
-          "label": "Contains whole pathogen",
+          "label": "B Cells",
           "items": [
-            "MMR (live attenuated)",
-            "Flu shot (inactivated)",
-            "Oral polio (live attenuated)"
+            "Produce antibodies",
+            "Tag pathogens for destruction",
+            "Neutralize pathogens directly"
           ]
         },
         {
-          "label": "Contains partial pathogen",
+          "label": "T Cells",
           "items": [
-            "Hepatitis B (subunit)",
-            "HPV vaccine (subunit)",
-            "Shingles (subunit)"
-          ]
-        },
-        {
-          "label": "Contains genetic instructions",
-          "items": [
-            "Pfizer COVID (mRNA)",
-            "Moderna COVID (mRNA)"
+            "Coordinate immune response via cytokines",
+            "Destroy infected host cells",
+            "Activate other immune cells"
           ]
         }
       ],
       "feedback": {
         "correct": {
-          "title": "Correct",
-          "body": "Live attenuated and inactivated vaccines use whole pathogens. Subunit vaccines use just a piece. mRNA vaccines deliver genetic instructions for your cells to make the antigen."
+          "body": "You've got it. B cells are the antibody factories; T cells are the coordinators and killers."
         },
         "wrong": {
-          "title": "Not quite",
-          "body": "Think about what's actually in each vaccine: the whole virus, a protein fragment, or instructions to build a protein."
+          "body": "Remember: B cells produce and deploy antibodies. T cells coordinate the response (helper) and destroy infected cells (killer)."
         }
       }
     },
-    "q-mechanism": {
-      "time": 192.2,
-      "title": "Vaccine Mechanism",
-      "desc": "What is the primary way vaccines protect you from future infections?",
-      "options": [
-        "They kill pathogens directly when injected",
-        "They train memory cells to recognize specific antigens",
-        "They permanently boost your innate immune system"
+    "try-memory-steps": {
+      "time": 220.7,
+      "title": "Immune Memory Formation",
+      "desc": "Drag to arrange from first to last.",
+      "widget": "sort",
+      "sortItems": [
+        "Pathogen enters the body for the first time",
+        "Innate immunity buys time with a generic response",
+        "Adaptive immune cells identify the specific antigen",
+        "B cells produce antibodies; T cells destroy infected cells",
+        "Memory B and T cells are created and persist long-term",
+        "On re-exposure, memory cells mount a rapid, stronger response"
       ],
       "feedback": {
         "correct": {
-          "title": "Correct",
-          "body": "Vaccines introduce antigens that trigger the adaptive immune system to create memory B and T cells. These memory cells enable a rapid response to future encounters with the real pathogen."
+          "body": "Perfect sequence. The key insight is step 5 — memory cells are the bridge between your first fight and future protection."
+        },
+        "wrong": {
+          "body": "Review the order: innate responds first, then adaptive kicks in, the infection is fought, and memory cells persist for future encounters."
+        }
+      }
+    },
+    "q-vaccine-type": {
+      "time": 341.71,
+      "title": "Vaccine Types",
+      "desc": "Which vaccine type uses the pathogen's own genetic instructions to make your cells produce the antigen?",
+      "options": [
+        "Live attenuated — uses a weakened whole pathogen",
+        "Subunit — uses a purified protein fragment",
+        "mRNA — delivers genetic instructions to your cells"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Correct!",
+          "body": "mRNA vaccines deliver the genetic blueprint for the antigen. Your cells follow the instructions temporarily, the immune system responds, and the mRNA degrades within days."
         },
         "wrong": {
           "title": "Not quite",
-          "body": "Vaccines don't kill pathogens directly or permanently change innate immunity. They work by training the adaptive immune system to create memory cells that recognize specific antigens."
+          "body": "Live attenuated uses a weakened pathogen, and subunit uses a protein piece. mRNA vaccines are unique because they deliver genetic instructions — your own cells manufacture the antigen."
         }
+      }
+    },
+    "try-herd-immunity": {
+      "time": 384.75,
+      "title": "Herd Immunity Explorer",
+      "desc": "Adjust the vaccination rate to see how it affects disease spread.",
+      "widget": "slider",
+      "slider": {
+        "min": 0,
+        "max": 100,
+        "step": 5,
+        "initial": 50,
+        "unit": "%",
+        "stops": [
+          {
+            "value": 0,
+            "label": "No vaccination",
+            "detail": "The pathogen spreads freely through the entire population. Everyone susceptible is at risk."
+          },
+          {
+            "value": 30,
+            "label": "Low coverage (30%)",
+            "detail": "Outbreaks still occur easily. Too many susceptible people for the chain of transmission to break."
+          },
+          {
+            "value": 60,
+            "label": "Moderate coverage (60%)",
+            "detail": "Spread is slowed but not stopped. Outbreaks are smaller but still happen in clusters of unvaccinated people."
+          },
+          {
+            "value": 80,
+            "label": "Near threshold (80%)",
+            "detail": "For many diseases, this approaches the herd immunity threshold. Outbreaks become rare and self-limiting."
+          },
+          {
+            "value": 95,
+            "label": "High coverage (95%)",
+            "detail": "Herd immunity achieved for even highly contagious diseases like measles. The pathogen can't find enough hosts to sustain transmission. Vulnerable individuals are protected by the community."
+          }
+        ]
       }
     }
   }

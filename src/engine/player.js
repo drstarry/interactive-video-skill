@@ -227,17 +227,34 @@ export function createPlayer({
       }
     }
 
-    // Reset narration state so the next segment plays correctly.
-    // Mark current segment as spoken to avoid replaying it from the start.
-    const ni = getNI(time);
-    lastSpoke = ni;
-    currentNarIdx = -1;
-    waitingForAudio = false;
+    // Resume narration from current position after quiz dismiss.
+    triggerNarrationAt(time);
 
     playing = true;
     lastTs = null;
     updatePlayIcon(true);
     requestAnimationFrame(tick);
+  }
+
+  // ── Narration trigger helper ──
+  // Used by seek(), continuePlay(), and play() to start audio for
+  // the narration segment at a given time, with correct offset.
+
+  function triggerNarrationAt(t, withOffset = true) {
+    const ni = getNI(t);
+    currentNarIdx = -1;
+    waitingForAudio = false;
+
+    if (narrationEnabled && ni >= 0 && narration[ni].text) {
+      lastSpoke = ni;
+      currentNarIdx = ni;
+      waitingForAudio = true;
+      const offset = withOffset ? Math.max(0, t - narration[ni].t) : 0;
+      audio.play(lessonId, ni, narration[ni].text, offset || undefined);
+      if (onNarrationChange) onNarrationChange(ni);
+    } else {
+      lastSpoke = ni;
+    }
   }
 
   // ── Play / Pause / Seek ──
@@ -252,7 +269,11 @@ export function createPlayer({
     playing = true;
     lastTs = null;
     updatePlayIcon(true);
-    if (audio.state === "PAUSED") audio.resume();
+    if (audio.state === "PAUSED") {
+      audio.resume();
+    } else if (!waitingForAudio && audio.state === "IDLE") {
+      triggerNarrationAt(time, false);
+    }
     requestAnimationFrame(tick);
   }
 
@@ -269,40 +290,48 @@ export function createPlayer({
 
   function seek(pct) {
     if (activeIx) return;
-    stopAudio();
-    time = Math.max(0, Math.min(pct * duration, duration));
-    const ni = getNI(time);
 
-    // If the current segment is linked to an undone quiz, trigger it directly.
-    // Otherwise mark it as spoken so we skip to the next segment boundary.
-    if (ni >= 0 && narToIx.has(ni) && !done.has(narToIx.get(ni).id)) {
-      lastSpoke = ni;
-      currentNarIdx = -1;
+    const wasPlaying = playing;
+    if (playing) { playing = false; updatePlayIcon(false); }
+    stopAudio();
+
+    time = Math.max(0, Math.min(pct * duration, duration));
+
+    // Check for interaction at this position
+    const ix = findInteractionAt(time);
+    if (ix) {
+      lastSpoke = getNI(time);
       renderFrame();
       updateUI();
-      showIx(narToIx.get(ni));
+      showIx(ix);
       return;
     }
 
-    // Also check if we landed right on an unlinked interaction
-    if (interactions) {
-      for (const ix of interactions) {
-        if (linkedIx.has(ix.id)) continue;
-        if (!done.has(ix.id) && time >= ix.time - 0.5 && time <= ix.time + 1) {
-          lastSpoke = ni;
-          currentNarIdx = -1;
-          renderFrame();
-          updateUI();
-          showIx(ix);
-          return;
-        }
-      }
-    }
+    // Play the current narration segment from the correct offset
+    if (wasPlaying) triggerNarrationAt(time);
+    else lastSpoke = getNI(time);
 
-    lastSpoke = ni;
-    currentNarIdx = -1;
     renderFrame();
     updateUI();
+    if (wasPlaying) play();
+  }
+
+  // Find the nearest undone interaction within ±1s of the given time
+  function findInteractionAt(t) {
+    if (!interactions) return null;
+    // Check linked interactions (narration → quiz)
+    const ni = getNI(t);
+    if (ni >= 0 && narToIx.has(ni) && !done.has(narToIx.get(ni).id)) {
+      return narToIx.get(ni);
+    }
+    // Check unlinked interactions
+    for (const ix of interactions) {
+      if (linkedIx.has(ix.id)) continue;
+      if (!done.has(ix.id) && t >= ix.time - 0.5 && t <= ix.time + 1) {
+        return ix;
+      }
+    }
+    return null;
   }
 
   function setMuted(muted) {

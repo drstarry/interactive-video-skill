@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="src/lesson.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <style>
       :root {
         --bg: #e8e8e8;
@@ -41,7 +41,7 @@
   </head>
   <body data-theme="clean-light">
     <!-- Navigation -->
-                <nav class="site-nav">
+    <nav class="site-nav">
       <a class="site-nav-brand" href="https://github.com/drstarry/interactive-video-skill">Interactive Video Skill</a>
       <div class="site-nav-links">
         <a href="skill-onboarding.html">Onboarding [theme: Chalkboard]</a>
@@ -107,477 +107,1362 @@
       import { VW, VH } from "./src/engine/canvas.js";
 
       // ===== SCENE DATA =====
+      // Contiguous boundaries: each s = previous e. First s=0, last e=436.
       const scenes = [
-        { s: 0, e: 14.81, label: "Your Immune System", bg: "intro" },
-        { s: 14.81, e: 44.06, label: "Innate vs Adaptive Immunity", bg: "two-layers" },
-        { s: 44.06, e: 77.76, label: "Antigens and Immune Cells", bg: "antigens" },
-        { s: 77.76, e: 117.93, label: "Memory Cells", bg: "memory" },
-        { s: 117.93, e: 170.23, label: "How Vaccines Work", bg: "vaccines" },
-        { s: 170.23, e: 234, label: "Boosters and Summary", bg: "summary" },
+        { s: 0,      e: 19.68,  label: "Your Immune System",            bg: "intro" },
+        { s: 19.68,  e: 53.45,  label: "Innate Immunity",               bg: "innate" },
+        { s: 53.45,  e: 89.98,  label: "Adaptive Immunity",             bg: "adaptive" },
+        { s: 89.98,  e: 128.83, label: "B Cells & Antibodies",          bg: "bcells" },
+        { s: 128.83, e: 164.93, label: "T Cells",                       bg: "tcells" },
+        { s: 164.93, e: 194.81, label: "Memory Cells",                  bg: "memory" },
+        { s: 194.81, e: 220.7,  label: "Primary vs Secondary Response", bg: "response" },
+        { s: 220.7,  e: 255.29, label: "How Vaccines Work",             bg: "mechanism" },
+        { s: 255.29, e: 290.66, label: "Traditional Vaccine Types",     bg: "types-trad" },
+        { s: 290.66, e: 341.71, label: "Modern Vaccine Types",          bg: "types-modern" },
+        { s: 341.71, e: 384.75, label: "Herd Immunity",                 bg: "herd" },
+        { s: 384.75, e: 436,    label: "Putting It All Together",       bg: "summary" },
       ];
 
       const IX = [
         {
-          id: "try-immune-components", time: 77.76, cat: "try",
-          title: "Immune System Components",
-          desc: "Tap each component to learn what it does in the adaptive immune response.",
-        },
-        {
-          id: "try-response-order", time: 117.93, cat: "try",
-          title: "Order the Immune Response",
-          desc: "Drag to arrange the steps from initial infection to long-term immunity.",
-        },
-        {
-          id: "try-vaccine-types", time: 170.23, cat: "try",
-          title: "Classify Vaccine Types",
-          desc: "Drag each vaccine into the correct category based on what it contains.",
-        },
-        {
-          id: "q-mechanism", time: 192.2, cat: "q",
-          title: "Vaccine Mechanism",
-          desc: "What is the primary way vaccines protect you from future infections?",
+          id: "q-first-encounter", time: 89.98, cat: "q",
+          title: "First Encounter",
+          desc: "Your body encounters a pathogen it has never seen before. What happens in the first few hours?",
           options: [
             { k: "A", c: false },
             { k: "B", c: true },
             { k: "C", c: false },
           ],
         },
+        {
+          id: "try-cell-roles", time: 164.93, cat: "try",
+          title: "Immune Cell Roles",
+          desc: "Drag each function to the correct cell type.",
+          options: [],
+        },
+        {
+          id: "try-memory-steps", time: 220.7, cat: "try",
+          title: "Immune Memory Formation",
+          desc: "Drag to arrange from first to last.",
+          options: [],
+        },
+        {
+          id: "q-vaccine-type", time: 341.71, cat: "q",
+          title: "Vaccine Types",
+          desc: "Which vaccine type uses the pathogen\u2019s own genetic instructions to make your cells produce the antigen?",
+          options: [
+            { k: "A", c: false },
+            { k: "B", c: false },
+            { k: "C", c: true },
+          ],
+        },
+        {
+          id: "try-herd-immunity", time: 384.75, cat: "try",
+          title: "Herd Immunity Explorer",
+          desc: "Adjust the vaccination rate to see how it affects disease spread.",
+          options: [],
+        },
       ];
 
       // ===== DECLARATIVE ELEMENTS =====
       const sceneElements = {
         intro: [
-          { type: "glow", x: 960, y: 540, radius: 420, color: "rgba(26,106,106,0.06)" },
-          { type: "text", x: 960, y: 400, text: "Your Immune System", font: '600 46px "DM Sans"', color: "#1a1a1a" },
-          { type: "text", x: 960, y: 460, text: "How your body defends against invaders", font: '300 22px "DM Sans"', color: "#6a6a6a", revealAt: 0.2 },
-          { type: "rule", x1: 860, y1: 500, x2: 1060, y2: 500, color: "#1a6a6a", revealAt: 0.3 },
-          { type: "text", x: 960, y: 580, text: "Bacteria  \u00B7  Viruses  \u00B7  Pathogens", font: '400 18px "DM Sans"', color: "#6a6a6a", revealAt: 0.5 },
-          { type: "text", x: 960, y: 640, text: "vs. your built-in defense system", font: '500 20px "DM Sans"', color: "#1a6a6a", revealAt: 0.7 },
+          { type: "glow", x: 960, y: 460, radius: 450, color: "rgba(26,106,106,0.06)" },
+          { type: "text", x: 960, y: 340, text: "Your Immune System",
+            font: '600 48px "DM Sans"', color: "#1a1a1a" },
+          { type: "rule", x1: 830, y1: 385, x2: 1090, y2: 385,
+            color: "#1a6a6a", revealAt: 0.12 },
+          { type: "text", x: 960, y: 440, text: "Billions of cells on 24/7 patrol",
+            font: '400 22px "DM Sans"', color: "#6a6a6a", revealAt: 0.18 },
+          { type: "text", x: 960, y: 500, text: "It has a memory",
+            font: '600 26px "DM Sans"', color: "#1a6a6a", revealAt: 0.41 },
+          { type: "text", x: 960, y: 560, text: "Vaccines write to that memory",
+            font: '500 24px "DM Sans"', color: "#1a1a1a", revealAt: 0.55 },
+          { type: "text", x: 960, y: 600, text: "without ever getting sick",
+            font: '400 22px "DM Sans"', color: "#6a6a6a", revealAt: 0.68 },
+          { type: "text", x: 960, y: 660, text: "Let\u2019s see how that works.",
+            font: '500 22px "DM Sans"', color: "#1a6a6a", revealAt: 0.82 },
         ],
-        "two-layers": [
-          { type: "text", x: 960, y: 160, text: "Two Layers of Defense", font: '600 36px "DM Sans"', color: "#1a1a1a" },
-          { type: "rule", x1: 860, y1: 195, x2: 1060, y2: 195, color: "#1a6a6a", revealAt: 0.05 },
-          { type: "rect", x: 160, y: 260, w: 720, h: 520, fill: "rgba(26,106,106,0.06)", stroke: "#1a6a6a" },
-          { type: "text", x: 520, y: 300, text: "Innate Immunity", font: '600 26px "DM Sans"', color: "#1a6a6a", revealAt: 0.1 },
-          { type: "text", x: 520, y: 370, text: "Fast & Non-specific", font: '500 22px "DM Sans"', color: "#1a6a6a", revealAt: 0.15 },
-          { type: "text", x: 520, y: 430, text: "Skin barrier", font: '400 18px "DM Sans"', color: "#6a6a6a", revealAt: 0.25 },
-          { type: "text", x: 520, y: 475, text: "Mucus membranes", font: '400 18px "DM Sans"', color: "#6a6a6a", revealAt: 0.3 },
-          { type: "text", x: 520, y: 520, text: "Fever response", font: '400 18px "DM Sans"', color: "#6a6a6a", revealAt: 0.35 },
-          { type: "text", x: 520, y: 565, text: "Inflammation", font: '400 18px "DM Sans"', color: "#6a6a6a", revealAt: 0.4 },
-          { type: "rect", x: 1040, y: 260, w: 720, h: 520, fill: "rgba(58,90,122,0.06)", stroke: "#3a5a7a" },
-          { type: "text", x: 1400, y: 300, text: "Adaptive Immunity", font: '600 26px "DM Sans"', color: "#3a5a7a", revealAt: 0.1 },
-          { type: "text", x: 1400, y: 370, text: "Slow but Precise", font: '500 22px "DM Sans"', color: "#3a5a7a", revealAt: 0.5 },
-          { type: "text", x: 1400, y: 430, text: "Learns specific invaders", font: '400 18px "DM Sans"', color: "#6a6a6a", revealAt: 0.6 },
-          { type: "text", x: 1400, y: 475, text: "Creates targeted antibodies", font: '400 18px "DM Sans"', color: "#6a6a6a", revealAt: 0.65 },
-          { type: "text", x: 1400, y: 520, text: "Remembers for years", font: '400 18px "DM Sans"', color: "#6a6a6a", revealAt: 0.7 },
-          { type: "text", x: 1400, y: 565, text: "Gets stronger with exposure", font: '400 18px "DM Sans"', color: "#6a6a6a", revealAt: 0.75 },
+        innate: [
+          { type: "text", x: 960, y: 100, text: "Innate Immunity",
+            font: '600 38px "DM Sans"', color: "#1a1a1a" },
+          { type: "text", x: 960, y: 148, text: "The security perimeter",
+            font: '400 20px "DM Sans"', color: "#6a6a6a", revealAt: 0.04 },
         ],
-        antigens: [
-          { type: "text", x: 960, y: 140, text: "Antigens & Immune Activation", font: '600 36px "DM Sans"', color: "#1a1a1a" },
-          { type: "rule", x1: 830, y1: 175, x2: 1090, y2: 175, color: "#1a6a6a", revealAt: 0.05 },
+        adaptive: [
+          { type: "text", x: 960, y: 100, text: "Adaptive Immunity",
+            font: '600 38px "DM Sans"', color: "#1a1a1a" },
+          { type: "text", x: 960, y: 148, text: "Precision targeting",
+            font: '400 20px "DM Sans"', color: "#6a6a6a", revealAt: 0.04 },
+        ],
+        bcells: [
+          { type: "text", x: 960, y: 90, text: "B Cells \u2014 Antibody Factories",
+            font: '600 34px "DM Sans"', color: "#1a1a1a" },
+          { type: "rule", x1: 780, y1: 128, x2: 1140, y2: 128,
+            color: "#1a6a6a", revealAt: 0.04 },
+        ],
+        tcells: [
+          { type: "text", x: 960, y: 90, text: "T Cells \u2014 Coordinators & Killers",
+            font: '600 34px "DM Sans"', color: "#1a1a1a" },
+          { type: "rule", x1: 760, y1: 128, x2: 1160, y2: 128,
+            color: "#3a5a7a", revealAt: 0.04 },
         ],
         memory: [
-          { type: "text", x: 960, y: 140, text: "Immunological Memory", font: '600 36px "DM Sans"', color: "#1a1a1a" },
-          { type: "rule", x1: 850, y1: 175, x2: 1070, y2: 175, color: "#1a6a6a", revealAt: 0.05 },
+          { type: "text", x: 960, y: 90, text: "Memory Cells \u2014 The Real Magic",
+            font: '600 34px "DM Sans"', color: "#1a1a1a" },
+          { type: "rule", x1: 800, y1: 128, x2: 1120, y2: 128,
+            color: "#1a6a6a", revealAt: 0.04 },
         ],
-        vaccines: [
-          { type: "text", x: 960, y: 140, text: "How Vaccines Work", font: '600 36px "DM Sans"', color: "#1a1a1a" },
-          { type: "rule", x1: 860, y1: 175, x2: 1060, y2: 175, color: "#1a6a6a", revealAt: 0.05 },
+        response: [
+          { type: "text", x: 960, y: 90, text: "Primary vs Secondary Response",
+            font: '600 32px "DM Sans"', color: "#1a1a1a" },
+          { type: "rule", x1: 740, y1: 128, x2: 1180, y2: 128,
+            color: "#1a6a6a", revealAt: 0.04 },
+        ],
+        mechanism: [
+          { type: "text", x: 960, y: 90, text: "How Vaccines Work",
+            font: '600 36px "DM Sans"', color: "#1a1a1a" },
+          { type: "text", x: 960, y: 138, text: "Exploiting immunological memory",
+            font: '400 20px "DM Sans"', color: "#6a6a6a", revealAt: 0.06 },
+        ],
+        "types-trad": [
+          { type: "text", x: 960, y: 90, text: "Traditional Vaccine Types",
+            font: '600 34px "DM Sans"', color: "#1a1a1a" },
+          { type: "rule", x1: 780, y1: 128, x2: 1140, y2: 128,
+            color: "#1a6a6a", revealAt: 0.04 },
+        ],
+        "types-modern": [
+          { type: "text", x: 960, y: 90, text: "Modern Vaccine Approaches",
+            font: '600 34px "DM Sans"', color: "#1a1a1a" },
+          { type: "rule", x1: 780, y1: 128, x2: 1140, y2: 128,
+            color: "#1a6a6a", revealAt: 0.04 },
+        ],
+        herd: [
+          { type: "text", x: 960, y: 90, text: "Herd Immunity",
+            font: '600 36px "DM Sans"', color: "#1a1a1a" },
+          { type: "text", x: 960, y: 138, text: "From individual to population protection",
+            font: '400 20px "DM Sans"', color: "#6a6a6a", revealAt: 0.06 },
         ],
         summary: [
-          { type: "glow", x: 960, y: 540, radius: 400, color: "rgba(26,106,106,0.06)" },
-          { type: "text", x: 960, y: 400, text: "Vaccines Save Lives", font: '600 42px "DM Sans"', color: "#1a1a1a" },
-          { type: "text", x: 960, y: 460, text: "By training your adaptive immune system to remember", font: '300 22px "DM Sans"', color: "#6a6a6a", revealAt: 0.2 },
-          { type: "rule", x1: 860, y1: 500, x2: 1060, y2: 500, color: "#1a6a6a", revealAt: 0.3 },
+          { type: "glow", x: 960, y: 460, radius: 500, color: "rgba(26,106,106,0.05)" },
+          { type: "text", x: 960, y: 90, text: "Putting It All Together",
+            font: '600 36px "DM Sans"', color: "#1a1a1a" },
+          { type: "rule", x1: 830, y1: 130, x2: 1090, y2: 130,
+            color: "#1a6a6a", revealAt: 0.04 },
         ],
       };
 
+      // ===== HELPERS =====
+      const reveal = (p, delay, dur) => Math.max(0, Math.min(1, (p - delay) / (dur || 0.15)));
+
+      function drawRRect(ctx, x, y, w, h, r, fill, stroke) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+        if (fill) { ctx.fillStyle = fill; ctx.fill(); }
+        if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = 2; ctx.stroke(); }
+      }
+
+      function drawDashArrow(ctx, x1, y1, x2, y2, t, color, alpha) {
+        ctx.globalAlpha = alpha;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([8, 6]);
+        ctx.lineDashOffset = -t * 30;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        const a = Math.atan2(y2 - y1, x2 - x1);
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - 12 * Math.cos(a - 0.4), y2 - 12 * Math.sin(a - 0.4));
+        ctx.lineTo(x2 - 12 * Math.cos(a + 0.4), y2 - 12 * Math.sin(a + 0.4));
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+
+      function drawCell(ctx, x, y, r, color, alpha) {
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+
       // ===== CUSTOM DRAW =====
       const customDraw = {
-        antigens: (ctx, p, t) => {
-          const cx = VW / 2, cy = VH / 2;
 
-          // Pathogen circle
-          const pathReveal = Math.max(0, Math.min(1, (p - 0.05) / 0.2));
-          ctx.globalAlpha = pathReveal;
+        // ── INTRO: floating immune cells ──
+        intro: (ctx, p, t) => {
+          const cells = [
+            { bx: 200, by: 280, r: 16, c: "rgba(26,106,106,0.3)", s: 0.7 },
+            { bx: 400, by: 720, r: 12, c: "rgba(58,90,122,0.25)", s: 0.5 },
+            { bx: 700, by: 240, r: 18, c: "rgba(26,106,106,0.25)", s: 0.9 },
+            { bx: 1250, by: 350, r: 14, c: "rgba(138,106,58,0.25)", s: 0.6 },
+            { bx: 1550, by: 620, r: 20, c: "rgba(26,106,106,0.2)", s: 0.4 },
+            { bx: 300, by: 560, r: 11, c: "rgba(58,90,122,0.2)", s: 0.8 },
+            { bx: 1700, by: 380, r: 13, c: "rgba(138,106,58,0.2)", s: 0.55 },
+            { bx: 1050, by: 750, r: 15, c: "rgba(26,106,106,0.25)", s: 0.65 },
+          ];
+          const a = reveal(p, 0, 0.3);
+          for (const c of cells) {
+            const x = c.bx + Math.sin(t * c.s) * 8;
+            const y = c.by + Math.cos(t * c.s * 0.8 + 1) * 7;
+            const r = c.r + Math.sin(t * 1.2 + c.bx) * 2;
+            drawCell(ctx, x, y, r, c.c, a * 0.7);
+          }
+          ctx.globalAlpha = 1;
+        },
+
+        // ── INNATE: barriers, phagocytes, inflammation ──
+        innate: (ctx, p, t) => {
+          // Skin barrier
+          const r1 = reveal(p, 0.08, 0.12);
+          ctx.globalAlpha = r1;
+          drawRRect(ctx, 140, 200, 480, 120, 10, "rgba(26,106,106,0.07)", "#1a6a6a");
+          ctx.font = '600 22px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("Skin \u2014 Physical Wall", 380, 245);
+          ctx.font = '400 17px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.fillText("First barrier against invaders", 380, 280);
+          // pulsing border
+          const pulse1 = 0.4 + 0.3 * Math.sin(t * 2);
+          ctx.globalAlpha = r1 * pulse1;
+          ctx.strokeStyle = "#1a6a6a";
+          ctx.lineWidth = 3;
+          drawRRect(ctx, 138, 198, 484, 124, 12, null, "#1a6a6a");
+
+          // Mucous membranes
+          const r2 = reveal(p, 0.2, 0.12);
+          ctx.globalAlpha = r2;
+          drawRRect(ctx, 140, 350, 480, 120, 10, "rgba(58,90,122,0.07)", "#3a5a7a");
+          ctx.font = '600 22px "DM Sans"';
+          ctx.fillStyle = "#3a5a7a";
+          ctx.textAlign = "center";
+          ctx.fillText("Mucous Membranes", 380, 395);
+          ctx.font = '400 17px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.fillText("Trap and flush out invaders", 380, 430);
+          const pulse2 = 0.4 + 0.3 * Math.sin(t * 2 + 1);
+          ctx.globalAlpha = r2 * pulse2;
+          drawRRect(ctx, 138, 348, 484, 124, 12, null, "#3a5a7a");
+
+          // Inflammation box
+          const r3 = reveal(p, 0.36, 0.12);
+          ctx.globalAlpha = r3;
+          drawRRect(ctx, 720, 200, 540, 270, 10, "rgba(138,42,42,0.06)", "#8a2a2a");
+          ctx.font = '600 22px "DM Sans"';
+          ctx.fillStyle = "#8a2a2a";
+          ctx.textAlign = "center";
+          ctx.fillText("Inflammation Response", 990, 240);
+
+          const r3a = reveal(p, 0.42, 0.12);
+          ctx.globalAlpha = r3a;
+          ctx.font = '400 17px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.fillText("Blood flow increases", 990, 280);
+
+          const r3b = reveal(p, 0.47, 0.12);
+          ctx.globalAlpha = r3b;
+          ctx.fillText("Phagocytes rush to engulf & destroy", 990, 315);
+
+          // Floating phagocytes
+          const r4 = reveal(p, 0.5, 0.15);
+          const phags = [
+            { bx: 780, by: 410, s: 1.1 }, { bx: 1100, by: 380, s: 0.8 },
+            { bx: 950, by: 430, s: 0.9 }, { bx: 1200, by: 440, s: 0.7 },
+          ];
+          for (const ph of phags) {
+            const x = ph.bx + Math.sin(t * ph.s) * 6;
+            const y = ph.by + Math.cos(t * ph.s * 0.7 + 2) * 5;
+            drawCell(ctx, x, y, 10, "rgba(138,42,42,0.35)", r4 * 0.7);
+          }
+
+          // Arrows from barriers to inflammation
+          const r5 = reveal(p, 0.4, 0.12);
+          drawDashArrow(ctx, 620, 280, 720, 300, t, "#6a6a6a", r5 * 0.5);
+          drawDashArrow(ctx, 620, 400, 720, 380, t, "#6a6a6a", r5 * 0.5);
+
+          // Speed labels
+          const r6 = reveal(p, 0.65, 0.12);
+          ctx.globalAlpha = r6;
+          drawRRect(ctx, 260, 530, 400, 60, 8, "rgba(26,106,106,0.06)", "#1a6a6a");
+          ctx.font = '600 20px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("Fast \u2014 responds in minutes", 460, 567);
+
+          const r7 = reveal(p, 0.77, 0.12);
+          ctx.globalAlpha = r7;
+          drawRRect(ctx, 760, 530, 540, 60, 8, "rgba(138,106,58,0.06)", "#8a6a3a");
+          ctx.font = '600 20px "DM Sans"';
+          ctx.fillStyle = "#8a6a3a";
+          ctx.textAlign = "center";
+          ctx.fillText("Generic \u2014 can\u2019t tell flu from bacteria", 1030, 567);
+
+          ctx.globalAlpha = 1;
+        },
+
+        // ── ADAPTIVE: antigen fingerprints, specificity ──
+        adaptive: (ctx, p, t) => {
+          // Pathogen with antigen spikes
+          const r1 = reveal(p, 0.06, 0.15);
+          ctx.globalAlpha = r1;
+          const px = 360, py = 400;
           ctx.beginPath();
-          ctx.arc(cx - 300, cy + 60, 80, 0, Math.PI * 2);
-          ctx.fillStyle = "rgba(138,42,42,0.15)";
+          ctx.arc(px, py, 55, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(138,42,42,0.12)";
           ctx.fill();
           ctx.strokeStyle = "#8a2a2a";
           ctx.lineWidth = 2;
           ctx.stroke();
-          ctx.font = '500 16px "DM Sans"';
-          ctx.fillStyle = "#8a2a2a";
-          ctx.textAlign = "center";
-          ctx.fillText("Pathogen", cx - 300, cy + 65);
-
-          // Antigen spikes on pathogen
           for (let i = 0; i < 8; i++) {
-            const angle = (i / 8) * Math.PI * 2 + t * 0.3;
-            const sx = cx - 300 + Math.cos(angle) * 80;
-            const sy = cy + 60 + Math.sin(angle) * 80;
-            const ex = cx - 300 + Math.cos(angle) * 105;
-            const ey = cy + 60 + Math.sin(angle) * 105;
+            const ang = (i / 8) * Math.PI * 2 + Math.sin(t * 0.5) * 0.08;
+            const sx = px + Math.cos(ang) * 55;
+            const sy = py + Math.sin(ang) * 55;
+            const ex = px + Math.cos(ang) * 80;
+            const ey = py + Math.sin(ang) * 80;
             ctx.beginPath();
             ctx.moveTo(sx, sy);
             ctx.lineTo(ex, ey);
             ctx.strokeStyle = "#8a2a2a";
-            ctx.lineWidth = 2;
+            ctx.lineWidth = 3;
             ctx.stroke();
             ctx.beginPath();
-            ctx.arc(ex, ey, 6, 0, Math.PI * 2);
+            ctx.arc(ex, ey, 5, 0, Math.PI * 2);
             ctx.fillStyle = "#8a2a2a";
             ctx.fill();
           }
-          ctx.font = '400 14px "DM Sans"';
-          ctx.fillStyle = "#6a6a6a";
-          ctx.fillText("Antigens (surface molecules)", cx - 300, cy + 190);
+          ctx.font = '600 20px "DM Sans"';
+          ctx.fillStyle = "#8a2a2a";
+          ctx.textAlign = "center";
+          ctx.fillText("Pathogen", px, py + 110);
 
-          // Arrow to APC
-          const arrowReveal = Math.max(0, Math.min(1, (p - 0.3) / 0.15));
-          ctx.globalAlpha = arrowReveal;
-          ctx.beginPath();
-          ctx.setLineDash([6, 4]);
-          ctx.lineDashOffset = -t * 25;
-          ctx.moveTo(cx - 190, cy + 60);
-          ctx.lineTo(cx - 50, cy + 60);
-          ctx.strokeStyle = "#1a6a6a";
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.setLineDash([]);
-          // Arrowhead
-          ctx.beginPath();
-          ctx.moveTo(cx - 50, cy + 60);
-          ctx.lineTo(cx - 65, cy + 50);
-          ctx.lineTo(cx - 65, cy + 70);
-          ctx.closePath();
+          // Antigen labels
+          const r2 = reveal(p, 0.18, 0.12);
+          ctx.globalAlpha = r2;
+          ctx.font = '400 17px "DM Sans"';
+          ctx.fillStyle = "#6a6a6a";
+          ctx.fillText("Antigens = unique surface molecules", px, py + 140);
+
+          const r2b = reveal(p, 0.28, 0.12);
+          ctx.globalAlpha = r2b;
+          ctx.fillText("Like a fingerprint \u2014 unique per pathogen", px, py + 170);
+
+          // Adaptive recognition box
+          const r3 = reveal(p, 0.38, 0.15);
+          ctx.globalAlpha = r3;
+          drawRRect(ctx, 680, 250, 540, 220, 12, "rgba(26,106,106,0.06)", "#1a6a6a");
+          ctx.font = '600 24px "DM Sans"';
           ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("Adaptive Immune System", 950, 295);
+
+          const r3a = reveal(p, 0.44, 0.12);
+          ctx.globalAlpha = r3a;
+          ctx.font = '400 18px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.fillText("Learns to recognize specific antigens", 950, 340);
+
+          const r3b = reveal(p, 0.54, 0.12);
+          ctx.globalAlpha = r3b;
+          ctx.fillText("Precision comes at a cost:", 950, 380);
+
+          const r3c = reveal(p, 0.64, 0.12);
+          ctx.globalAlpha = r3c;
+          ctx.font = '600 22px "DM Sans"';
+          ctx.fillStyle = "#8a2a2a";
+          ctx.fillText("First encounter takes DAYS", 950, 425);
+
+          // Flowing arrow pathogen to box
+          const r4 = reveal(p, 0.35, 0.12);
+          drawDashArrow(ctx, 450, 400, 680, 360, t, "#1a6a6a", r4 * 0.5);
+
+          // Pulsing emphasis on DAYS
+          const r5 = reveal(p, 0.68, 0.12);
+          const pulseD = 0.3 + 0.25 * Math.sin(t * 3);
+          ctx.globalAlpha = r5 * pulseD;
+          ctx.beginPath();
+          ctx.arc(950, 420, 35, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(138,42,42,0.08)";
           ctx.fill();
 
-          // APC circle
-          const apcReveal = Math.max(0, Math.min(1, (p - 0.35) / 0.2));
-          ctx.globalAlpha = apcReveal;
+          // Timeline comparison
+          const r6 = reveal(p, 0.75, 0.12);
+          ctx.globalAlpha = r6;
+          ctx.font = '500 18px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "left";
+          ctx.fillText("Innate: minutes", 380, 680);
+          ctx.fillStyle = "#8a2a2a";
+          ctx.fillText("Adaptive (first time): days", 380, 720);
+
+          ctx.globalAlpha = 1;
+        },
+
+        // ── B CELLS: antibody lock-and-key with flowing connections ──
+        bcells: (ctx, p, t) => {
+          // B Cell circle
+          const r1 = reveal(p, 0.04, 0.12);
+          ctx.globalAlpha = r1;
+          const bx = 280, by = 380;
           ctx.beginPath();
-          ctx.arc(cx + 30, cy + 60, 70, 0, Math.PI * 2);
+          ctx.arc(bx, by, 65, 0, Math.PI * 2);
           ctx.fillStyle = "rgba(26,106,106,0.1)";
           ctx.fill();
           ctx.strokeStyle = "#1a6a6a";
-          ctx.lineWidth = 2;
+          ctx.lineWidth = 3;
           ctx.stroke();
-          ctx.font = '500 14px "DM Sans"';
+          ctx.font = '600 24px "DM Sans"';
           ctx.fillStyle = "#1a6a6a";
           ctx.textAlign = "center";
-          ctx.fillText("Antigen-", cx + 30, cy + 55);
-          ctx.fillText("Presenting Cell", cx + 30, cy + 75);
-
-          // Arrows to B and T cells
-          const cellReveal = Math.max(0, Math.min(1, (p - 0.55) / 0.15));
-          ctx.globalAlpha = cellReveal;
-          // Arrow up to B cell
+          ctx.fillText("B Cell", bx, by + 8);
+          // pulsing glow
+          const pulse = 0.4 + 0.3 * Math.sin(t * 2);
+          ctx.globalAlpha = r1 * pulse * 0.5;
           ctx.beginPath();
-          ctx.setLineDash([6, 4]);
-          ctx.lineDashOffset = -t * 25;
-          ctx.moveTo(cx + 100, cy + 20);
-          ctx.lineTo(cx + 250, cy - 60);
-          ctx.strokeStyle = "#1a6a6a";
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.setLineDash([]);
-          // Arrow down to T cell
-          ctx.beginPath();
-          ctx.setLineDash([6, 4]);
-          ctx.lineDashOffset = -t * 25;
-          ctx.moveTo(cx + 100, cy + 100);
-          ctx.lineTo(cx + 250, cy + 180);
-          ctx.strokeStyle = "#1a6a6a";
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.setLineDash([]);
-
-          // B Cell
-          const bReveal = Math.max(0, Math.min(1, (p - 0.6) / 0.15));
-          ctx.globalAlpha = bReveal;
-          ctx.beginPath();
-          ctx.arc(cx + 340, cy - 80, 60, 0, Math.PI * 2);
-          ctx.fillStyle = "rgba(58,90,122,0.12)";
+          ctx.arc(bx, by, 80, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(26,106,106,0.1)";
           ctx.fill();
-          ctx.strokeStyle = "#3a5a7a";
-          ctx.lineWidth = 2;
-          ctx.stroke();
-          ctx.font = '600 20px "DM Sans"';
-          ctx.fillStyle = "#3a5a7a";
-          ctx.fillText("B Cell", cx + 340, cy - 75);
-          ctx.font = '400 14px "DM Sans"';
-          ctx.fillStyle = "#6a6a6a";
-          ctx.fillText("Produces antibodies", cx + 340, cy - 50);
 
-          // T Cell
-          const tReveal = Math.max(0, Math.min(1, (p - 0.65) / 0.15));
-          ctx.globalAlpha = tReveal;
+          // Receptor matches antigen text
+          const r1a = reveal(p, 0.08, 0.12);
+          ctx.globalAlpha = r1a;
+          ctx.font = '400 17px "DM Sans"';
+          ctx.fillStyle = "#6a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("Receptor matches specific antigen", bx, by + 100);
+
+          // Antibodies flowing out
+          const r2 = reveal(p, 0.18, 0.12);
+          const abs = [
+            { ang: -0.6, d: 120, ph: 0 }, { ang: -0.3, d: 155, ph: 1 },
+            { ang: 0.0, d: 140, ph: 2 }, { ang: 0.3, d: 170, ph: 3 },
+            { ang: -0.9, d: 135, ph: 4 },
+          ];
+          for (const ab of abs) {
+            const d = ab.d + Math.sin(t * 1.5 + ab.ph) * 8;
+            const ax = bx + Math.cos(ab.ang) * d;
+            const ay = by + Math.sin(ab.ang) * d;
+            ctx.globalAlpha = r2 * 0.75;
+            ctx.strokeStyle = "#1a6a6a";
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.moveTo(ax, ay + 10);
+            ctx.lineTo(ax, ay);
+            ctx.lineTo(ax - 7, ay - 9);
+            ctx.moveTo(ax, ay);
+            ctx.lineTo(ax + 7, ay - 9);
+            ctx.stroke();
+          }
+
+          // Target pathogen
+          const r3 = reveal(p, 0.32, 0.12);
+          ctx.globalAlpha = r3;
+          const tx = 720, ty = 380;
           ctx.beginPath();
-          ctx.arc(cx + 340, cy + 200, 60, 0, Math.PI * 2);
-          ctx.fillStyle = "rgba(138,106,58,0.12)";
+          ctx.arc(tx, ty, 40, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(138,42,42,0.1)";
           ctx.fill();
-          ctx.strokeStyle = "#8a6a3a";
+          ctx.strokeStyle = "#8a2a2a";
           ctx.lineWidth = 2;
           ctx.stroke();
+          // antigen bump
+          ctx.beginPath();
+          ctx.moveTo(tx - 40, ty);
+          ctx.lineTo(tx - 58, ty);
+          ctx.strokeStyle = "#8a2a2a";
+          ctx.lineWidth = 3;
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(tx - 62, ty, 6, 0, Math.PI * 2);
+          ctx.fillStyle = "#8a2a2a";
+          ctx.fill();
+
+          // Lock-and-key label
+          const r4 = reveal(p, 0.38, 0.12);
+          ctx.globalAlpha = r4;
           ctx.font = '600 20px "DM Sans"';
-          ctx.fillStyle = "#8a6a3a";
-          ctx.fillText("T Cell", cx + 340, cy + 205);
-          ctx.font = '400 14px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("Lock-and-Key Binding", 620, 280);
+          ctx.font = '400 16px "DM Sans"';
           ctx.fillStyle = "#6a6a6a";
-          ctx.fillText("Coordinates & kills", cx + 340, cy + 230);
+          ctx.fillText("Antibody fits specific antigen", 620, 308);
+
+          // Flowing arrow antibody to antigen
+          const approachX = 580 + Math.sin(t * 1.2) * 6;
+          ctx.globalAlpha = r4;
+          ctx.strokeStyle = "#1a6a6a";
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          ctx.moveTo(approachX, ty + 10);
+          ctx.lineTo(approachX, ty);
+          ctx.lineTo(approachX - 7, ty - 9);
+          ctx.moveTo(approachX, ty);
+          ctx.lineTo(approachX + 7, ty - 9);
+          ctx.stroke();
+          drawDashArrow(ctx, approachX + 10, ty, tx - 70, ty, t, "#6a6a6a", r4 * 0.4);
+
+          // Info box right
+          const r5 = reveal(p, 0.52, 0.12);
+          ctx.globalAlpha = r5;
+          drawRRect(ctx, 880, 240, 440, 260, 10, "rgba(26,106,106,0.05)", "#b8b8b8");
+          ctx.font = '500 18px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.textAlign = "center";
+          ctx.fillText("Antibodies can:", 1100, 280);
+
+          const r5a = reveal(p, 0.58, 0.12);
+          ctx.globalAlpha = r5a;
+          ctx.textAlign = "left";
+          ctx.font = '400 17px "DM Sans"';
+          ctx.fillText("\u2022 Tag pathogens for destruction", 910, 322);
+
+          const r5b = reveal(p, 0.64, 0.12);
+          ctx.globalAlpha = r5b;
+          ctx.fillText("\u2022 Neutralize by blocking infection sites", 910, 358);
+
+          const r5c = reveal(p, 0.76, 0.12);
+          ctx.globalAlpha = r5c;
+          ctx.font = '500 17px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.fillText("\u2022 1000s per second from one B cell", 910, 400);
+
+          // Bottom summary
+          const r6 = reveal(p, 0.85, 0.12);
+          ctx.globalAlpha = r6;
+          ctx.font = '500 18px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("Thousands of antibodies per second from a single activated B cell", VW / 2, 560);
 
           ctx.globalAlpha = 1;
         },
 
-        memory: (ctx, p, t) => {
-          const cx = VW / 2, cy = VH / 2;
-
-          // First encounter (left side)
-          const firstReveal = Math.max(0, Math.min(1, (p - 0.05) / 0.2));
-          ctx.globalAlpha = firstReveal;
-          ctx.font = '500 20px "DM Sans"';
-          ctx.fillStyle = "#1a1a1a";
+        // ── T CELLS: helper and killer with flowing connections ──
+        tcells: (ctx, p, t) => {
+          // Helper T Cell box
+          const r1 = reveal(p, 0.04, 0.12);
+          ctx.globalAlpha = r1;
+          drawRRect(ctx, 120, 180, 520, 360, 12, "rgba(58,90,122,0.06)", "#3a5a7a");
+          ctx.font = '600 24px "DM Sans"';
+          ctx.fillStyle = "#3a5a7a";
           ctx.textAlign = "center";
-          ctx.fillText("First Encounter", cx - 350, cy - 80);
+          ctx.fillText("Helper T Cells", 380, 225);
 
-          // Slow response curve
-          ctx.beginPath();
-          ctx.moveTo(cx - 550, cy + 120);
-          for (let i = 0; i <= 100; i++) {
-            const x = cx - 550 + (i / 100) * 400;
-            const prog = i / 100;
-            const y = cy + 120 - Math.max(0, (prog - 0.4)) * 200 * Math.min(1, (prog - 0.4) / 0.3);
-            ctx.lineTo(x, y);
+          const r1a = reveal(p, 0.1, 0.12);
+          ctx.globalAlpha = r1a;
+          ctx.font = '400 18px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.fillText('"Field Commanders"', 380, 268);
+
+          const r1b = reveal(p, 0.2, 0.12);
+          ctx.globalAlpha = r1b;
+          ctx.textAlign = "left";
+          ctx.fillText("\u2022 Release cytokines (chemical signals)", 150, 315);
+
+          const r1c = reveal(p, 0.28, 0.12);
+          ctx.globalAlpha = r1c;
+          ctx.fillText("\u2022 Tell B cells to produce antibodies", 150, 355);
+
+          const r1d = reveal(p, 0.35, 0.12);
+          ctx.globalAlpha = r1d;
+          ctx.fillText("\u2022 Recruit more phagocytes", 150, 395);
+
+          const r1e = reveal(p, 0.42, 0.12);
+          ctx.globalAlpha = r1e;
+          ctx.fillText("\u2022 Activate killer T cells", 150, 435);
+
+          // Arrow helper to killer
+          const r2 = reveal(p, 0.45, 0.12);
+          drawDashArrow(ctx, 640, 360, 740, 360, t, "#3a5a7a", r2 * 0.6);
+
+          // Killer T Cell box
+          const r3 = reveal(p, 0.5, 0.12);
+          ctx.globalAlpha = r3;
+          drawRRect(ctx, 740, 180, 520, 360, 12, "rgba(138,42,42,0.06)", "#8a2a2a");
+          ctx.font = '600 24px "DM Sans"';
+          ctx.fillStyle = "#8a2a2a";
+          ctx.textAlign = "center";
+          ctx.fillText("Killer T Cells", 1000, 225);
+
+          const r3a = reveal(p, 0.55, 0.12);
+          ctx.globalAlpha = r3a;
+          ctx.font = '400 18px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.fillText('"Cytotoxic T Cells"', 1000, 268);
+
+          const r3b = reveal(p, 0.62, 0.12);
+          ctx.globalAlpha = r3b;
+          ctx.textAlign = "left";
+          ctx.fillText("\u2022 Find infected host cells", 770, 315);
+
+          const r3c = reveal(p, 0.7, 0.12);
+          ctx.globalAlpha = r3c;
+          ctx.fillText("\u2022 Destroy the virus factory", 770, 355);
+
+          const r3d = reveal(p, 0.78, 0.12);
+          ctx.globalAlpha = r3d;
+          ctx.fillText("\u2022 Stop pathogen from spreading", 770, 395);
+
+          // Floating cells with drift
+          const cells = [
+            { x: 90, y: 320, c: "rgba(58,90,122,0.25)", s: 0.8 },
+            { x: 670, y: 500, c: "rgba(58,90,122,0.2)", s: 0.6 },
+            { x: 1290, y: 300, c: "rgba(138,42,42,0.25)", s: 0.7 },
+            { x: 1300, y: 500, c: "rgba(138,42,42,0.2)", s: 0.9 },
+          ];
+          for (const c of cells) {
+            const dr = reveal(p, 0.3, 0.2);
+            drawCell(ctx, c.x + Math.sin(t * c.s) * 5, c.y + Math.cos(t * c.s * 0.7 + 1) * 4,
+              10 + Math.sin(t * 1.2 + c.x) * 1.5, c.c, dr * 0.6);
           }
-          ctx.strokeStyle = "#8a2a2a";
-          ctx.lineWidth = 3;
-          ctx.stroke();
 
-          ctx.font = '400 14px "DM Sans"';
+          // Summary
+          const r4 = reveal(p, 0.85, 0.12);
+          ctx.globalAlpha = r4;
+          ctx.font = '500 19px "DM Sans"';
           ctx.fillStyle = "#6a6a6a";
-          ctx.fillText("1-2 weeks to peak", cx - 350, cy + 160);
-          ctx.fillText("Response Strength \u2191", cx - 560, cy - 10);
+          ctx.textAlign = "center";
+          ctx.fillText("Together: coordinate, amplify, and destroy", VW / 2, 600);
 
-          // Arrow between
-          const arrowReveal = Math.max(0, Math.min(1, (p - 0.4) / 0.15));
-          ctx.globalAlpha = arrowReveal;
-          ctx.beginPath();
-          ctx.setLineDash([8, 5]);
-          ctx.lineDashOffset = -t * 20;
-          ctx.moveTo(cx - 100, cy + 20);
-          ctx.lineTo(cx + 100, cy + 20);
-          ctx.strokeStyle = "#1a6a6a";
+          ctx.globalAlpha = 1;
+        },
+
+        // ── MEMORY: formation of memory cells ──
+        memory: (ctx, p, t) => {
+          // Fighting phase
+          const r1 = reveal(p, 0.04, 0.12);
+          ctx.globalAlpha = r1;
+          drawRRect(ctx, 120, 180, 400, 200, 10, "rgba(138,42,42,0.06)", "#8a2a2a");
+          ctx.font = '600 20px "DM Sans"';
+          ctx.fillStyle = "#8a2a2a";
+          ctx.textAlign = "center";
+          ctx.fillText("During the Fight", 320, 225);
+          ctx.font = '400 17px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.fillText("B cells + T cells battle", 320, 265);
+          ctx.fillText("the pathogen", 320, 295);
+
+          // Arrow
+          const r2 = reveal(p, 0.2, 0.12);
+          drawDashArrow(ctx, 520, 280, 620, 280, t, "#1a6a6a", r2 * 0.6);
+
+          // Critical event
+          const r3 = reveal(p, 0.25, 0.12);
+          ctx.globalAlpha = r3;
+          drawRRect(ctx, 620, 180, 440, 200, 10, "rgba(26,106,106,0.07)", "#1a6a6a");
+          ctx.font = '600 20px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("Something Critical Happens", 840, 225);
+
+          const r3a = reveal(p, 0.35, 0.12);
+          ctx.globalAlpha = r3a;
+          ctx.font = '400 17px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.fillText("Memory cells are created", 840, 268);
+
+          const r3b = reveal(p, 0.45, 0.12);
+          ctx.globalAlpha = r3b;
+          ctx.fillText("Specialized B and T cells", 840, 300);
+          ctx.fillText("that don\u2019t die off", 840, 332);
+
+          // Arrow down
+          const r4 = reveal(p, 0.5, 0.12);
+          drawDashArrow(ctx, 840, 380, 640, 470, t, "#1a6a6a", r4 * 0.6);
+
+          // Persistence box
+          const r5 = reveal(p, 0.55, 0.12);
+          ctx.globalAlpha = r5;
+          drawRRect(ctx, 340, 470, 560, 160, 10, "rgba(26,106,106,0.1)", "#1a6a6a");
+          ctx.font = '600 22px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("Memory Cells Persist", 620, 515);
+
+          const r5a = reveal(p, 0.65, 0.12);
+          ctx.globalAlpha = r5a;
+          ctx.font = '400 18px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.fillText("Years \u2014 sometimes your entire life", 620, 555);
+
+          const r5b = reveal(p, 0.75, 0.12);
+          ctx.globalAlpha = r5b;
+          ctx.fillText("Already know the pathogen\u2019s antigens", 620, 590);
+
+          // Pulsing memory cells
+          const mcs = [
+            { x: 240, y: 560, c: "rgba(26,106,106,0.3)" },
+            { x: 1000, y: 540, c: "rgba(58,90,122,0.3)" },
+            { x: 180, y: 480, c: "rgba(26,106,106,0.2)" },
+            { x: 1080, by: 480, c: "rgba(58,90,122,0.2)" },
+          ];
+          for (const mc of mcs) {
+            const y = mc.by || mc.y;
+            const rr = reveal(p, 0.6, 0.2);
+            const pr = 0.5 + 0.3 * Math.sin(t * 1.5 + (mc.x || 0));
+            drawCell(ctx, mc.x + Math.sin(t * 0.6 + y) * 4, y + Math.cos(t * 0.4) * 3,
+              13, mc.c, rr * pr);
+          }
+
+          ctx.globalAlpha = 1;
+        },
+
+        // ── RESPONSE: animated primary vs secondary curves ──
+        response: (ctx, p, t) => {
+          const ox = 260, oy = 700, gw = 880, gh = 420;
+
+          // Axes
+          const r0 = reveal(p, 0.04, 0.12);
+          ctx.globalAlpha = r0;
+          ctx.strokeStyle = "#6a6a6a";
           ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(ox, oy);
+          ctx.lineTo(ox + gw, oy);
+          ctx.moveTo(ox, oy);
+          ctx.lineTo(ox, oy - gh);
+          ctx.stroke();
+          ctx.font = '500 16px "DM Sans"';
+          ctx.fillStyle = "#6a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("Time (days)", ox + gw / 2, oy + 40);
+          ctx.save();
+          ctx.translate(ox - 40, oy - gh / 2);
+          ctx.rotate(-Math.PI / 2);
+          ctx.fillText("Antibody Level", 0, 0);
+          ctx.restore();
+          ctx.font = '400 14px "DM Sans"';
+          ctx.fillText("0", ox, oy + 20);
+          ctx.fillText("7", ox + gw * 0.25, oy + 20);
+          ctx.fillText("14", ox + gw * 0.5, oy + 20);
+          ctx.fillText("28+", ox + gw * 0.85, oy + 20);
+
+          // 1st exposure line
+          const r1 = reveal(p, 0.08, 0.12);
+          ctx.globalAlpha = r1;
+          ctx.strokeStyle = "#b8b8b8";
+          ctx.lineWidth = 1;
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.moveTo(ox + 10, oy);
+          ctx.lineTo(ox + 10, oy - gh);
           ctx.stroke();
           ctx.setLineDash([]);
+          ctx.font = '500 15px "DM Sans"';
+          ctx.fillStyle = "#8a2a2a";
+          ctx.fillText("1st Exposure", ox + 10, oy - gh - 10);
+
+          // Primary curve - animated drawing
+          const r2 = reveal(p, 0.12, 0.25);
+          ctx.globalAlpha = r2;
+          ctx.strokeStyle = "#8a2a2a";
+          ctx.lineWidth = 3;
           ctx.beginPath();
-          ctx.moveTo(cx + 100, cy + 20);
-          ctx.lineTo(cx + 85, cy + 10);
-          ctx.lineTo(cx + 85, cy + 30);
-          ctx.closePath();
+          const maxI = Math.floor(r2 * 100);
+          for (let i = 0; i <= maxI; i++) {
+            const frac = i / 100;
+            const x = ox + frac * gw * 0.5;
+            let y = 0;
+            if (frac < 0.2) y = 0;
+            else if (frac < 0.6) y = Math.pow((frac - 0.2) / 0.4, 1.5) * 0.3;
+            else y = 0.3 * Math.exp(-(frac - 0.6) * 3);
+            const py = oy - y * gh;
+            if (i === 0) ctx.moveTo(x, py); else ctx.lineTo(x, py);
+          }
+          ctx.stroke();
+
+          const r2l = reveal(p, 0.3, 0.12);
+          ctx.globalAlpha = r2l;
+          ctx.font = '500 16px "DM Sans"';
+          ctx.fillStyle = "#8a2a2a";
+          ctx.textAlign = "left";
+          ctx.fillText("Primary Response", ox + gw * 0.25, oy - gh * 0.38);
+          ctx.font = '400 14px "DM Sans"';
+          ctx.fillText("Slow, low antibody levels", ox + gw * 0.25, oy - gh * 0.38 + 20);
+
+          // 2nd exposure line
+          const r3 = reveal(p, 0.45, 0.12);
+          ctx.globalAlpha = r3;
+          ctx.strokeStyle = "#b8b8b8";
+          ctx.lineWidth = 1;
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.moveTo(ox + gw * 0.52, oy);
+          ctx.lineTo(ox + gw * 0.52, oy - gh);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.font = '500 15px "DM Sans"';
           ctx.fillStyle = "#1a6a6a";
-          ctx.fill();
+          ctx.textAlign = "center";
+          ctx.fillText("2nd Exposure", ox + gw * 0.52, oy - gh - 10);
+
+          // Secondary curve
+          const r4 = reveal(p, 0.5, 0.25);
+          ctx.globalAlpha = r4;
+          ctx.strokeStyle = "#1a6a6a";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          const maxJ = Math.floor(r4 * 100);
+          for (let i = 0; i <= maxJ; i++) {
+            const frac = i / 100;
+            const x = ox + gw * 0.52 + frac * gw * 0.44;
+            let y = 0;
+            if (frac < 0.05) y = 0;
+            else if (frac < 0.25) y = Math.pow((frac - 0.05) / 0.2, 1.2) * 0.85;
+            else y = 0.85 * Math.exp(-(frac - 0.25) * 1.5);
+            const py = oy - y * gh;
+            if (i === 0) ctx.moveTo(x, py); else ctx.lineTo(x, py);
+          }
+          ctx.stroke();
+
+          const r4l = reveal(p, 0.68, 0.12);
+          ctx.globalAlpha = r4l;
           ctx.font = '500 16px "DM Sans"';
           ctx.fillStyle = "#1a6a6a";
-          ctx.fillText("Memory Cells", cx, cy - 10);
-
-          // Second encounter (right side)
-          const secondReveal = Math.max(0, Math.min(1, (p - 0.5) / 0.2));
-          ctx.globalAlpha = secondReveal;
-          ctx.font = '500 20px "DM Sans"';
-          ctx.fillStyle = "#1a1a1a";
-          ctx.fillText("Second Encounter", cx + 350, cy - 80);
-
-          // Fast response curve
-          ctx.beginPath();
-          ctx.moveTo(cx + 150, cy + 120);
-          for (let i = 0; i <= 100; i++) {
-            const x = cx + 150 + (i / 100) * 400;
-            const prog = i / 100;
-            const y = cy + 120 - Math.max(0, (prog - 0.05)) * 350 * Math.min(1, (prog - 0.05) / 0.15);
-            ctx.lineTo(x, y);
-          }
-          ctx.strokeStyle = "#1a6a6a";
-          ctx.lineWidth = 3;
-          ctx.stroke();
-
+          ctx.textAlign = "left";
+          ctx.fillText("Secondary Response", ox + gw * 0.68, oy - gh * 0.75);
           ctx.font = '400 14px "DM Sans"';
-          ctx.fillStyle = "#6a6a6a";
-          ctx.fillText("Hours to peak \u2014 faster & stronger", cx + 350, cy + 160);
+          ctx.fillText("Fast, massive antibody surge", ox + gw * 0.68, oy - gh * 0.75 + 20);
 
-          // Ghost the first curve for comparison
-          const ghostReveal = Math.max(0, Math.min(1, (p - 0.7) / 0.15));
-          ctx.globalAlpha = ghostReveal * 0.25;
+          // Pulsing glow on secondary peak
+          const r5 = reveal(p, 0.7, 0.12);
+          const gp = 0.25 + 0.2 * Math.sin(t * 2);
+          ctx.globalAlpha = r5 * gp;
           ctx.beginPath();
-          ctx.moveTo(cx + 150, cy + 120);
-          for (let i = 0; i <= 100; i++) {
-            const x = cx + 150 + (i / 100) * 400;
-            const prog = i / 100;
-            const y = cy + 120 - Math.max(0, (prog - 0.4)) * 200 * Math.min(1, (prog - 0.4) / 0.3);
-            ctx.lineTo(x, y);
-          }
-          ctx.strokeStyle = "#8a2a2a";
-          ctx.lineWidth = 2;
-          ctx.stroke();
+          ctx.arc(ox + gw * 0.62, oy - gh * 0.85, 25, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(26,106,106,0.12)";
+          ctx.fill();
+
+          // Bottom label
+          const r6 = reveal(p, 0.8, 0.12);
+          ctx.globalAlpha = r6;
+          ctx.font = '500 18px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("Immunological memory \u2014 the foundation vaccines are built on", VW / 2, oy + 70);
 
           ctx.globalAlpha = 1;
         },
 
-        vaccines: (ctx, p, t) => {
-          const cx = VW / 2, cy = VH / 2;
-          const types = [
-            { name: "Live Attenuated", desc: "Weakened virus", color: "#8a2a2a", x: cx - 540 },
-            { name: "Inactivated", desc: "Killed pathogen", color: "#8a6a3a", x: cx - 180 },
-            { name: "Subunit", desc: "Protein fragment", color: "#3a5a7a", x: cx + 180 },
-            { name: "mRNA", desc: "Genetic instructions", color: "#1a6a6a", x: cx + 540 },
-          ];
+        // ── MECHANISM: vaccine flow with dashed arrows ──
+        mechanism: (ctx, p, t) => {
+          const sw = 270, sh = 150, gap = 60;
+          const sx = 100, y1 = 220, y2 = 520;
 
-          types.forEach((vt, i) => {
-            const delay = 0.1 + i * 0.12;
-            const reveal = Math.max(0, Math.min(1, (p - delay) / 0.15));
-            ctx.globalAlpha = reveal;
+          // Step 1: Vaccine
+          const r1 = reveal(p, 0.06, 0.12);
+          ctx.globalAlpha = r1;
+          drawRRect(ctx, sx, y1, sw, sh, 10, "rgba(26,106,106,0.07)", "#1a6a6a");
+          ctx.font = '600 20px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("1. Vaccine", sx + sw / 2, y1 + 40);
+          ctx.font = '400 16px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.fillText("Harmless antigen", sx + sw / 2, y1 + 75);
+          ctx.fillText("preview delivered", sx + sw / 2, y1 + 100);
 
-            // Card background
-            const cardW = 280, cardH = 340;
-            const rx = 12;
-            ctx.beginPath();
-            ctx.roundRect(vt.x - cardW / 2, cy - 60, cardW, cardH, rx);
-            ctx.fillStyle = vt.color + "10";
-            ctx.fill();
-            ctx.strokeStyle = vt.color;
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
+          // Arrow 1->2
+          const ra1 = reveal(p, 0.14, 0.1);
+          drawDashArrow(ctx, sx + sw, y1 + sh / 2, sx + sw + gap, y1 + sh / 2, t, "#1a6a6a", ra1 * 0.6);
 
-            // Type name
-            ctx.font = '600 18px "DM Sans"';
-            ctx.fillStyle = vt.color;
-            ctx.textAlign = "center";
-            ctx.fillText(vt.name, vt.x, cy - 20);
+          // Step 2: Recognition
+          const x2 = sx + sw + gap;
+          const r2 = reveal(p, 0.18, 0.12);
+          ctx.globalAlpha = r2;
+          drawRRect(ctx, x2, y1, sw, sh, 10, "rgba(58,90,122,0.07)", "#3a5a7a");
+          ctx.font = '600 20px "DM Sans"';
+          ctx.fillStyle = "#3a5a7a";
+          ctx.textAlign = "center";
+          ctx.fillText("2. Recognition", x2 + sw / 2, y1 + 40);
+          ctx.font = '400 16px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.fillText("Immune system treats", x2 + sw / 2, y1 + 75);
+          ctx.fillText("it as real infection", x2 + sw / 2, y1 + 100);
 
-            // Description
-            ctx.font = '400 15px "DM Sans"';
-            ctx.fillStyle = "#6a6a6a";
-            ctx.fillText(vt.desc, vt.x, cy + 10);
+          // Arrow 2->3
+          const ra2 = reveal(p, 0.28, 0.1);
+          drawDashArrow(ctx, x2 + sw, y1 + sh / 2, x2 + sw + gap, y1 + sh / 2, t, "#3a5a7a", ra2 * 0.6);
 
-            // Vaccine illustration (simplified)
-            ctx.beginPath();
-            ctx.arc(vt.x, cy + 100, 40, 0, Math.PI * 2);
-            ctx.fillStyle = vt.color + "20";
-            ctx.fill();
-            ctx.strokeStyle = vt.color;
-            ctx.lineWidth = 1.5;
-            ctx.stroke();
+          // Step 3: Response
+          const x3 = x2 + sw + gap;
+          const r3 = reveal(p, 0.32, 0.12);
+          ctx.globalAlpha = r3;
+          drawRRect(ctx, x3, y1, sw, sh, 10, "rgba(138,106,58,0.07)", "#8a6a3a");
+          ctx.font = '600 20px "DM Sans"';
+          ctx.fillStyle = "#8a6a3a";
+          ctx.textAlign = "center";
+          ctx.fillText("3. Response", x3 + sw / 2, y1 + 40);
+          ctx.font = '400 16px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.fillText("B cells \u2192 antibodies", x3 + sw / 2, y1 + 75);
+          ctx.fillText("T cells \u2192 coordinate", x3 + sw / 2, y1 + 100);
 
-            if (i === 0) {
-              // Live attenuated - wiggly virus
-              for (let j = 0; j < 6; j++) {
-                const a = (j / 6) * Math.PI * 2 + t * 0.5;
-                ctx.beginPath();
-                ctx.arc(vt.x + Math.cos(a) * 40, cy + 100 + Math.sin(a) * 40, 5, 0, Math.PI * 2);
-                ctx.fillStyle = vt.color + "60";
-                ctx.fill();
-              }
-            } else if (i === 1) {
-              // Inactivated - X through virus
-              ctx.beginPath();
-              ctx.moveTo(vt.x - 25, cy + 75);
-              ctx.lineTo(vt.x + 25, cy + 125);
-              ctx.moveTo(vt.x + 25, cy + 75);
-              ctx.lineTo(vt.x - 25, cy + 125);
-              ctx.strokeStyle = vt.color;
-              ctx.lineWidth = 2;
-              ctx.stroke();
-            } else if (i === 2) {
-              // Subunit - just a fragment
-              ctx.beginPath();
-              ctx.arc(vt.x, cy + 85, 8, 0, Math.PI * 2);
-              ctx.fillStyle = vt.color;
-              ctx.fill();
-              ctx.font = '400 12px "DM Sans"';
-              ctx.fillText("protein", vt.x, cy + 135);
-            } else {
-              // mRNA - strand
-              ctx.beginPath();
-              for (let k = 0; k <= 20; k++) {
-                const mx = vt.x - 25 + (k / 20) * 50;
-                const my = cy + 100 + Math.sin(k * 0.8 + t * 2) * 12;
-                if (k === 0) ctx.moveTo(mx, my);
-                else ctx.lineTo(mx, my);
-              }
-              ctx.strokeStyle = vt.color;
-              ctx.lineWidth = 2.5;
-              ctx.stroke();
-            }
-          });
+          // Arrow 3->4 (down)
+          const ra3 = reveal(p, 0.42, 0.1);
+          drawDashArrow(ctx, x3 + sw / 2, y1 + sh, x3 + sw / 2, y2, t, "#8a6a3a", ra3 * 0.6);
 
-          // Examples text
-          const exReveal = Math.max(0, Math.min(1, (p - 0.7) / 0.15));
-          ctx.globalAlpha = exReveal;
-          ctx.font = '400 14px "DM Sans"';
+          // Step 4: Memory
+          const r4 = reveal(p, 0.48, 0.12);
+          ctx.globalAlpha = r4;
+          drawRRect(ctx, x3 - 30, y2, sw + 60, sh + 20, 10, "rgba(26,106,106,0.1)", "#1a6a6a");
+          ctx.font = '600 22px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("4. Memory Created", x3 + sw / 2, y2 + 45);
+          ctx.font = '400 17px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.fillText("Ready for real pathogen", x3 + sw / 2, y2 + 85);
+          // pulse
+          const pulse = 0.4 + 0.3 * Math.sin(t * 2);
+          ctx.globalAlpha = r4 * pulse * 0.5;
+          drawRRect(ctx, x3 - 32, y2 - 2, sw + 64, sh + 24, 12, null, "#1a6a6a");
+
+          // Arrow 4-> result (left)
+          const ra4 = reveal(p, 0.58, 0.1);
+          drawDashArrow(ctx, x3 - 30, y2 + sh / 2 + 10, sx + sw + 30, y2 + sh / 2 + 10, t, "#1a6a6a", ra4 * 0.5);
+
+          // Result: Protection
+          const r5 = reveal(p, 0.62, 0.12);
+          ctx.globalAlpha = r5;
+          drawRRect(ctx, sx, y2, sw + 30, sh + 20, 10, "rgba(26,106,106,0.12)", "#1a6a6a");
+          ctx.font = '600 22px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("Protection", sx + (sw + 30) / 2, y2 + 45);
+          ctx.font = '400 17px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.fillText("Fast, massive response", sx + (sw + 30) / 2, y2 + 85);
+          ctx.fillText("Pathogen eliminated", sx + (sw + 30) / 2, y2 + 115);
+
+          // Bottom insight
+          const r6 = reveal(p, 0.78, 0.12);
+          ctx.globalAlpha = r6;
+          ctx.font = '500 20px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("Your body already has the playbook.", VW / 2, 750);
+
+          const r7 = reveal(p, 0.88, 0.12);
+          ctx.globalAlpha = r7;
+          ctx.font = '400 18px "DM Sans"';
+          ctx.fillStyle = "#6a6a6a";
+          ctx.fillText("The pathogen doesn\u2019t stand a chance.", VW / 2, 785);
+
+          ctx.globalAlpha = 1;
+        },
+
+        // ── TRADITIONAL TYPES: live attenuated vs inactivated ──
+        "types-trad": (ctx, p, t) => {
+          // Live Attenuated
+          const r1 = reveal(p, 0.04, 0.12);
+          ctx.globalAlpha = r1;
+          drawRRect(ctx, 120, 180, 540, 340, 12, "rgba(26,106,106,0.06)", "#1a6a6a");
+          ctx.font = '600 24px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("Live Attenuated", 390, 225);
+
+          const r1a = reveal(p, 0.1, 0.1);
+          ctx.globalAlpha = r1a;
+          ctx.font = '400 17px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.textAlign = "left";
+          ctx.fillText("Weakened version of real pathogen", 150, 272);
+
+          const r1b = reveal(p, 0.18, 0.1);
+          ctx.globalAlpha = r1b;
+          ctx.fillText("Can still replicate \u2192 strong response", 150, 308);
+
+          const r1c = reveal(p, 0.26, 0.1);
+          ctx.globalAlpha = r1c;
+          ctx.fillText("Too weak to cause disease", 150, 344);
+
+          const r1d = reveal(p, 0.34, 0.1);
+          ctx.globalAlpha = r1d;
+          ctx.font = '500 17px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.fillText("Examples: MMR, oral polio", 150, 390);
+
+          // Pulsing pathogen icon
+          const p1 = 0.5 + 0.3 * Math.sin(t * 1.5);
+          ctx.globalAlpha = r1 * p1 * 0.5;
+          ctx.beginPath();
+          ctx.arc(580, 440, 20, 0, Math.PI * 2);
+          ctx.fillStyle = "rgba(26,106,106,0.15)";
+          ctx.fill();
+
+          // Inactivated
+          const r2 = reveal(p, 0.42, 0.12);
+          ctx.globalAlpha = r2;
+          drawRRect(ctx, 720, 180, 540, 340, 12, "rgba(138,106,58,0.06)", "#8a6a3a");
+          ctx.font = '600 24px "DM Sans"';
+          ctx.fillStyle = "#8a6a3a";
+          ctx.textAlign = "center";
+          ctx.fillText("Inactivated", 990, 225);
+
+          const r2a = reveal(p, 0.5, 0.1);
+          ctx.globalAlpha = r2a;
+          ctx.font = '400 17px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.textAlign = "left";
+          ctx.fillText("Killed version of pathogen", 750, 272);
+
+          const r2b = reveal(p, 0.58, 0.1);
+          ctx.globalAlpha = r2b;
+          ctx.fillText("Can\u2019t replicate \u2192 weaker response", 750, 308);
+
+          const r2c = reveal(p, 0.66, 0.1);
+          ctx.globalAlpha = r2c;
+          ctx.fillText("Often requires booster shots", 750, 344);
+
+          const r2d = reveal(p, 0.74, 0.1);
+          ctx.globalAlpha = r2d;
+          ctx.font = '500 17px "DM Sans"';
+          ctx.fillStyle = "#8a6a3a";
+          ctx.fillText("Example: flu shot", 750, 390);
+
+          // vs label
+          const rv = reveal(p, 0.48, 0.12);
+          ctx.globalAlpha = rv * 0.5;
+          ctx.font = '500 20px "DM Sans"';
           ctx.fillStyle = "#6a6a6a";
           ctx.textAlign = "center";
-          ctx.fillText("MMR, Chickenpox", types[0].x, cy + 200);
-          ctx.fillText("Flu shot, Hep A", types[1].x, cy + 200);
-          ctx.fillText("Hep B, HPV", types[2].x, cy + 200);
-          ctx.fillText("Pfizer, Moderna", types[3].x, cy + 200);
+          ctx.fillText("vs", 680, 355);
+
+          // Strength bars
+          const r3 = reveal(p, 0.82, 0.12);
+          ctx.globalAlpha = r3;
+          ctx.font = '500 16px "DM Sans"';
+          ctx.fillStyle = "#6a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("Immune Response Strength", VW / 2, 580);
+
+          drawRRect(ctx, 300, 600, 280, 22, 6, "#1a6a6a", null);
+          ctx.font = '400 14px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "left";
+          ctx.fillText("Live attenuated", 300, 645);
+
+          drawRRect(ctx, 750, 600, 150, 22, 6, "#8a6a3a", null);
+          ctx.fillStyle = "#8a6a3a";
+          ctx.fillText("Inactivated", 750, 645);
 
           ctx.globalAlpha = 1;
         },
 
-        summary: (ctx, p, t) => {
-          const cx = VW / 2, cy = VH / 2;
+        // ── MODERN TYPES: subunit & mRNA ──
+        "types-modern": (ctx, p, t) => {
+          // Subunit
+          const r1 = reveal(p, 0.04, 0.12);
+          ctx.globalAlpha = r1;
+          drawRRect(ctx, 100, 180, 540, 300, 12, "rgba(58,90,122,0.06)", "#3a5a7a");
+          ctx.font = '600 24px "DM Sans"';
+          ctx.fillStyle = "#3a5a7a";
+          ctx.textAlign = "center";
+          ctx.fillText("Subunit Vaccines", 370, 225);
 
-          // Timeline showing vaccine -> memory -> protection
-          const tlReveal = Math.max(0, Math.min(1, (p - 0.3) / 0.2));
-          ctx.globalAlpha = tlReveal;
+          const r1a = reveal(p, 0.07, 0.1);
+          ctx.globalAlpha = r1a;
+          ctx.font = '400 17px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.textAlign = "left";
+          ctx.fillText("Just a purified protein piece", 130, 272);
 
+          const r1b = reveal(p, 0.12, 0.1);
+          ctx.globalAlpha = r1b;
+          ctx.fillText("Zero chance of infection", 130, 308);
+
+          const r1c = reveal(p, 0.17, 0.1);
+          ctx.globalAlpha = r1c;
+          ctx.fillText("May need adjuvants (chemical boosters)", 130, 344);
+
+          const r1d = reveal(p, 0.22, 0.1);
+          ctx.globalAlpha = r1d;
+          ctx.font = '500 17px "DM Sans"';
+          ctx.fillStyle = "#3a5a7a";
+          ctx.fillText("Example: Hepatitis B vaccine", 130, 390);
+
+          // mRNA
+          const r2 = reveal(p, 0.3, 0.12);
+          ctx.globalAlpha = r2;
+          drawRRect(ctx, 700, 180, 560, 300, 12, "rgba(26,106,106,0.07)", "#1a6a6a");
+          ctx.font = '600 24px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("mRNA Vaccines", 980, 225);
+
+          const r2a = reveal(p, 0.34, 0.1);
+          ctx.globalAlpha = r2a;
+          ctx.font = '400 17px "DM Sans"';
+          ctx.fillStyle = "#1a1a1a";
+          ctx.textAlign = "left";
+          ctx.fillText("Delivers genetic instructions", 730, 272);
+
+          const r2b = reveal(p, 0.39, 0.1);
+          ctx.globalAlpha = r2b;
+          ctx.fillText("Your cells produce the antigen", 730, 308);
+
+          const r2c = reveal(p, 0.44, 0.1);
+          ctx.globalAlpha = r2c;
+          ctx.fillText("mRNA degrades within days", 730, 344);
+
+          const r2d = reveal(p, 0.49, 0.1);
+          ctx.globalAlpha = r2d;
+          ctx.font = '500 16px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.fillText("Never enters nucleus or alters DNA", 730, 380);
+
+          const r2e = reveal(p, 0.54, 0.1);
+          ctx.globalAlpha = r2e;
+          ctx.font = '500 17px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.fillText("Examples: Pfizer, Moderna COVID-19", 730, 420);
+
+          // mRNA flow diagram
+          const flowY = 580;
           const steps = [
-            { label: "Vaccine", sub: "Harmless antigen", x: cx - 400 },
-            { label: "Immune Response", sub: "B & T cells activate", x: cx - 133 },
-            { label: "Memory Cells", sub: "Long-term patrol", x: cx + 133 },
-            { label: "Protection", sub: "Rapid future response", x: cx + 400 },
+            { x: 220, label: "mRNA\nDelivered", color: "#1a6a6a" },
+            { x: 500, label: "Cell Makes\nAntigen", color: "#3a5a7a" },
+            { x: 780, label: "Immune\nResponse", color: "#8a6a3a" },
+            { x: 1060, label: "Memory\nCreated", color: "#1a6a6a" },
           ];
-
-          steps.forEach((step, i) => {
-            const delay = 0.35 + i * 0.1;
-            const sr = Math.max(0, Math.min(1, (p - delay) / 0.12));
-            ctx.globalAlpha = sr;
-
-            ctx.beginPath();
-            ctx.arc(step.x, cy + 100, 35, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(26,106,106,0.1)";
-            ctx.fill();
-            ctx.strokeStyle = "#1a6a6a";
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            ctx.font = '600 15px "DM Sans"';
-            ctx.fillStyle = "#1a1a1a";
+          for (let i = 0; i < steps.length; i++) {
+            const rs = reveal(p, 0.6 + i * 0.06, 0.1);
+            ctx.globalAlpha = rs;
+            drawRRect(ctx, steps[i].x - 80, flowY - 35, 160, 70, 8, "rgba(26,106,106,0.05)", steps[i].color);
+            ctx.font = '500 15px "DM Sans"';
+            ctx.fillStyle = steps[i].color;
             ctx.textAlign = "center";
-            ctx.fillText(step.label, step.x, cy + 160);
-            ctx.font = '400 13px "DM Sans"';
-            ctx.fillStyle = "#6a6a6a";
-            ctx.fillText(step.sub, step.x, cy + 180);
-            ctx.font = '600 18px "DM Sans"';
-            ctx.fillStyle = "#1a6a6a";
-            ctx.fillText(String(i + 1), step.x, cy + 106);
+            const lines = steps[i].label.split("\n");
+            lines.forEach((line, li) => ctx.fillText(line, steps[i].x, flowY - 5 + li * 22));
 
-            // Arrow to next
             if (i < steps.length - 1) {
+              const ra = reveal(p, 0.63 + i * 0.06, 0.1);
+              drawDashArrow(ctx, steps[i].x + 80, flowY, steps[i + 1].x - 80, flowY, t, "#6a6a6a", ra * 0.5);
+            }
+          }
+
+          // Bottom note
+          const r6 = reveal(p, 0.85, 0.1);
+          ctx.globalAlpha = r6;
+          ctx.font = '400 15px "DM Sans"';
+          ctx.fillStyle = "#6a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("Temporary instructions, lasting immunity", VW / 2, flowY + 60);
+
+          ctx.globalAlpha = 1;
+        },
+
+        // ── HERD IMMUNITY: network of dots with spreading/blocking ──
+        herd: (ctx, p, t) => {
+          const cols = 12, rows = 6;
+          const sx = 220, sy = 220, spX = 110, spY = 80;
+          const total = cols * rows;
+
+          // Deterministic shuffle
+          const order = [];
+          for (let i = 0; i < total; i++) order.push(i);
+          for (let i = order.length - 1; i > 0; i--) {
+            const j = (i * 7 + 3) % (i + 1);
+            [order[i], order[j]] = [order[j], order[i]];
+          }
+
+          // Vaccination increases with scene progress
+          const vacPct = Math.min(0.95, p * 1.2);
+          const vacCount = Math.floor(total * vacPct);
+
+          // Connections
+          const r0 = reveal(p, 0.04, 0.15);
+          ctx.globalAlpha = r0 * 0.12;
+          ctx.strokeStyle = "#6a6a6a";
+          ctx.lineWidth = 1;
+          for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+              const x = sx + col * spX, y = sy + row * spY;
+              if (col < cols - 1) { ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + spX, y); ctx.stroke(); }
+              if (row < rows - 1) { ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x, y + spY); ctx.stroke(); }
+            }
+          }
+
+          // Dots
+          for (let i = 0; i < total; i++) {
+            const row = Math.floor(i / cols), col = i % cols;
+            const x = sx + col * spX, y = sy + row * spY;
+            const isVac = order.indexOf(i) < vacCount;
+            ctx.globalAlpha = r0;
+            if (isVac) {
+              const pulse = 0.7 + 0.2 * Math.sin(t * 1.2 + i * 0.3);
+              ctx.globalAlpha = r0 * pulse;
               ctx.beginPath();
-              ctx.setLineDash([5, 4]);
-              ctx.lineDashOffset = -t * 20;
-              ctx.moveTo(step.x + 45, cy + 100);
-              ctx.lineTo(steps[i + 1].x - 45, cy + 100);
-              ctx.strokeStyle = "#1a6a6a";
+              ctx.arc(x, y, 13 + Math.sin(t * 1.5 + i) * 1.2, 0, Math.PI * 2);
+              ctx.fillStyle = "#1a6a6a";
+              ctx.fill();
+            } else {
+              ctx.globalAlpha = r0 * 0.85;
+              ctx.beginPath();
+              ctx.arc(x, y, 13, 0, Math.PI * 2);
+              ctx.fillStyle = "#d0d0d0";
+              ctx.fill();
+              ctx.strokeStyle = "#b8b8b8";
               ctx.lineWidth = 1.5;
               ctx.stroke();
-              ctx.setLineDash([]);
             }
-          });
+          }
+
+          // Spread wave when low coverage
+          if (vacPct < 0.7) {
+            const sp = Math.max(0, (p - 0.1) / 0.3);
+            let ox = sx, oy = sy;
+            for (let i = 0; i < total; i++) {
+              if (order.indexOf(i) >= vacCount) {
+                ox = sx + (i % cols) * spX;
+                oy = sy + Math.floor(i / cols) * spY;
+                break;
+              }
+            }
+            const sa = Math.max(0, 0.25 - vacPct * 0.35);
+            ctx.globalAlpha = r0 * sa;
+            ctx.beginPath();
+            ctx.arc(ox, oy, sp * 280, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(138,42,42,0.07)";
+            ctx.fill();
+          }
+
+          // Legend
+          const r1 = reveal(p, 0.12, 0.12);
+          ctx.globalAlpha = r1;
+          ctx.font = '500 16px "DM Sans"';
+          ctx.textAlign = "left";
+          ctx.beginPath();
+          ctx.arc(320, 760, 9, 0, Math.PI * 2);
+          ctx.fillStyle = "#1a6a6a";
+          ctx.fill();
+          ctx.fillStyle = "#1a1a1a";
+          ctx.fillText("Vaccinated (immune)", 338, 765);
+          ctx.beginPath();
+          ctx.arc(560, 760, 9, 0, Math.PI * 2);
+          ctx.fillStyle = "#d0d0d0";
+          ctx.fill();
+          ctx.strokeStyle = "#b8b8b8";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          ctx.fillStyle = "#1a1a1a";
+          ctx.fillText("Unvaccinated", 578, 765);
+
+          // Percentage and threshold
+          const r2 = reveal(p, 0.15, 0.12);
+          ctx.globalAlpha = r2;
+          ctx.font = '600 24px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText(Math.round(vacPct * 100) + "% vaccinated", 960, 760);
+
+          const r3 = reveal(p, 0.5, 0.12);
+          ctx.globalAlpha = r3;
+          ctx.font = '500 18px "DM Sans"';
+          if (vacPct >= 0.8) {
+            ctx.fillStyle = "#1a6a6a";
+            ctx.fillText("Herd immunity threshold reached", 960, 800);
+          } else {
+            ctx.fillStyle = "#8a2a2a";
+            ctx.fillText("Below herd immunity threshold", 960, 800);
+          }
+
+          // Firebreak analogy
+          const r4 = reveal(p, 0.65, 0.12);
+          ctx.globalAlpha = r4;
+          ctx.font = '400 17px "DM Sans"';
+          ctx.fillStyle = "#6a6a6a";
+          ctx.fillText("Like firebreaks in a forest \u2014 enough gaps stop the wildfire", VW / 2, 840);
+
+          // Measles threshold note
+          const r5 = reveal(p, 0.8, 0.12);
+          ctx.globalAlpha = r5;
+          ctx.font = '500 17px "DM Sans"';
+          ctx.fillStyle = "#8a2a2a";
+          ctx.fillText("Measles: ~95% needed   |   Less contagious: 70-80%", VW / 2, 880);
+
+          ctx.globalAlpha = 1;
+        },
+
+        // ── SUMMARY: all connected ──
+        summary: (ctx, p, t) => {
+          const boxes = [
+            { x: 160, y: 200, w: 310, h: 110, label: "Innate Immunity", sub: "Fast, generic defense", color: "#8a6a3a", delay: 0.06 },
+            { x: 160, y: 380, w: 310, h: 110, label: "Adaptive Immunity", sub: "Specific but slow (1st time)", color: "#3a5a7a", delay: 0.12 },
+            { x: 560, y: 290, w: 310, h: 110, label: "Memory Cells", sub: "Persist for years", color: "#1a6a6a", delay: 0.2 },
+            { x: 960, y: 200, w: 310, h: 110, label: "Vaccines", sub: "Harmless antigen preview", color: "#1a6a6a", delay: 0.36 },
+            { x: 960, y: 380, w: 310, h: 110, label: "Herd Immunity", sub: "Community protection", color: "#8a2a2a", delay: 0.6 },
+          ];
+          for (const b of boxes) {
+            const r = reveal(p, b.delay, 0.12);
+            ctx.globalAlpha = r;
+            drawRRect(ctx, b.x, b.y, b.w, b.h, 10, "rgba(26,106,106,0.05)", b.color);
+            ctx.font = '600 20px "DM Sans"';
+            ctx.fillStyle = b.color;
+            ctx.textAlign = "center";
+            ctx.fillText(b.label, b.x + b.w / 2, b.y + 42);
+            ctx.font = '400 16px "DM Sans"';
+            ctx.fillStyle = "#6a6a6a";
+            ctx.fillText(b.sub, b.x + b.w / 2, b.y + 76);
+          }
+
+          // Flowing arrows
+          const ra1 = reveal(p, 0.15, 0.1);
+          drawDashArrow(ctx, 315, 310, 315, 380, t, "#6a6a6a", ra1 * 0.5);
+          const ra2 = reveal(p, 0.22, 0.1);
+          drawDashArrow(ctx, 470, 260, 560, 310, t, "#6a6a6a", ra2 * 0.5);
+          drawDashArrow(ctx, 470, 440, 560, 385, t, "#6a6a6a", ra2 * 0.5);
+          const ra3 = reveal(p, 0.4, 0.1);
+          drawDashArrow(ctx, 870, 345, 960, 280, t, "#6a6a6a", ra3 * 0.5);
+          const ra4 = reveal(p, 0.65, 0.1);
+          drawDashArrow(ctx, 1115, 310, 1115, 380, t, "#6a6a6a", ra4 * 0.5);
+
+          // Key takeaway box
+          const r5 = reveal(p, 0.75, 0.12);
+          ctx.globalAlpha = r5;
+          drawRRect(ctx, 320, 550, 680, 110, 12, "rgba(26,106,106,0.07)", "#1a6a6a");
+          ctx.font = '600 21px "DM Sans"';
+          ctx.fillStyle = "#1a6a6a";
+          ctx.textAlign = "center";
+          ctx.fillText("Training your body\u2019s defense with a harmless preview", 660, 595);
+          ctx.font = '400 17px "DM Sans"';
+          ctx.fillStyle = "#6a6a6a";
+          ctx.fillText("so it\u2019s ready for the real thing", 660, 630);
+          // pulsing border
+          const pulse = 0.35 + 0.25 * Math.sin(t * 1.8);
+          ctx.globalAlpha = r5 * pulse;
+          drawRRect(ctx, 318, 548, 684, 114, 14, null, "#1a6a6a");
+
+          // Floating cells
+          const cells = [
+            { x: 100, y: 680, s: 0.6 }, { x: 1350, y: 240, s: 0.8 },
+            { x: 1420, y: 520, s: 0.5 }, { x: 80, y: 340, s: 0.7 },
+          ];
+          for (const c of cells) {
+            const cr = reveal(p, 0.3, 0.2);
+            drawCell(ctx, c.x + Math.sin(t * c.s) * 5, c.y + Math.cos(t * c.s * 0.7 + 1) * 4,
+              10, "rgba(26,106,106,0.2)", cr * 0.5);
+          }
 
           ctx.globalAlpha = 1;
         },

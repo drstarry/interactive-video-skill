@@ -4,152 +4,288 @@
     "voice": "en-US-AndrewNeural",
     "rate": "+5%",
     "gap": 1.2,
-    "duration": 209,
+    "duration": 431,
     "audioGenerated": true
   },
   "narration": [
     {
       "t": 1.2,
-      "text": "In most programming languages, you either manage memory yourself, like in C, or you rely on a garbage collector, like in Java or Python. Rust takes a third path. It enforces memory safety at compile time through a system called ownership. No garbage collector, no manual free. Just rules the compiler checks before your code ever runs."
+      "text": "Every program needs memory. And for decades, we've had two ways to manage it, both with serious trade-offs."
     },
     {
-      "t": 22.99,
-      "text": "Here's the core idea. Every value in Rust has exactly one owner, the variable that holds it. When that owner goes out of scope, Rust automatically drops the value and frees the memory. This is deterministic. You always know exactly when cleanup happens."
+      "t": 9.43,
+      "text": "In C and C-plus-plus, you manage memory manually. You call malloc to allocate and free to release. Full control, but one mistake — a forgotten free, a use-after-free — and you've got a crash, a security hole, or worse."
     },
     {
-      "t": 39.05,
-      "text": "Now let's see what makes ownership different from what you're used to. When you assign a String to a new variable, like writing let s2 equals s1, Rust doesn't copy the data. It moves it. After the move, s1 is no longer valid. If you try to use s1, the compiler will reject your code. This prevents two variables from trying to free the same memory, which would be a double-free bug."
+      "t": 24.77,
+      "text": "Languages like Java, Python, and Go took the opposite approach: a garbage collector. It tracks what's in use and cleans up automatically. Safe, but you pay with unpredictable pauses and higher memory usage."
     },
     {
-      "t": 62.06,
-      "text": "Let me show you the three ownership rules. Rule one: each value has exactly one owner. Rule two: there can only be one owner at a time. Rule three: when the owner goes out of scope, the value is dropped. These three rules are the foundation of everything Rust does with memory.",
-      "endsBeforeIx": "try-ownership-rules"
+      "t": 38.52,
+      "text": "Rust introduced a third way: ownership. The compiler itself tracks who owns each piece of memory and inserts the cleanup code at compile time. Zero runtime cost. Zero garbage collector. And if your code compiles, memory bugs simply can't happen."
     },
     {
-      "t": 79.75,
-      "text": "Move semantics also apply when you pass a value to a function. If you pass a String to a function, ownership transfers to that function's parameter. After the call, the original variable is gone. The function now owns the value and will drop it when it returns, unless it passes ownership back."
+      "t": 55.32,
+      "text": "The entire ownership system rests on three rules. Rule one: each value in Rust has exactly one owner. Not two, not zero — one variable owns that data at any given time."
     },
     {
-      "t": 98.23,
-      "text": "But what if you want to let a function read a value without taking ownership? That's where borrowing comes in. You create a reference using the ampersand symbol. A shared reference, ampersand T, lets you read the data but not modify it. You can have as many shared references as you want at the same time.",
-      "endsBeforeIx": "q-borrowing"
+      "t": 68.28,
+      "text": "Rule two: there can only be one owner at a time. When ownership transfers, the previous owner can no longer access the value. This is fundamentally different from most languages you've used."
     },
     {
-      "t": 115.32,
-      "text": "Sometimes you need to modify borrowed data. For that, Rust has mutable references, written as ampersand mut. But here's the critical rule: you can have either one mutable reference, or any number of shared references, but never both at the same time. This prevents data races at compile time. No locks needed."
+      "t": 80.04,
+      "text": "Rule three: when the owner goes out of scope, the value is dropped. Rust calls a special drop function automatically. No garbage collector needed — the compiler knows exactly when to clean up."
     },
     {
-      "t": 134.76,
-      "text": "Let's think about why this rule matters. Imagine two threads both have mutable access to the same data. One writes while the other reads. That's a data race, undefined behavior in C or C plus plus. Rust makes this impossible. The compiler enforces exclusive access for mutation.",
-      "endsBeforeIx": "try-valid-code"
+      "t": 92.26,
+      "text": "Now here's where it gets interesting. Let's say you have a String, s1, and you write let s2 equals s1. In most languages, you'd expect both variables to point to the same data. But what does Rust do?"
     },
     {
-      "t": 153.14,
-      "text": "References also have lifetimes. A lifetime is how long a reference is valid. Most of the time, Rust figures out lifetimes automatically. But the compiler will reject code where a reference outlives the data it points to. This eliminates dangling pointers entirely."
+      "t": 105.17,
+      "text": "Think about it for a moment. If both s1 and s2 owned the same heap data, what would happen when both go out of scope? Rust would try to free the same memory twice — a double free bug. So instead, Rust moves the ownership.",
+      "endsBeforeIx": "q-move"
     },
     {
-      "t": 169.27,
-      "text": "Here's a classic example. If you create a reference to a local variable inside a function and try to return that reference, the compiler stops you. The local variable will be dropped when the function ends, so the reference would point to freed memory. Rust catches this at compile time.",
-      "endsBeforeIx": "q-lifetimes"
+      "t": 119.42,
+      "text": "When you assign s1 to s2, Rust doesn't copy the heap data and it doesn't create a second pointer. It transfers ownership. s1 is invalidated — you can't use it anymore. The compiler enforces this. If you try to use s1 after the move, you get a compile error, not a runtime crash."
     },
     {
-      "t": 185.66,
-      "text": "Let's bring it all together. Ownership gives you deterministic cleanup. Move semantics prevent double frees. Borrowing rules prevent data races. And lifetimes prevent dangling pointers. All checked at compile time, with zero runtime cost. This is why Rust can be both safe and fast."
+      "t": 137.81,
+      "text": "Let me show you the code. Before the move, s1 has a pointer, a length, and a capacity on the stack, pointing to hello on the heap. After let s2 equals s1, those stack values move to s2, and s1 is marked invalid. Only s2 can access the heap data now."
+    },
+    {
+      "t": 156.1,
+      "text": "But wait — not everything moves. Simple types like integers, floats, booleans, and characters implement the Copy trait. When you write let y equals x where x is an i32, Rust copies the value. Both x and y remain valid."
+    },
+    {
+      "t": 172.27,
+      "text": "The rule is straightforward: if a type lives entirely on the stack and copying it is cheap, it implements Copy. Integers, floats, booleans, chars, and tuples of Copy types. Anything that allocates heap memory — like String, Vec, or Box — cannot be Copy. It must move."
+    },
+    {
+      "t": 191.54,
+      "text": "Moving is safe, but it's restrictive. What if a function just needs to read a value without taking ownership? That's where borrowing comes in. Instead of giving away ownership, you lend a reference."
+    },
+    {
+      "t": 203.62,
+      "text": "A shared reference, written ampersand T, lets you read the data but not modify it. You can have as many shared references as you want — just like multiple readers at a library. The original owner keeps ownership."
+    },
+    {
+      "t": 217.13,
+      "text": "A mutable reference, written ampersand mut T, lets you both read and modify the data. But there's a catch: you can only have one mutable reference at a time, and you can't have any shared references while a mutable reference exists."
+    },
+    {
+      "t": 231.46,
+      "text": "Think of it this way: many readers, or one writer. Never both at the same time. This is the borrowing rule that prevents data races at compile time.",
+      "endsBeforeIx": "try-borrow-rules"
+    },
+    {
+      "t": 241.44,
+      "text": "The borrow checker is the part of the Rust compiler that enforces these rules. It analyzes your code at compile time, tracking every reference and its lifetime. If you violate any borrowing rule, your code won't compile."
+    },
+    {
+      "t": 255.24,
+      "text": "Here's a classic example. You create a mutable reference r1 to a vector, then try to create a shared reference r2 while r1 is still active. The borrow checker rejects this — you can't have a shared reference while a mutable reference exists."
+    },
+    {
+      "t": 270.34,
+      "text": "But the borrow checker is smarter than a simple rule engine. It tracks when references are actually used — not just when they're declared. If r1's last use is on line three, and r2 is created on line five, the borrow checker sees that their lifetimes don't overlap, and the code compiles fine. This is called Non-Lexical Lifetimes, or NLL.",
+      "endsBeforeIx": "q-borrow-checker"
+    },
+    {
+      "t": 291.12,
+      "text": "Speaking of lifetimes — sometimes the compiler needs help figuring out how long a reference is valid. That's what lifetime annotations are for. They don't change how long something lives — they tell the compiler about the relationships between references."
+    },
+    {
+      "t": 305.64,
+      "text": "Consider a function that takes two string slices and returns one of them. The compiler asks: does the returned reference live as long as the first input, the second, or both? You answer with lifetime annotations. The tick a in ampersand tick a str tells the compiler: the output lives at least as long as both inputs."
+    },
+    {
+      "t": 325.56,
+      "text": "Most of the time, Rust infers lifetimes through three elision rules, and you never write an annotation. But when a function returns a reference and has multiple inputs, you need to be explicit. The compiler will always tell you when.",
+      "endsBeforeIx": "try-lifetime-scope"
+    },
+    {
+      "t": 339.7,
+      "text": "Now let's zoom out and see what this system actually prevents. Ownership isn't just an academic exercise — it eliminates entire categories of bugs that plague C, C-plus-plus, and even garbage-collected languages."
+    },
+    {
+      "t": 353.88,
+      "text": "Dangling pointers — when you use a reference after the data it points to has been freed. Ownership prevents this because the compiler ensures references never outlive the data they point to."
+    },
+    {
+      "t": 365.45,
+      "text": "Double free — when you free the same memory twice. Ownership prevents this because exactly one owner calls drop, and moved values can't be used again."
+    },
+    {
+      "t": 375.94,
+      "text": "Data races — when two threads access the same data and at least one is writing. The borrowing rules prevent this at compile time: you can't have a mutable reference and any other reference at the same time, period.",
+      "endsBeforeIx": "try-bug-categories"
+    },
+    {
+      "t": 389.88,
+      "text": "Let's bring it all together. Three rules — one owner, transfer on assignment, drop on scope exit. Borrowing extends this with shared and mutable references. The borrow checker enforces everything at compile time. And lifetimes make the relationships explicit when the compiler needs help."
+    },
+    {
+      "t": 407.78,
+      "text": "The result? Memory safety without a garbage collector. No runtime cost. No pauses. If it compiles, it's safe. That's Rust's ownership promise — and once you internalize these rules, you'll find that the compiler isn't fighting you. It's catching bugs you didn't even know you had.",
+      "endsBeforeIx": "q-synthesis"
     }
   ],
   "interactions": {
-    "try-ownership-rules": {
-      "time": 78.55,
-      "title": "Order the Ownership Rules",
-      "desc": "Arrange Rust's three ownership rules in the correct order.",
-      "widget": "sort",
-      "sortItems": [
-        "Each value has exactly one owner",
-        "There can only be one owner at a time",
-        "When the owner goes out of scope, the value is dropped"
-      ],
-      "feedback": {
-        "correct": {
-          "title": "Correct!",
-          "body": "These three rules form the foundation of Rust's memory model. The compiler enforces all of them."
-        },
-        "wrong": {
-          "title": "Not quite",
-          "body": "The rules build on each other: first a value gets an owner, then only one owner exists at a time, and finally scope determines when the value is freed."
-        }
-      }
-    },
-    "q-borrowing": {
-      "time": 114.12,
-      "title": "Borrowing Check",
-      "desc": "What does a shared reference (&T) allow you to do?",
+    "q-move": {
+      "time": 118.23,
+      "title": "Predict the Move",
+      "desc": "You write: let s2 = s1; where s1 is a String. What happens next?",
       "options": [
-        "Read the data and modify it freely",
-        "Read the data but not modify it",
-        "Take ownership of the data"
+        "Both s1 and s2 point to the same heap data (shared ownership)",
+        "Rust copies the heap data so s1 and s2 each have their own copy",
+        "s1 is invalidated — only s2 can access the data (ownership moved)"
       ],
       "feedback": {
         "correct": {
-          "title": "Correct!",
-          "body": "A shared reference gives read-only access. You need &mut T to modify borrowed data."
+          "title": "Exactly right",
+          "body": "Rust moves ownership to s2 and invalidates s1. This prevents double-free bugs — only one variable can drop the heap data."
         },
         "wrong": {
           "title": "Not quite",
-          "body": "A shared reference (&T) only grants read access. Modifying requires a mutable reference (&mut T), and taking ownership requires a move, not a borrow."
+          "body": "Shared ownership would cause a double-free when both go out of scope. Copying heap data would be expensive and implicit. Instead, Rust moves ownership — s1 becomes invalid, only s2 can use the data."
         }
       }
     },
-    "try-valid-code": {
-      "time": 151.94,
-      "title": "Valid or Invalid?",
-      "desc": "Categorize each Rust code snippet as valid or invalid.",
+    "try-borrow-rules": {
+      "time": 240.24,
+      "title": "Valid or Invalid Borrows?",
+      "desc": "Drag each code pattern into the correct category.",
       "widget": "categorize",
       "categories": [
         {
-          "label": "Valid",
+          "label": "Compiles",
           "items": [
-            "let r1 = &s; let r2 = &s;",
-            "let r1 = &mut s; *r1 += 1;",
-            "let s2 = s1.clone();"
+            "Multiple &T refs to the same value",
+            "One &mut T ref with no &T refs",
+            "&T ref after &mut T is last used"
           ]
         },
         {
-          "label": "Invalid",
+          "label": "Rejected",
           "items": [
-            "let r1 = &s; let r2 = &mut s;",
-            "let r1 = &mut s; let r2 = &mut s;",
-            "println!(\"{}\", s1); // after let s2 = s1;"
+            "&mut T while &T refs exist",
+            "Two &mut T refs at the same time",
+            "&T ref after value is moved"
           ]
         }
       ],
       "feedback": {
         "correct": {
-          "title": "Perfect!",
-          "body": "You can have multiple shared references, or one mutable reference, but not both. Moved values can't be used, and clone creates a separate copy."
+          "body": "You've got the borrowing rules down. Many readers OR one writer — never both. And NLL means the compiler tracks actual usage, not just declaration scope."
         },
         "wrong": {
-          "title": "Not quite",
-          "body": "Remember: multiple &T is fine, one &mut T is fine, but mixing &T and &mut T or having two &mut T is invalid. After a move, the original is gone."
+          "body": "Remember: any number of &T (shared) refs are fine together. Only one &mut T at a time, and no &T refs can coexist with &mut T. The compiler tracks when refs are actually used (NLL)."
         }
       }
     },
-    "q-lifetimes": {
-      "time": 184.46,
-      "title": "Lifetime Check",
-      "desc": "Why does Rust reject a function that returns a reference to a local variable?",
+    "q-borrow-checker": {
+      "time": 289.92,
+      "title": "Does This Compile?",
+      "desc": "let mut v = vec![1,2,3];\nlet r1 = &mut v;\nr1.push(4);\nlet r2 = &v;\nprintln!(\"{}\", r2.len());",
       "options": [
-        "The reference would point to freed memory after the function returns",
-        "Rust doesn't allow returning references from functions",
-        "Local variables are always copied, not referenced"
+        "Error: can't borrow v as shared while mutably borrowed",
+        "Compiles: r1's last use is before r2 is created (NLL)",
+        "Error: can't borrow v at all after pushing to it"
       ],
       "feedback": {
         "correct": {
-          "title": "Correct!",
-          "body": "The local variable is dropped when the function scope ends. A reference to it would dangle. Rust's lifetime system catches this at compile time."
+          "title": "Correct",
+          "body": "Non-Lexical Lifetimes in action — r1 is last used on the push line, so its borrow ends there. By the time r2 borrows v, there's no conflict."
         },
         "wrong": {
           "title": "Not quite",
-          "body": "Rust can return references, but only if the referenced data lives long enough. A local variable dies at the end of the function, making any reference to it a dangling pointer."
+          "body": "Before NLL (Rust 2015 edition), this would fail. But modern Rust tracks actual last usage: r1 is done after push(4), so the mutable borrow ends. r2's shared borrow starts after, so there's no overlap."
+        }
+      }
+    },
+    "try-lifetime-scope": {
+      "time": 338.5,
+      "title": "Lifetime Scope Explorer",
+      "desc": "Slide to see how reference lifetimes affect what compiles.",
+      "widget": "slider",
+      "slider": {
+        "min": 1,
+        "max": 6,
+        "step": 1,
+        "initial": 1,
+        "unit": "",
+        "stops": [
+          {
+            "value": 1,
+            "label": "Line 1: let x = String::from(\"hi\")",
+            "detail": "x is created. Its lifetime begins. It owns the heap-allocated string."
+          },
+          {
+            "value": 2,
+            "label": "Line 2: let r = &x",
+            "detail": "r borrows x. r's lifetime begins. x must outlive r for the borrow to be valid."
+          },
+          {
+            "value": 3,
+            "label": "Line 3: println!(\"{}\", r)",
+            "detail": "r is used here. This is r's last use — under NLL, r's borrow ends after this line."
+          },
+          {
+            "value": 4,
+            "label": "Line 4: drop(x)",
+            "detail": "Compiles! r's borrow already ended at line 3. x can be safely dropped."
+          },
+          {
+            "value": 5,
+            "label": "What if r was used on line 5?",
+            "detail": "Error! x was dropped on line 4, but r tries to use it on line 5. The borrow checker catches this: x doesn't live long enough."
+          },
+          {
+            "value": 6,
+            "label": "Fix: move drop(x) after last use of r",
+            "detail": "The fix is simple — ensure the owner outlives all its borrows. The compiler tells you exactly where the conflict is."
+          }
+        ]
+      }
+    },
+    "try-bug-categories": {
+      "time": 388.68,
+      "title": "Match the Bug to the Fix",
+      "desc": "Drag to order: which ownership rule prevents each bug?",
+      "widget": "sort",
+      "sortItems": [
+        "One owner → drop is called exactly once (prevents double free)",
+        "Move semantics → invalidates old variable (prevents use-after-move)",
+        "References must outlive their borrows (prevents dangling pointers)",
+        "One writer XOR many readers (prevents data races)"
+      ],
+      "feedback": {
+        "correct": {
+          "body": "That's the ownership bug-prevention chain — from single ownership through move semantics, borrow checking, and the aliasing rule."
+        },
+        "wrong": {
+          "body": "The chain builds on itself: single ownership enables safe drops, moves prevent stale access, lifetime checking prevents dangling pointers, and borrowing rules prevent data races."
+        }
+      }
+    },
+    "q-synthesis": {
+      "time": 424.82,
+      "title": "Why Is This Safe?",
+      "desc": "fn process(data: &[u8]) { /* read-only work */ }\nlet buffer = vec![0u8; 1024];\nprocess(&buffer);\nprintln!(\"Buffer len: {}\", buffer.len());\n\nWhy does this code compile and run without any memory issues?",
+      "options": [
+        "The garbage collector keeps buffer alive until process finishes",
+        "process borrows buffer as &[u8] — shared ref doesn't take ownership, so buffer remains valid",
+        "Rust copies buffer into process, so both the original and the copy are valid"
+      ],
+      "feedback": {
+        "correct": {
+          "title": "Perfect",
+          "body": "process takes a shared borrow (&[u8]), so buffer keeps ownership. After process returns, the borrow ends and buffer is still valid. No GC, no copy — just the borrow checker ensuring safety at compile time."
+        },
+        "wrong": {
+          "title": "Not quite",
+          "body": "Rust has no garbage collector, and it doesn't implicitly copy heap data. The key is borrowing: process(&buffer) creates a shared reference. buffer keeps ownership, process can read but not modify, and after the call buffer is still valid. The borrow checker verifies all of this at compile time."
         }
       }
     }
