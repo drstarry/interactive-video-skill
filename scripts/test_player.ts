@@ -132,7 +132,9 @@ async function getAudioState(page: Page) {
   console.log(`\n━━━ Player E2E Tests ━━━\n`);
   console.log(`  HTML: ${htmlPath}\n`);
 
-  const browser = await chromium.launch();
+  let browser: Browser | null = null;
+  try {
+  browser = await chromium.launch();
   const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
 
   // Navigate via HTTP (ES modules require http://, not file://)
@@ -412,8 +414,10 @@ async function getAudioState(page: Page) {
   // ════════════════════════════════════════
   // Summary
   // ════════════════════════════════════════
-  await browser.close();
-  try { process.kill(-server.pid!); } catch {}
+  } finally {
+    if (browser) await browser.close().catch(() => {});
+    try { process.kill(-server.pid!); } catch {}
+  }
 
   console.log(`\n━━━ Results: ${passed} passed, ${failed} failed ━━━\n`);
 
