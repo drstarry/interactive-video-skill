@@ -269,40 +269,50 @@ export function createPlayer({
 
   function seek(pct) {
     if (activeIx) return;
+
+    // 1. Stop everything cleanly
+    const wasPlaying = playing;
+    if (playing) { playing = false; updatePlayIcon(false); }
     stopAudio();
+
+    // 2. Jump time and reset narration state
     time = Math.max(0, Math.min(pct * duration, duration));
     const ni = getNI(time);
+    lastSpoke = ni;
+    currentNarIdx = -1;
+    waitingForAudio = false;
 
-    // If the current segment is linked to an undone quiz, trigger it directly.
-    // Otherwise mark it as spoken so we skip to the next segment boundary.
-    if (ni >= 0 && narToIx.has(ni) && !done.has(narToIx.get(ni).id)) {
-      lastSpoke = ni;
-      currentNarIdx = -1;
+    // 3. Check for interaction at this position
+    const ix = findInteractionAt(time);
+    if (ix) {
       renderFrame();
       updateUI();
-      showIx(narToIx.get(ni));
+      showIx(ix); // showIx calls continuePlay when done, which resumes
       return;
     }
 
-    // Also check if we landed right on an unlinked interaction
-    if (interactions) {
-      for (const ix of interactions) {
-        if (linkedIx.has(ix.id)) continue;
-        if (!done.has(ix.id) && time >= ix.time - 0.5 && time <= ix.time + 1) {
-          lastSpoke = ni;
-          currentNarIdx = -1;
-          renderFrame();
-          updateUI();
-          showIx(ix);
-          return;
-        }
-      }
-    }
-
-    lastSpoke = ni;
-    currentNarIdx = -1;
+    // 4. Render and resume if was playing
     renderFrame();
     updateUI();
+    if (wasPlaying) play();
+  }
+
+  // Find the nearest undone interaction within ±1s of the given time
+  function findInteractionAt(t) {
+    if (!interactions) return null;
+    // Check linked interactions (narration → quiz)
+    const ni = getNI(t);
+    if (ni >= 0 && narToIx.has(ni) && !done.has(narToIx.get(ni).id)) {
+      return narToIx.get(ni);
+    }
+    // Check unlinked interactions
+    for (const ix of interactions) {
+      if (linkedIx.has(ix.id)) continue;
+      if (!done.has(ix.id) && t >= ix.time - 0.5 && t <= ix.time + 1) {
+        return ix;
+      }
+    }
+    return null;
   }
 
   function setMuted(muted) {
