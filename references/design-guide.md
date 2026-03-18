@@ -129,6 +129,33 @@ When the narration describes a list, stack, or hierarchy, decide the **narration
 
 **Common failure:** a layer stack (Types at top, UI at bottom) where the narration describes from bottom-up but the visual reveals top-down. Fix: either reverse the reveal order (`revealAt` lowest for bottom elements) or flip the layout so the first-described layer is at the top.
 
+## Alive vs dead scenes
+
+A dead scene is a slide — elements fade in and sit there. A living scene breathes. The difference is **continuous motion**: something on screen that moves every frame, even subtly.
+
+**Every scene should have at least one source of visual pulse.** This is what makes a walkthrough feel like a video, not a slideshow.
+
+| Technique | Code pattern | Feels like |
+|-----------|-------------|------------|
+| Flowing dashed lines | `ctx.setLineDash([8,6]); ctx.lineDashOffset = -t * 30;` | Energy flowing through connections |
+| Pulsing glow | `opacity = 0.5 + 0.3 * Math.sin(t * 2)` | Breathing, alive |
+| Gentle drift | `y = baseY + Math.sin(t * 0.5) * 3` | Floating, weightless |
+| Flickering emphasis | `opacity = 0.8 + 0.2 * Math.sin(t * 8)` | Urgency, attention |
+| Rotating element | `ctx.rotate(t * 0.3)` | Process, cycle |
+| Growing/shrinking | `r = base + Math.sin(t) * 4` | Heartbeat, importance |
+
+**When to use declarative-only (no custom draw):**
+- The scene is a title card or intro (< 15 seconds)
+- All elements are text/labels that reveal and hold
+
+**When to add custom draw:**
+- The scene has relationships between elements (arrows, flows, connections)
+- The scene shows a process, sequence, or transformation
+- The scene is >20 seconds and would feel frozen without motion
+- The narration describes something dynamic ("flows through", "passes to", "builds up")
+
+**The test:** pause the scene at 50% progress. If every element is fully visible and nothing is moving, the scene is dead. Add a flowing arrow, a pulsing glow, or a gentle drift.
+
 ## Animation rules
 
 - **One focal point per beat.** Dim non-active areas to 40-60% opacity.

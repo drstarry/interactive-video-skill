@@ -19,6 +19,7 @@ Parse `$ARGUMENTS` for source (URL, file, topic, or "codebase"), scope hints ("f
 - **Hardcoded colors instead of theme palette.** Pull colors from `styles.json` for the selected theme — hardcoded colors break theme switching.
 - **`interactions` in content.json is an object keyed by ID**, not an array. The engine looks up by ID: `CONTENT.interactions[ix.id]`.
 - **Visual reveal order mismatches narration order.** If the narration describes a stack bottom-to-top, the visual must reveal bottom-to-top (or flip the layout). The most recently revealed element must always be the thing currently being narrated. See `design-guide.md` § Spatial-temporal alignment.
+- **Dead scenes.** A scene where everything fades in and sits still feels like a slideshow, not a video. Every scene >20s should have at least one source of continuous motion — flowing dashed arrows, a pulsing glow, gentle drift. See `design-guide.md` § Alive vs dead scenes.
 
 ## Quality principles
 
