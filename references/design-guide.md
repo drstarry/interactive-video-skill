@@ -112,6 +112,23 @@ Boxes (`rect`) must be tall enough to contain their text with these gaps. Exampl
 
 Self-check: estimate audio duration before writing. If it feels thin for the selected length, add depth.
 
+## Spatial-temporal alignment
+
+**Visual reveal order must match narration order.** The eye and the ear must agree on sequence.
+
+When the narration describes a list, stack, or hierarchy, decide the **narration order first**, then arrange the layout to match:
+
+| Narration order | Layout rule |
+|-----------------|-------------|
+| Top-to-bottom (surface → foundation) | Place first-described item at the top, reveal downward |
+| Bottom-to-top (foundation → surface) | Place first-described item at the bottom, reveal upward — OR flip the layout so foundation is at the top |
+| Left-to-right (input → output) | Place first-described item on the left, reveal rightward |
+| Arbitrary (no spatial meaning) | Layout doesn't matter — just match `revealAt` to narration timing |
+
+**The test:** at any moment, the most recently revealed element should be the thing the narration is currently talking about. If the eye has to jump backwards to find what the ear just heard, the layout is wrong.
+
+**Common failure:** a layer stack (Types at top, UI at bottom) where the narration describes from bottom-up but the visual reveals top-down. Fix: either reverse the reveal order (`revealAt` lowest for bottom elements) or flip the layout so the first-described layer is at the top.
+
 ## Animation rules
 
 - **One focal point per beat.** Dim non-active areas to 40-60% opacity.
