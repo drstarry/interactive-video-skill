@@ -227,17 +227,34 @@ export function createPlayer({
       }
     }
 
-    // Reset narration state so the next segment plays correctly.
-    // Mark current segment as spoken to avoid replaying it from the start.
-    const ni = getNI(time);
-    lastSpoke = ni;
-    currentNarIdx = -1;
-    waitingForAudio = false;
+    // Resume narration from current position after quiz dismiss.
+    triggerNarrationAt(time);
 
     playing = true;
     lastTs = null;
     updatePlayIcon(true);
     requestAnimationFrame(tick);
+  }
+
+  // ── Narration trigger helper ──
+  // Used by seek(), continuePlay(), and play() to start audio for
+  // the narration segment at a given time, with correct offset.
+
+  function triggerNarrationAt(t, withOffset = true) {
+    const ni = getNI(t);
+    currentNarIdx = -1;
+    waitingForAudio = false;
+
+    if (narrationEnabled && ni >= 0 && narration[ni].text) {
+      lastSpoke = ni;
+      currentNarIdx = ni;
+      waitingForAudio = true;
+      const offset = withOffset ? Math.max(0, t - narration[ni].t) : 0;
+      audio.play(lessonId, ni, narration[ni].text, offset || undefined);
+      if (onNarrationChange) onNarrationChange(ni);
+    } else {
+      lastSpoke = ni;
+    }
   }
 
   // ── Play / Pause / Seek ──
@@ -252,7 +269,11 @@ export function createPlayer({
     playing = true;
     lastTs = null;
     updatePlayIcon(true);
-    if (audio.state === "PAUSED") audio.resume();
+    if (audio.state === "PAUSED") {
+      audio.resume();
+    } else if (!waitingForAudio && audio.state === "IDLE") {
+      triggerNarrationAt(time, false);
+    }
     requestAnimationFrame(tick);
   }
 
@@ -270,28 +291,26 @@ export function createPlayer({
   function seek(pct) {
     if (activeIx) return;
 
-    // 1. Stop everything cleanly
     const wasPlaying = playing;
     if (playing) { playing = false; updatePlayIcon(false); }
     stopAudio();
 
-    // 2. Jump time and reset narration state
     time = Math.max(0, Math.min(pct * duration, duration));
-    const ni = getNI(time);
-    lastSpoke = ni;
-    currentNarIdx = -1;
-    waitingForAudio = false;
 
-    // 3. Check for interaction at this position
+    // Check for interaction at this position
     const ix = findInteractionAt(time);
     if (ix) {
+      lastSpoke = getNI(time);
       renderFrame();
       updateUI();
-      showIx(ix); // showIx calls continuePlay when done, which resumes
+      showIx(ix);
       return;
     }
 
-    // 4. Render and resume if was playing
+    // Play the current narration segment from the correct offset
+    if (wasPlaying) triggerNarrationAt(time);
+    else lastSpoke = getNI(time);
+
     renderFrame();
     updateUI();
     if (wasPlaying) play();

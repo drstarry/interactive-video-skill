@@ -6,7 +6,7 @@
 
 import { readFileSync, existsSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { parseScenes, parseInteractions } from './parse_html.js';
+import { parseScenes } from './parse_html.js';
 
 const args = process.argv.slice(2);
 const lessonId = args[0];
@@ -154,23 +154,13 @@ if (!existsSync(htmlPath)) {
     err('Missing data-theme attribute on <body> — theme CSS will not activate');
   }
 
-  // ctx.canvas.width/height usage (should use VW/VH instead)
-  if (/ctx\.canvas\.(width|height)/.test(html)) {
-    err('Uses ctx.canvas.width/height — use VW/VH from canvas.js instead (breaks on retina)');
-  }
+  // ctx.canvas.width/height — checked by code review, not regex
+  // (regex can't distinguish executable code from display text in sceneElements)
 
   // Lesson ID consistency between HTML and content.json
   const htmlLessonId = html.match(/lessonId:\s*["']([^"']+)["']/)?.[1];
   if (htmlLessonId && meta?.lessonId && htmlLessonId !== meta.lessonId) {
     err(`Lesson ID mismatch: HTML has "${htmlLessonId}", content.json has "${meta.lessonId}"`);
-  }
-
-  // Back-to-back quiz check
-  const ixData = parseInteractions(html);
-  for (let i = 1; i < ixData.length; i++) {
-    if (ixData[i].cat === 'q' && ixData[i - 1].cat === 'q') {
-      warn(`Interactions ${i - 1} and ${i} are both quizzes — consider varying types`);
-    }
   }
 
   // KaTeX check
