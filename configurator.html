@@ -978,6 +978,11 @@ function generatePrompt() {
 // ── Done button: POST /config ──
 document.getElementById('btn-done').addEventListener('click', async function() {
   var btn = document.getElementById('btn-done');
+  if (!state.audience || !state.length) {
+    btn.textContent = 'Pick a preset first';
+    setTimeout(function() { btn.textContent = 'Done \u2014 Send to Claude'; }, 1500);
+    return;
+  }
   var copyBtn = document.getElementById('btn-copy');
   try {
     var res = await fetch('http://localhost:' + port + '/config', {
@@ -1017,11 +1022,8 @@ document.getElementById('btn-copy').addEventListener('click', function() {
 // ── Init ──
 renderPresets();
 
-if (recommendKey && PRESETS[recommendKey]) {
-  applyPreset(recommendKey);
-} else {
-  updateSummary();
-}
+// Don't auto-apply — let the user choose. Recommended preset is visually highlighted but not selected.
+updateSummary();
 
 requestAnimationFrame(initPreviews);
 loadVoices();
