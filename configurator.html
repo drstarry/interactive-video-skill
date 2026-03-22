@@ -25,72 +25,28 @@ body::after {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.wrap { max-width: 780px; margin: 0 auto; padding: 40px 24px 140px; }
+.wrap { max-width: 780px; margin: 0 auto; padding: 40px 24px 120px; }
+.hero { margin-bottom: 48px; }
+.hero h1 { font-family: var(--serif); font-size: 2.4rem; font-weight: 400; font-style: italic; margin-bottom: 8px; }
+.hero p { font-size: .85rem; color: var(--text2); max-width: 520px; line-height: 1.7; }
 
-/* Header */
-.header { margin-bottom: 36px; }
-.header h1 { font-family: var(--serif); font-size: 2.2rem; font-weight: 400; font-style: italic; margin-bottom: 6px; }
-.context-bar {
-  margin-top: 10px; padding: 8px 14px; border: 1px solid var(--border); border-radius: 8px;
-  background: var(--surface); font-size: .78rem; color: var(--text2); display: none;
-}
-.context-bar .label { color: var(--accent); font-weight: 500; }
-
-/* Preset cards */
-.presets { margin-bottom: 24px; }
-.presets-heading { font-size: .65rem; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; font-weight: 600; }
-.preset-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-.preset-card {
-  padding: 18px 16px; border: 1px solid var(--border); border-radius: 10px;
-  background: var(--surface); cursor: pointer; transition: all .2s; position: relative;
-}
-.preset-card:hover { border-color: var(--accent-dim); background: var(--surface2); }
-.preset-card.selected { border-color: var(--accent); background: rgba(129,140,248,0.06); }
-.preset-card.selected::after {
-  content: ''; position: absolute; top: 10px; right: 10px;
-  width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
-}
-.preset-card.recommended {
-  border-color: var(--accent); box-shadow: 0 0 24px rgba(129,140,248,0.12);
-}
-.preset-card h4 { font-size: .88rem; font-weight: 600; margin-bottom: 3px; }
-.preset-card .preset-desc { font-size: .72rem; color: var(--text2); line-height: 1.5; margin-bottom: 6px; }
-.preset-card .preset-meta { font-size: .68rem; color: var(--text2); font-family: var(--mono); }
-.recommend-badge {
-  display: none; font-size: .68rem; color: var(--accent); margin-bottom: 6px; font-weight: 500;
-}
-.preset-card.recommended .recommend-badge { display: block; }
-
-/* Summary row */
-.summary-row {
-  margin-bottom: 24px; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px;
-  background: var(--surface); cursor: pointer; transition: all .2s;
-  display: flex; align-items: center; gap: 10px;
-}
-.summary-row:hover { border-color: var(--accent-dim); }
-.summary-check { color: var(--grn); font-weight: 600; font-size: .9rem; flex-shrink: 0; }
-.summary-text { flex: 1; font-size: .82rem; color: var(--text); font-family: var(--mono); }
-.summary-chevron { color: var(--text2); font-size: .75rem; flex-shrink: 0; transition: transform .2s; }
-
-/* Customize section */
-.customize { display: none; margin-bottom: 32px; }
-.customize.open { display: block; }
-
-.section { margin-bottom: 36px; }
+/* Sections */
+.section { margin-bottom: 44px; }
 .section-label {
   font-size: .65rem; letter-spacing: .08em; text-transform: uppercase;
   color: var(--accent); margin-bottom: 6px; font-weight: 600;
 }
-.section-title { font-family: var(--serif); font-size: 1.2rem; font-weight: 400; margin-bottom: 12px; }
-.section-hint { font-size: .78rem; color: var(--text2); margin-bottom: 12px; line-height: 1.6; }
+.section-title { font-family: var(--serif); font-size: 1.3rem; font-weight: 400; margin-bottom: 16px; }
+.section-hint { font-size: .78rem; color: var(--text2); margin-bottom: 16px; line-height: 1.6; }
 
 /* Cards grid */
 .cards { display: grid; gap: 10px; }
 .cards-3 { grid-template-columns: repeat(3, 1fr); }
 .cards-2 { grid-template-columns: repeat(2, 1fr); }
 .card {
-  padding: 16px 14px; border: 1px solid var(--border); border-radius: 10px;
-  background: var(--surface); cursor: pointer; transition: all .2s; position: relative;
+  padding: 18px 16px; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surface); cursor: pointer; transition: all .2s;
+  position: relative;
 }
 .card:hover { border-color: var(--accent-dim); background: var(--surface2); }
 .card.selected { border-color: var(--accent); background: rgba(129,140,248,0.06); }
@@ -148,35 +104,55 @@ body::after {
 .voice-item .v-play:hover { border-color: var(--accent); color: var(--accent); }
 .voice-item .v-play.playing { border-color: var(--grn); color: var(--grn); background: rgba(110,231,183,0.08); }
 
-/* Footer */
-.footer {
+/* Language selector */
+.lang-select {
+  width: 100%; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surface); color: var(--text); font-family: var(--sans);
+  font-size: .82rem; cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23848290' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+}
+.lang-select:focus { outline: none; border-color: var(--accent); }
+
+/* Source input */
+.source-input {
+  width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px;
+  background: var(--surface); color: var(--text); font-family: var(--sans);
+  font-size: .85rem; resize: none;
+}
+.source-input::placeholder { color: var(--text2); }
+.source-input:focus { outline: none; border-color: var(--accent); }
+
+/* Output */
+.output-wrap {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
-  border-top: 1px solid var(--border); padding: 16px 24px;
-  backdrop-filter: blur(12px); background: rgba(15,15,22,0.92);
+  background: var(--surface); border-top: 1px solid var(--border);
+  padding: 16px 24px; backdrop-filter: blur(12px);
+  background: rgba(15,15,22,0.92);
 }
-.footer-inner {
-  max-width: 780px; margin: 0 auto;
-  display: flex; align-items: center; gap: 16px; justify-content: flex-end;
+.output-inner { max-width: 780px; margin: 0 auto; display: flex; align-items: center; gap: 16px; }
+.output-preview {
+  flex: 1; font-family: var(--mono); font-size: .7rem; color: var(--text2);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.btn-done {
-  padding: 12px 32px; background: var(--accent); color: var(--bg); border: none;
-  border-radius: 8px; font-family: var(--sans); font-size: .88rem; font-weight: 600;
+.btn-send {
+  padding: 10px 24px; background: var(--accent); color: var(--bg); border: none;
+  border-radius: 8px; font-family: var(--sans); font-size: .82rem; font-weight: 600;
   cursor: pointer; transition: all .2s; white-space: nowrap;
 }
-.btn-done:hover { filter: brightness(1.1); }
-.btn-done.sent { background: var(--grn); }
-.btn-done.error { background: var(--red); }
-.btn-copy-link {
-  font-size: .75rem; color: var(--text2); cursor: pointer; background: none;
-  border: none; font-family: var(--sans); text-decoration: underline;
-  text-underline-offset: 2px; transition: color .15s;
+.btn-send:hover { filter: brightness(1.1); }
+.btn-send.sent { background: var(--grn); }
+.btn-send.error { background: var(--red); }
+.btn-copy {
+  padding: 6px 12px; background: none; color: var(--text2); border: 1px solid var(--border);
+  border-radius: 6px; font-family: var(--sans); font-size: .7rem;
+  cursor: pointer; transition: all .2s; white-space: nowrap;
 }
-.btn-copy-link:hover { color: var(--text); }
-.btn-copy-link.copied { color: var(--grn); }
+.btn-copy:hover { border-color: var(--accent-dim); color: var(--text); }
+.btn-copy.copied { border-color: var(--grn); color: var(--grn); }
 
 /* Responsive */
 @media (max-width: 640px) {
-  .preset-grid { grid-template-columns: 1fr; }
   .cards-3 { grid-template-columns: 1fr; }
   .cards-2 { grid-template-columns: 1fr; }
   .style-cards { grid-template-columns: 1fr 1fr; }
@@ -187,215 +163,181 @@ body::after {
 <body>
 
 <div class="wrap">
-  <!-- Header -->
-  <div class="header">
+  <div class="hero">
     <h1>Lesson Configurator</h1>
-    <div class="context-bar" id="context-bar">
-      <span class="label">Source:</span> <span id="ctx-source"></span>
+    <p>Pick your style, choose a voice, set your preferences. When you're done, copy the prompt into Claude Code.</p>
+    <div id="context-bar" style="margin-top:12px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:.78rem;color:var(--text2);display:none">
+      <span style="color:var(--accent);font-weight:500">Source:</span> <span id="ctx-source"></span>
       &nbsp;&middot;&nbsp;
-      <span class="label">Language:</span> <span id="ctx-lang"></span>
+      <span style="color:var(--accent);font-weight:500">Language:</span> <span id="ctx-lang"></span>
     </div>
   </div>
 
-  <!-- Presets -->
-  <div class="presets">
-    <div class="presets-heading">Choose a preset</div>
-    <div class="preset-grid" id="preset-grid"></div>
+  <!-- 1. Audience -->
+  <div class="section">
+    <div class="section-label">Step 1</div>
+    <div class="section-title">Who is this for?</div>
+    <div class="cards cards-3" data-group="audience">
+      <div class="card" data-value="beginner">
+        <h4>Beginner</h4>
+        <p>No prior knowledge. Heavy on analogies and foundations.</p>
+      </div>
+      <div class="card" data-value="intermediate">
+        <h4>Intermediate</h4>
+        <p>Knows the basics. Focuses on how and why.</p>
+      </div>
+      <div class="card" data-value="expert">
+        <h4>Expert</h4>
+        <p>Deep knowledge. Nuance, tradeoffs, edge cases.</p>
+      </div>
+    </div>
   </div>
 
-  <!-- Summary row -->
-  <div class="summary-row" id="summary-row">
-    <span class="summary-check" id="summary-check"></span>
-    <span class="summary-text" id="summary-text">Select a preset to get started...</span>
-    <span class="summary-chevron" id="summary-chevron">&#9656; Customize</span>
+  <!-- 2. Length -->
+  <div class="section">
+    <div class="section-label">Step 2</div>
+    <div class="section-title">How deep should we go?</div>
+    <div class="cards cards-3" data-group="length">
+      <div class="card" data-value="quick">
+        <h4>Quick Overview</h4>
+        <p>~2-3 min, 4-6 scenes. Hit the highlights.</p>
+      </div>
+      <div class="card" data-value="standard">
+        <h4>Standard Lesson</h4>
+        <p>~5-6 min, 8-10 scenes. Explain + examples.</p>
+      </div>
+      <div class="card" data-value="deep">
+        <h4>Deep Dive</h4>
+        <p>~8-10 min, 14-18 scenes. Examples, edge cases, analogies.</p>
+      </div>
+    </div>
   </div>
 
-  <!-- Customize section -->
-  <div class="customize" id="customize">
+  <!-- 3. Interaction -->
+  <div class="section">
+    <div class="section-label">Step 3</div>
+    <div class="section-title">How interactive?</div>
+    <div class="cards cards-3" data-group="interaction">
+      <div class="card" data-value="full">
+        <h4>Full Interactive</h4>
+        <p>Quizzes, visualizations, drag widgets.</p>
+      </div>
+      <div class="card" data-value="quizzes">
+        <h4>Quizzes Only</h4>
+        <p>Multiple choice after key concepts.</p>
+      </div>
+      <div class="card" data-value="narration">
+        <h4>Narration Only</h4>
+        <p>Pure animated explainer, no stops.</p>
+      </div>
+    </div>
+  </div>
 
-    <!-- Audience -->
-    <div class="section">
-      <div class="section-label">Audience</div>
-      <div class="section-title">Who is this for?</div>
-      <div class="cards cards-3" data-group="audience">
-        <div class="card" data-value="beginner">
-          <h4>Beginner</h4>
-          <p>No prior knowledge. Heavy on analogies and foundations.</p>
-        </div>
-        <div class="card" data-value="intermediate">
-          <h4>Intermediate</h4>
-          <p>Knows the basics. Focuses on how and why.</p>
-        </div>
-        <div class="card" data-value="expert">
-          <h4>Expert</h4>
-          <p>Deep knowledge. Nuance, tradeoffs, edge cases.</p>
-        </div>
+  <!-- 4. Topics -->
+  <div class="section" id="topics-section" style="display:none">
+    <div class="section-label">Step 4</div>
+    <div class="section-title">What to cover?</div>
+    <div class="section-hint">Select the topics to include in the lesson. Uncheck anything you want to skip.</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="filter-btn active" id="topics-all">Select All</button>
+      <button class="filter-btn" id="topics-none">Deselect All</button>
+    </div>
+    <div class="cards cards-2" id="topics-list" data-group="topics-multi"></div>
+  </div>
+
+  <!-- 5. Visual Style -->
+  <div class="section">
+    <div class="section-label">Step 5</div>
+    <div class="section-title">Visual style</div>
+
+    <div class="section-hint" style="margin-bottom:6px;font-weight:600;color:var(--accent)">Match your content</div>
+    <div class="section-hint">Themes styled to match your subject. The visuals reinforce what you're teaching.</div>
+    <div class="style-cards" data-group="style">
+      <div class="style-card" data-value="chalkboard">
+        <canvas data-style="chalkboard"></canvas>
+        <div class="style-info"><div class="style-name">Chalkboard</div><div class="style-desc">Math, physics, and theory — the classroom. Dark slate with chalk-white text and yellow emphasis.</div></div>
+      </div>
+      <div class="style-card" data-value="terminal">
+        <canvas data-style="terminal"></canvas>
+        <div class="style-info"><div class="style-name">Terminal</div><div class="style-desc">Code, DevOps, and CLI — the developer's screen. Amber on dark with monospace type.</div></div>
+      </div>
+      <div class="style-card" data-value="notebook">
+        <canvas data-style="notebook"></canvas>
+        <div class="style-info"><div class="style-name">Notebook</div><div class="style-desc">Writing, languages, and humanities — the printed page. Cream background with serif headings and margin notes.</div></div>
+      </div>
+      <div class="style-card" data-value="blueprint">
+        <canvas data-style="blueprint"></canvas>
+        <div class="style-info"><div class="style-name">Blueprint</div><div class="style-desc">Engineering, architecture, and systems — the drafting table. Navy with grid lines and technical annotations.</div></div>
       </div>
     </div>
 
-    <!-- Length -->
-    <div class="section">
-      <div class="section-label">Length</div>
-      <div class="section-title">How deep should we go?</div>
-      <div class="cards cards-3" data-group="length">
-        <div class="card" data-value="quick">
-          <h4>Quick Overview</h4>
-          <p>~2-3 min, 4-6 scenes. Hit the highlights.</p>
-        </div>
-        <div class="card" data-value="standard">
-          <h4>Standard Lesson</h4>
-          <p>~5-6 min, 8-10 scenes. Explain + examples.</p>
-        </div>
-        <div class="card" data-value="deep">
-          <h4>Deep Dive</h4>
-          <p>~8-10 min, 14-18 scenes. Examples, edge cases, analogies.</p>
-        </div>
+    <div class="section-hint" style="margin-top:24px;margin-bottom:6px;font-weight:600;color:var(--text2)">Set the mood</div>
+    <div class="section-hint">General-purpose themes that work for any topic. Pick based on how you want it to feel.</div>
+    <div class="style-cards" data-group="style">
+      <div class="style-card" data-value="clean-dark">
+        <canvas data-style="clean-dark"></canvas>
+        <div class="style-info"><div class="style-name">Clean Dark</div><div class="style-desc">Distraction-free — content speaks for itself. Pure grayscale, no accent colors.</div></div>
+      </div>
+      <div class="style-card" data-value="clean-light">
+        <canvas data-style="clean-light"></canvas>
+        <div class="style-info"><div class="style-name">Clean Light</div><div class="style-desc">Bright and functional — easy on the eyes in daylight. Grey with teal accent, no decoration.</div></div>
+      </div>
+      <div class="style-card" data-value="studio">
+        <canvas data-style="studio"></canvas>
+        <div class="style-info"><div class="style-name">Studio</div><div class="style-desc">Warm and approachable — casual, hands-on learning. Kraft tan with orange accents and ruled lines.</div></div>
+      </div>
+      <div class="style-card" data-value="focus">
+        <canvas data-style="focus"></canvas>
+        <div class="style-info"><div class="style-name">Focus</div><div class="style-desc">Maximum concentration — near-black, no distractions. Restrained red accent, tight spacing.</div></div>
       </div>
     </div>
+  </div>
 
-    <!-- Interaction -->
-    <div class="section">
-      <div class="section-label">Interaction</div>
-      <div class="section-title">How interactive?</div>
-      <div class="cards cards-3" data-group="interaction">
-        <div class="card" data-value="full">
-          <h4>Full Interactive</h4>
-          <p>Quizzes, visualizations, drag widgets.</p>
-        </div>
-        <div class="card" data-value="quizzes">
-          <h4>Quizzes Only</h4>
-          <p>Multiple choice after key concepts.</p>
-        </div>
-        <div class="card" data-value="narration">
-          <h4>Narration Only</h4>
-          <p>Pure animated explainer, no stops.</p>
-        </div>
-      </div>
+  <!-- 6. Voice -->
+  <div class="section">
+    <div class="section-label">Step 6</div>
+    <div class="section-title">Narrator voice</div>
+    <div class="section-hint">Click the play button to hear each Microsoft neural voice. This is the actual TTS engine used in lessons.</div>
+    <div class="voice-filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="M">Male</button>
+      <button class="filter-btn" data-filter="F">Female</button>
     </div>
-
-    <!-- Visual Style -->
-    <div class="section">
-      <div class="section-label">Visual Style</div>
-      <div class="section-title">Visual style</div>
-
-      <div class="section-hint" style="margin-bottom:6px;font-weight:600;color:var(--accent)">Match your content</div>
-      <div class="section-hint">Themes styled to match your subject. The visuals reinforce what you're teaching.</div>
-      <div class="style-cards" data-group="style">
-        <div class="style-card" data-value="chalkboard">
-          <canvas data-style="chalkboard"></canvas>
-          <div class="style-info"><div class="style-name">Chalkboard</div><div class="style-desc">Math, physics, and theory — the classroom.</div></div>
-        </div>
-        <div class="style-card" data-value="terminal">
-          <canvas data-style="terminal"></canvas>
-          <div class="style-info"><div class="style-name">Terminal</div><div class="style-desc">Code, DevOps, and CLI — the developer's screen.</div></div>
-        </div>
-        <div class="style-card" data-value="notebook">
-          <canvas data-style="notebook"></canvas>
-          <div class="style-info"><div class="style-name">Notebook</div><div class="style-desc">Writing, languages, and humanities — the printed page.</div></div>
-        </div>
-        <div class="style-card" data-value="blueprint">
-          <canvas data-style="blueprint"></canvas>
-          <div class="style-info"><div class="style-name">Blueprint</div><div class="style-desc">Engineering, architecture, and systems — the drafting table.</div></div>
-        </div>
-      </div>
-
-      <div class="section-hint" style="margin-top:24px;margin-bottom:6px;font-weight:600;color:var(--text2)">Set the mood</div>
-      <div class="section-hint">General-purpose themes that work for any topic. Pick based on how you want it to feel.</div>
-      <div class="style-cards" data-group="style">
-        <div class="style-card" data-value="clean-dark">
-          <canvas data-style="clean-dark"></canvas>
-          <div class="style-info"><div class="style-name">Clean Dark</div><div class="style-desc">Distraction-free — content speaks for itself.</div></div>
-        </div>
-        <div class="style-card" data-value="clean-light">
-          <canvas data-style="clean-light"></canvas>
-          <div class="style-info"><div class="style-name">Clean Light</div><div class="style-desc">Bright and functional — easy on the eyes in daylight.</div></div>
-        </div>
-        <div class="style-card" data-value="studio">
-          <canvas data-style="studio"></canvas>
-          <div class="style-info"><div class="style-name">Studio</div><div class="style-desc">Warm and approachable — casual, hands-on learning.</div></div>
-        </div>
-        <div class="style-card" data-value="focus">
-          <canvas data-style="focus"></canvas>
-          <div class="style-info"><div class="style-name">Focus</div><div class="style-desc">Maximum concentration — near-black, no distractions.</div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Topics -->
-    <div class="section" id="topics-section" style="display:none">
-      <div class="section-label">Topics</div>
-      <div class="section-title">What to cover?</div>
-      <div class="section-hint">Select the topics to include in the lesson. Uncheck anything you want to skip.</div>
-      <div style="display:flex;gap:8px;margin-bottom:12px">
-        <button class="filter-btn active" id="topics-all">Select All</button>
-        <button class="filter-btn" id="topics-none">Deselect All</button>
-      </div>
-      <div class="cards cards-2" id="topics-list" data-group="topics-multi"></div>
-    </div>
-
-    <!-- Voice -->
-    <div class="section">
-      <div class="section-label">Voice</div>
-      <div class="section-title">Narrator voice</div>
-      <div class="section-hint">Click the play button to hear each voice. Leave blank for auto-selection.</div>
-      <div class="voice-filters">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="M">Male</button>
-        <button class="filter-btn" data-filter="F">Female</button>
-      </div>
-      <div class="voice-list" id="voice-list"></div>
-    </div>
-
-  </div><!-- /customize -->
+    <div class="voice-list" id="voice-list"></div>
+  </div>
 </div>
 
-<!-- Sticky footer -->
-<div class="footer">
-  <div class="footer-inner">
-    <button class="btn-copy-link" id="btn-copy">or copy to clipboard</button>
-    <button class="btn-done" id="btn-done">Done — Send to Claude</button>
+<!-- Sticky output bar -->
+<div class="output-wrap">
+  <div class="output-inner">
+    <div class="output-preview" id="output-preview">Configure your lesson above...</div>
+    <button class="btn-copy" id="btn-copy">Copy</button>
+    <button class="btn-send" id="btn-send">Send to Claude</button>
   </div>
 </div>
 
 <script>
-// ── URL params ──
+// ── Read query params (set by CLI before opening) ──
 const params = new URLSearchParams(location.search);
-const port = String(parseInt(params.get('port') || '3456', 10) || 3456);
-const recommendKey = params.get('recommend') || '';
-const recommendReason = params.get('reason') || '';
+const port = String(parseInt(params.get('port') || '0', 10) || 0);
 const paramSource = params.get('source') || '';
 const paramLang = params.get('lang') || 'en';
 const paramTopics = params.get('topics') || '';
+// Pre-filled hints from natural language parsing
+const paramAudience = params.get('audience') || '';
+const paramLength = params.get('length') || '';
+const paramInteraction = params.get('interaction') || '';
+const paramStyle = params.get('style') || '';
 
-// ── Presets ──
-const PRESETS = {
-  'quick-explainer':  { audience: 'beginner',     length: 'quick',    interaction: 'narration', style: 'clean-dark', label: 'Quick Explainer',  desc: 'A fast, narration-only overview for newcomers.' },
-  'standard-lesson':  { audience: 'intermediate', length: 'standard', interaction: 'quizzes',   style: 'terminal',   label: 'Standard Lesson',  desc: 'Balanced depth with quizzes to check understanding.' },
-  'deep-workshop':    { audience: 'expert',       length: 'deep',     interaction: 'full',      style: 'blueprint',  label: 'Deep Workshop',    desc: 'Full interactive deep dive with all the details.' },
-  'visual-story':     { audience: 'beginner',     length: 'standard', interaction: 'narration', style: 'notebook',   label: 'Visual Story',     desc: 'A longer narrative with rich visual storytelling.' },
-};
-
-const LENGTH_LABELS = { quick: '~3 min', standard: '~6 min', deep: '~10 min' };
-const STYLE_LABELS = {
-  'clean-dark': 'clean dark', 'terminal': 'terminal', 'notebook': 'notebook', 'chalkboard': 'chalkboard',
-  'focus': 'focus', 'blueprint': 'blueprint', 'studio': 'studio', 'clean-light': 'clean light',
-};
-
-// ── State (single source of truth) ──
+// ── State ──
 const state = {
-  preset: '',
-  audience: '',
-  length: '',
-  interaction: '',
-  style: '',
-  voice: '',
-  voiceName: '',
-  topics: [],
-  lang: paramLang,
-  source: paramSource,
+  source: paramSource, audience: paramAudience, length: paramLength,
+  interaction: paramInteraction, style: paramStyle,
+  lang: paramLang, voice: '', voiceName: '',
+  topics: []
 };
 
-// ── Show context bar if source/lang were passed ──
+// Show context bar if source/lang were passed
 if (paramSource || paramLang !== 'en') {
   const bar = document.getElementById('context-bar');
   bar.style.display = 'block';
@@ -403,337 +345,208 @@ if (paramSource || paramLang !== 'en') {
   document.getElementById('ctx-lang').textContent = paramLang;
 }
 
-// ── Render preset cards ──
-function renderPresets() {
-  const grid = document.getElementById('preset-grid');
-  grid.textContent = '';
-  for (const [key, p] of Object.entries(PRESETS)) {
-    const card = document.createElement('div');
-    card.className = 'preset-card';
-    card.dataset.preset = key;
-    if (key === recommendKey) card.classList.add('recommended');
-    const meta = p.audience + ' \u00b7 ' + (LENGTH_LABELS[p.length] || p.length) + ' \u00b7 ' + p.interaction + ' \u00b7 ' + (STYLE_LABELS[p.style] || p.style);
-
-    // Build DOM elements instead of innerHTML
-    const badge = document.createElement('div');
-    badge.className = 'recommend-badge';
-    badge.textContent = recommendReason ? '\u2b50 Recommended \u2014 ' + recommendReason : '\u2b50 Recommended';
-
-    const h4 = document.createElement('h4');
-    h4.textContent = p.label;
-
-    const descDiv = document.createElement('div');
-    descDiv.className = 'preset-desc';
-    descDiv.textContent = p.desc;
-
-    const metaDiv = document.createElement('div');
-    metaDiv.className = 'preset-meta';
-    metaDiv.textContent = meta;
-
-    card.appendChild(badge);
-    card.appendChild(h4);
-    card.appendChild(descDiv);
-    card.appendChild(metaDiv);
-
-    card.addEventListener('click', () => applyPreset(key));
-    grid.appendChild(card);
-  }
+// Auto-select cards from URL hints
+function preselectCard(group, value) {
+  if (!value) return;
+  const container = document.querySelector(`[data-group="${group}"]`);
+  if (!container) return;
+  const card = container.querySelector(`[data-value="${value}"]`);
+  if (card) { card.classList.add('selected'); }
 }
-
-function applyPreset(key) {
-  const p = PRESETS[key];
-  if (!p) return;
-  state.preset = key;
-  state.audience = p.audience;
-  state.length = p.length;
-  state.interaction = p.interaction;
-  state.style = p.style;
-  state.voice = '';
-  state.voiceName = '';
-  // Clear voice selection in UI
-  document.querySelectorAll('.voice-item').forEach(function(v) { v.classList.remove('selected'); });
-  // Update preset card selection
-  document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('selected'));
-  const card = document.querySelector('.preset-card[data-preset="' + key + '"]');
-  if (card) card.classList.add('selected');
-  // Update customize controls to reflect preset
-  syncControlsToState();
-  updateSummary();
-  // Collapse customize when a preset is selected
-  document.getElementById('customize').classList.remove('open');
-  updateChevron();
-}
-
-function syncControlsToState() {
-  ['audience', 'length', 'interaction'].forEach(function(group) {
-    document.querySelectorAll('[data-group="' + group + '"] .card').forEach(function(c) {
-      c.classList.toggle('selected', c.dataset.value === state[group]);
-    });
-  });
-  document.querySelectorAll('[data-group="style"] .style-card').forEach(function(c) {
-    c.classList.toggle('selected', c.dataset.value === state.style);
-  });
-}
-
-// ── Summary row ──
-function updateSummary() {
-  const check = document.getElementById('summary-check');
-  const text = document.getElementById('summary-text');
-
-  if (!state.audience && !state.length) {
-    check.textContent = '';
-    text.textContent = 'Select a preset to get started...';
-    return;
-  }
-
-  check.textContent = '\u2713';
-  var presetObj = state.preset ? PRESETS[state.preset] : null;
-  var presetLabel = presetObj ? presetObj.label : 'Custom';
-  var parts = [presetLabel + ':'];
-  if (state.audience) parts.push(state.audience);
-  if (state.length) parts.push(LENGTH_LABELS[state.length] || state.length);
-  if (state.interaction) parts.push(state.interaction);
-  if (state.style) parts.push(STYLE_LABELS[state.style] || state.style);
-  parts.push(state.voice ? (state.voiceName || state.voice) : 'auto voice');
-  text.textContent = parts.join(' \u00b7 ');
-}
-
-// ── Summary row toggles customize ──
-var customizeOpen = false;
-document.getElementById('summary-row').addEventListener('click', function() {
-  customizeOpen = !customizeOpen;
-  document.getElementById('customize').classList.toggle('open', customizeOpen);
-  updateChevron();
-});
-
-function updateChevron() {
-  customizeOpen = document.getElementById('customize').classList.contains('open');
-  document.getElementById('summary-chevron').textContent = customizeOpen ? '\u25be Customize' : '\u25b8 Customize';
-}
-
-// ── Card selection in customize ──
-document.querySelectorAll('[data-group]').forEach(function(group) {
-  var gName = group.dataset.group;
-  var VALID_GROUPS = { audience: 1, length: 1, interaction: 1, style: 1 };
-  if (!VALID_GROUPS[gName]) return;
-  group.querySelectorAll('.card, .style-card').forEach(function(card) {
-    card.addEventListener('click', function() {
-      if (gName === 'style') {
-        document.querySelectorAll('[data-group="style"] .style-card').forEach(function(c) { c.classList.remove('selected'); });
-      } else {
-        group.querySelectorAll('.card, .style-card').forEach(function(c) { c.classList.remove('selected'); });
-      }
-      card.classList.add('selected');
-      state[gName] = card.dataset.value;
-      state.preset = detectPreset();
-      document.querySelectorAll('.preset-card').forEach(function(c) {
-        c.classList.toggle('selected', c.dataset.preset === state.preset);
-      });
-      updateSummary();
-    });
-  });
-});
-
-function detectPreset() {
-  for (var key in PRESETS) {
-    var p = PRESETS[key];
-    if (state.audience === p.audience && state.length === p.length &&
-        state.interaction === p.interaction && state.style === p.style) {
-      return key;
-    }
-  }
-  return '';
-}
+preselectCard('audience', paramAudience);
+preselectCard('length', paramLength);
+preselectCard('interaction', paramInteraction);
+preselectCard('style', paramStyle);
 
 // ── Topics from URL param ──
-var allTopics = [];
+// Format: JSON array of [{id, label, desc}]
+let allTopics = [];
 if (paramTopics) {
   try {
     allTopics = JSON.parse(decodeURIComponent(paramTopics));
-    var section = document.getElementById('topics-section');
-    var list = document.getElementById('topics-list');
+    const section = document.getElementById('topics-section');
+    const list = document.getElementById('topics-list');
     section.style.display = '';
 
+    // Render topic cards (all selected by default)
     list.textContent = '';
-    allTopics.forEach(function(t) {
-      var card = document.createElement('div');
+    allTopics.forEach(t => {
+      const card = document.createElement('div');
       card.className = 'card selected';
       card.dataset.topicId = t.id;
-      var h4 = document.createElement('h4');
+      const h4 = document.createElement('h4');
       h4.textContent = t.label;
-      var p = document.createElement('p');
+      const p = document.createElement('p');
       p.textContent = t.desc || '';
       card.appendChild(h4);
       card.appendChild(p);
       list.appendChild(card);
     });
 
-    state.topics = allTopics.map(function(t) { return t.id; });
+    state.topics = allTopics.map(t => t.id);
 
-    list.querySelectorAll('.card').forEach(function(card) {
-      card.addEventListener('click', function() {
+    // Toggle individual topics
+    list.querySelectorAll('.card').forEach(card => {
+      card.addEventListener('click', () => {
         card.classList.toggle('selected');
-        state.topics = Array.from(list.querySelectorAll('.card.selected')).map(function(c) { return c.dataset.topicId; });
-        updateSummary();
+        state.topics = [...list.querySelectorAll('.card.selected')].map(c => c.dataset.topicId);
+        updateOutput();
       });
     });
 
-    document.getElementById('topics-all').addEventListener('click', function() {
-      list.querySelectorAll('.card').forEach(function(c) { c.classList.add('selected'); });
-      state.topics = allTopics.map(function(t) { return t.id; });
-      updateSummary();
+    // Select All / Deselect All
+    document.getElementById('topics-all').addEventListener('click', () => {
+      list.querySelectorAll('.card').forEach(c => c.classList.add('selected'));
+      state.topics = allTopics.map(t => t.id);
+      updateOutput();
     });
-    document.getElementById('topics-none').addEventListener('click', function() {
-      list.querySelectorAll('.card').forEach(function(c) { c.classList.remove('selected'); });
+    document.getElementById('topics-none').addEventListener('click', () => {
+      list.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
       state.topics = [];
-      updateSummary();
+      updateOutput();
     });
   } catch (e) {
     console.warn('Failed to parse topics param:', e);
   }
 }
 
-// ── Voice list ──
-var allVoices = [];
-var currentFilter = 'all';
-var currentAudio = null;
-var currentPlayBtn = null;
+// ── Card selection ──
+document.querySelectorAll('[data-group]').forEach(group => {
+  const gName = group.dataset.group;
+  group.querySelectorAll('.card, .style-card').forEach(card => {
+    card.addEventListener('click', () => {
+      group.querySelectorAll('.card, .style-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      state[gName] = card.dataset.value;
+      updateOutput();
+    });
+  });
+});
+
+// ── Voice list (loaded from manifest.json) ──
+let allVoices = [];
+let currentFilter = 'all';
+let currentAudio = null;
+let currentPlayBtn = null;
 
 async function loadVoices() {
-  var list = document.getElementById('voice-list');
+  const list = document.getElementById('voice-list');
   try {
-    var res = await fetch('audio/previews/manifest.json');
+    const res = await fetch('audio/previews/manifest.json');
     if (!res.ok) throw new Error(res.status);
     allVoices = await res.json();
     renderVoiceList();
-  } catch (err) {
-    var msg = document.createElement('div');
-    msg.style.cssText = 'color:var(--text2);font-size:.78rem;padding:12px';
-    msg.textContent = 'No voice previews available. Voices will be auto-selected.';
-    list.textContent = '';
-    list.appendChild(msg);
+  } catch {
+    list.innerHTML = '<div style="color:var(--text2);font-size:.78rem;padding:12px">No voice previews found. Run in Claude Code:<br><code style="color:var(--accent)">npx --prefix $SKILL_DIR/scripts tsx $SKILL_DIR/scripts/build_audio.ts --generate-previews --lang ' + state.lang + '</code></div>';
   }
 }
 
 function stopAudio() {
   if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; currentAudio = null; }
-  if (currentPlayBtn) { currentPlayBtn.classList.remove('playing'); currentPlayBtn.textContent = '\u25b6'; currentPlayBtn = null; }
+  if (currentPlayBtn) { currentPlayBtn.classList.remove('playing'); currentPlayBtn.innerHTML = '&#9654;'; currentPlayBtn = null; }
 }
 
 function renderVoiceList() {
-  var list = document.getElementById('voice-list');
-  var filtered = currentFilter === 'all' ? allVoices : allVoices.filter(function(v) { return v.gender === currentFilter; });
+  const list = document.getElementById('voice-list');
+  const filtered = currentFilter === 'all' ? allVoices : allVoices.filter(v => v.gender === currentFilter);
 
   if (!filtered.length) {
-    list.textContent = '';
-    var msg = document.createElement('div');
-    msg.style.cssText = 'color:var(--text2);font-size:.78rem;padding:12px';
-    msg.textContent = 'No voices match this filter.';
-    list.appendChild(msg);
+    list.innerHTML = '<div style="color:var(--text2);font-size:.78rem;padding:12px">No voices match this filter.</div>';
     return;
   }
 
-  list.textContent = '';
-  filtered.forEach(function(v) {
-    var item = document.createElement('div');
-    item.className = 'voice-item' + (state.voice === v.id ? ' selected' : '');
-    item.dataset.id = v.id;
-    item.dataset.name = v.name;
+  list.innerHTML = filtered.map(v => `
+    <div class="voice-item${state.voice === v.id ? ' selected' : ''}" data-id="${v.id}" data-name="${v.name}">
+      <div>
+        <div class="v-name">${v.name} <span style="color:var(--text2);font-size:.68rem">${v.locale}</span></div>
+        <div class="v-meta">${v.gender === 'M' ? 'Male' : 'Female'}</div>
+      </div>
+      <div class="v-play" data-voice-id="${v.id}" title="Preview voice">&#9654;</div>
+    </div>
+  `).join('');
 
-    var info = document.createElement('div');
-    var nameDiv = document.createElement('div');
-    nameDiv.className = 'v-name';
-    nameDiv.textContent = v.name + ' ';
-    var localeSpan = document.createElement('span');
-    localeSpan.style.cssText = 'color:var(--text2);font-size:.68rem';
-    localeSpan.textContent = v.locale;
-    nameDiv.appendChild(localeSpan);
-    var metaDiv = document.createElement('div');
-    metaDiv.className = 'v-meta';
-    metaDiv.textContent = v.gender === 'M' ? 'Male' : 'Female';
-    info.appendChild(nameDiv);
-    info.appendChild(metaDiv);
-
-    var playBtn = document.createElement('div');
-    playBtn.className = 'v-play';
-    playBtn.dataset.voiceId = v.id;
-    playBtn.title = 'Preview voice';
-    playBtn.textContent = '\u25b6';
-
-    item.appendChild(info);
-    item.appendChild(playBtn);
-    list.appendChild(item);
-
-    item.addEventListener('click', function(e) {
+  list.querySelectorAll('.voice-item').forEach(item => {
+    item.addEventListener('click', e => {
       if (e.target.closest('.v-play')) return;
-      list.querySelectorAll('.voice-item').forEach(function(i) { i.classList.remove('selected'); });
+      list.querySelectorAll('.voice-item').forEach(i => i.classList.remove('selected'));
       item.classList.add('selected');
       state.voice = item.dataset.id;
       state.voiceName = item.dataset.name;
-      updateSummary();
+      updateOutput();
     });
+  });
 
-    playBtn.addEventListener('click', function(e) {
+  list.querySelectorAll('.v-play').forEach(btn => {
+    btn.addEventListener('click', e => {
       e.stopPropagation();
-      var voiceId = playBtn.dataset.voiceId;
-      if (!/^[\w\-]+$/.test(voiceId)) return;
-      if (currentPlayBtn === playBtn && currentAudio && !currentAudio.paused) { stopAudio(); return; }
+      const voiceId = btn.dataset.voiceId;
+      if (currentPlayBtn === btn && currentAudio && !currentAudio.paused) { stopAudio(); return; }
       stopAudio();
-      var audio = new Audio('audio/previews/' + voiceId + '.mp3');
+      const audio = new Audio(`audio/previews/${voiceId}.mp3`);
       currentAudio = audio;
-      currentPlayBtn = playBtn;
-      playBtn.classList.add('playing');
-      playBtn.textContent = '\u25a0';
-      audio.addEventListener('ended', function() { stopAudio(); });
-      audio.addEventListener('error', function() { stopAudio(); playBtn.title = 'Preview not available'; });
+      currentPlayBtn = btn;
+      btn.classList.add('playing');
+      btn.innerHTML = '&#9632;';
+      audio.addEventListener('ended', () => stopAudio());
+      audio.addEventListener('error', () => { stopAudio(); btn.title = 'Preview not available'; });
       audio.play();
     });
   });
 }
 
-// Voice filter buttons
-document.querySelectorAll('.voice-filters .filter-btn').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    document.querySelectorAll('.voice-filters .filter-btn').forEach(function(b) { b.classList.remove('active'); });
+// Filter buttons
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentFilter = btn.dataset.filter;
     renderVoiceList();
   });
 });
 
-// ── Canvas style previews ──
+// ── Visual style previews (canvas) ──
+// Each style has a unique draw function for maximum visual diversity
+
 function setupCanvas(canvas) {
-  var dpr = window.devicePixelRatio || 1;
-  var rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
   canvas.width = rect.width * dpr;
   canvas.height = rect.height * dpr;
-  var ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d');
   ctx.scale(dpr, dpr);
-  return { ctx: ctx, w: rect.width, h: rect.height };
+  return { ctx, w: rect.width, h: rect.height };
 }
 
-var STYLE_DRAWS = {
-  'clean-dark': function(canvas) {
-    var s = setupCanvas(canvas), ctx = s.ctx, w = s.w, h = s.h;
+const STYLE_DRAWS = {
+  // 1. Clean Dark — distraction-free, typography-forward, no color
+  'clean-dark'(canvas) {
+    const { ctx, w, h } = setupCanvas(canvas);
     ctx.fillStyle = '#111111'; ctx.fillRect(0, 0, w, h);
+    // Large title — the content IS the design
     ctx.font = '600 22px "DM Sans"'; ctx.fillStyle = '#e0e0e0'; ctx.textAlign = 'left';
     ctx.fillText('Content.', 16, 38);
+    // Thin separator
     ctx.fillStyle = '#2a2a2a'; ctx.fillRect(16, 48, w * 0.3, 1);
-    var lines = [0.75, 0.6, 0.82, 0.45, 0.7, 0.55];
-    lines.forEach(function(lw, i) {
+    // Text lines — varying widths, just value differences
+    const lines = [0.75, 0.6, 0.82, 0.45, 0.7, 0.55];
+    lines.forEach((lw, i) => {
       ctx.fillStyle = i === 0 ? '#888888' : '#333333';
       ctx.beginPath(); ctx.roundRect(16, 60 + i * 12, w * lw * 0.85, 6, 1); ctx.fill();
     });
+    // Small label bottom-right
     ctx.font = '400 7px "JetBrains Mono"'; ctx.fillStyle = '#444444'; ctx.textAlign = 'right';
     ctx.fillText('01 / 06', w - 16, h - 22);
+    // Progress — thin, grey
     ctx.fillStyle = '#222222'; ctx.fillRect(16, h - 14, w - 32, 2);
     ctx.fillStyle = '#666666'; ctx.fillRect(16, h - 14, (w - 32) * 0.4, 2);
   },
 
-  'terminal': function(canvas) {
-    var s = setupCanvas(canvas), ctx = s.ctx, w = s.w, h = s.h;
+  // 2. Terminal — amber on warm dark, prompt-style, monospace
+  'terminal'(canvas) {
+    const { ctx, w, h } = setupCanvas(canvas);
     ctx.fillStyle = '#1a1816'; ctx.fillRect(0, 0, w, h);
-    var promptLines = [
+    // Prompt lines — monospace, amber tones, realistic shell output
+    const promptLines = [
       { text: '$ explain --topic config', color: '#d4a054' },
       { text: 'Loading config-sync...', color: '#7a7060' },
       { text: '', color: '' },
@@ -744,122 +557,151 @@ var STYLE_DRAWS = {
       { text: '', color: '' },
       { text: '$ _', color: '#d4a054' },
     ];
-    var lh = 13, sx = 14, sy = 14;
-    promptLines.forEach(function(l, i) {
+    const lh = 13, sx = 14, sy = 14;
+    promptLines.forEach((l, i) => {
       if (!l.text) return;
       ctx.font = '11px "JetBrains Mono", monospace';
       ctx.fillStyle = l.color; ctx.textAlign = 'left';
       ctx.fillText(l.text, sx, sy + i * lh + 10);
     });
+    // Progress
     ctx.fillStyle = '#332f2a'; ctx.fillRect(14, h - 14, w - 28, 2);
     ctx.fillStyle = '#d4a054'; ctx.fillRect(14, h - 14, (w - 28) * 0.5, 2);
   },
 
-  'notebook': function(canvas) {
-    var s = setupCanvas(canvas), ctx = s.ctx, w = s.w, h = s.h;
+  // 3. Notebook — cream background, dark text, red margin line, book feel
+  'notebook'(canvas) {
+    const { ctx, w, h } = setupCanvas(canvas);
     ctx.fillStyle = '#faf6ee'; ctx.fillRect(0, 0, w, h);
+    // Margin line (like a ruled notebook)
     ctx.strokeStyle = '#c0392b30'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(w * 0.15, 0); ctx.lineTo(w * 0.15, h); ctx.stroke();
+    // Horizontal rules — faint
     ctx.strokeStyle = '#d8d0c418';
-    for (var y = 24; y < h - 20; y += 18) {
+    for (let y = 24; y < h - 20; y += 18) {
       ctx.beginPath(); ctx.moveTo(w * 0.15 + 8, y); ctx.lineTo(w - 16, y); ctx.stroke();
     }
+    // Title — serif
     ctx.font = '400 italic 16px "Instrument Serif", Georgia, serif';
     ctx.fillStyle = '#2a2420'; ctx.textAlign = 'left';
     ctx.fillText('Chapter Three', w * 0.15 + 12, 40);
+    // Body text blocks
     ctx.fillStyle = '#2a242040';
     [[w * 0.15 + 12, 54, w * 0.7, 5], [w * 0.15 + 12, 64, w * 0.6, 5],
-     [w * 0.15 + 12, 74, w * 0.75, 5], [w * 0.15 + 12, 84, w * 0.5, 5]].forEach(function(r) {
-      ctx.beginPath(); ctx.roundRect(r[0], r[1], r[2], r[3], 1); ctx.fill();
+     [w * 0.15 + 12, 74, w * 0.75, 5], [w * 0.15 + 12, 84, w * 0.5, 5]].forEach(([x, y, bw, bh]) => {
+      ctx.beginPath(); ctx.roundRect(x, y, bw, bh, 1); ctx.fill();
     });
+    // Margin note — red
     ctx.font = '400 italic 7px "Instrument Serif"'; ctx.fillStyle = '#c0392b';
     ctx.textAlign = 'right';
     ctx.fillText('key idea', w * 0.15 - 6, 58);
     ctx.fillText('see p.12', w * 0.15 - 6, 78);
+    // Page number
     ctx.font = '400 8px "DM Sans"'; ctx.fillStyle = '#8a8070'; ctx.textAlign = 'center';
-    ctx.fillText('\u2014 3 \u2014', w / 2, h - 16);
+    ctx.fillText('— 3 —', w / 2, h - 16);
   },
 
-  'chalkboard': function(canvas) {
-    var s = setupCanvas(canvas), ctx = s.ctx, w = s.w, h = s.h;
+  // 4. Chalkboard — dark green-grey, chalk strokes, yellow underlines
+  'chalkboard'(canvas) {
+    const { ctx, w, h } = setupCanvas(canvas);
     ctx.fillStyle = '#1a2420'; ctx.fillRect(0, 0, w, h);
+    // Subtle chalk dust texture — random dots
     ctx.fillStyle = 'rgba(216,216,200,0.02)';
-    for (var i = 0; i < 40; i++) {
-      var x = Math.random() * w, y = Math.random() * h, r = Math.random() * 2 + 0.5;
+    for (let i = 0; i < 40; i++) {
+      const x = Math.random() * w, y = Math.random() * h, r = Math.random() * 2 + 0.5;
       ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
     }
+    // Chalk text — rough, white
     ctx.font = '500 14px "DM Sans"'; ctx.fillStyle = '#d8d8c8'; ctx.textAlign = 'left';
     ctx.fillText('Key Concept', 20, 32);
+    // Yellow underline
     ctx.strokeStyle = '#e8d878'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(20, 36); ctx.lineTo(110, 37); ctx.stroke();
-    var boxes = [
+    // Chalk diagram — simple boxes with arrows
+    const boxes = [
       { x: 20, y: 50, w: 50, h: 28, label: 'Input' },
       { x: w * 0.4, y: 50, w: 55, h: 28, label: 'Process' },
       { x: w * 0.75, y: 50, w: 42, h: 28, label: 'Out' },
     ];
-    boxes.forEach(function(b) {
+    boxes.forEach(b => {
       ctx.strokeStyle = '#d8d8c860'; ctx.lineWidth = 1;
       ctx.strokeRect(b.x, b.y, b.w, b.h);
       ctx.font = '400 8px "DM Sans"'; ctx.fillStyle = '#d8d8c8'; ctx.textAlign = 'center';
       ctx.fillText(b.label, b.x + b.w / 2, b.y + b.h / 2 + 3);
     });
+    // Arrows between boxes
     ctx.strokeStyle = '#6a7a6880'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(70, 64); ctx.lineTo(w * 0.4, 64); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(w * 0.4 + 55, 64); ctx.lineTo(w * 0.75, 64); ctx.stroke();
+    // Bullet notes below
     ctx.font = '400 7px "DM Sans"'; ctx.fillStyle = '#6a7a68';
     ctx.textAlign = 'left';
-    ctx.fillText('\u2022 step one \u2014 transform', 20, 100);
-    ctx.fillText('\u2022 step two \u2014 validate', 20, 114);
+    ctx.fillText('• step one — transform', 20, 100);
+    ctx.fillText('• step two — validate', 20, 114);
+    // Progress
     ctx.fillStyle = '#304038'; ctx.fillRect(16, h - 14, w - 32, 2);
     ctx.fillStyle = '#e8d878'; ctx.fillRect(16, h - 14, (w - 32) * 0.35, 2);
   },
 
-  'focus': function(canvas) {
-    var s = setupCanvas(canvas), ctx = s.ctx, w = s.w, h = s.h;
+  // 5. Focus — near-black, restrained red, maximum concentration
+  'focus'(canvas) {
+    const { ctx, w, h } = setupCanvas(canvas);
     ctx.fillStyle = '#0e0e0e'; ctx.fillRect(0, 0, w, h);
+    // Sidebar panel
     ctx.fillStyle = '#161616'; ctx.fillRect(0, 0, w * 0.28, h);
     ctx.strokeStyle = '#282828'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(w * 0.28, 0); ctx.lineTo(w * 0.28, h); ctx.stroke();
+    // Sidebar labels
     ctx.font = '500 7px "DM Sans"'; ctx.textAlign = 'left';
-    var labels = ['Exposure', 'Contrast', 'Highlights', 'Shadows', 'Whites'];
-    labels.forEach(function(l, i) {
-      var y = 18 + i * 22;
+    const labels = ['Exposure', 'Contrast', 'Highlights', 'Shadows', 'Whites'];
+    labels.forEach((l, i) => {
+      const y = 18 + i * 22;
       ctx.fillStyle = '#606060'; ctx.fillText(l, 8, y);
+      // Slider track
       ctx.fillStyle = '#282828'; ctx.fillRect(8, y + 5, w * 0.28 - 18, 3);
-      var fillW = (w * 0.28 - 18) * (0.3 + i * 0.12);
+      // Slider fill — only one red, rest grey
+      const fillW = (w * 0.28 - 18) * (0.3 + i * 0.12);
       ctx.fillStyle = i === 0 ? '#cc4444' : '#444444';
       ctx.fillRect(8, y + 5, fillW, 3);
+      // Knob
       ctx.fillStyle = '#d0d0d0';
       ctx.beginPath(); ctx.arc(8 + fillW, y + 6.5, 3, 0, Math.PI * 2); ctx.fill();
     });
-    var mx = w * 0.28 + 12, my = 14, mw = w * 0.72 - 24, mh = h - 40;
+    // Main area — "image" preview placeholder
+    const mx = w * 0.28 + 12, my = 14, mw = w * 0.72 - 24, mh = h - 40;
     ctx.fillStyle = '#1e1e1e'; ctx.beginPath(); ctx.roundRect(mx, my, mw, mh, 3); ctx.fill();
     ctx.strokeStyle = '#282828'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.roundRect(mx, my, mw, mh, 3); ctx.stroke();
-    var ccx = mx + mw / 2, ccy = my + mh / 2;
+    // Crosshair in center
+    const ccx = mx + mw / 2, ccy = my + mh / 2;
     ctx.strokeStyle = '#cc444440'; ctx.lineWidth = 0.5;
     ctx.beginPath(); ctx.moveTo(ccx - 12, ccy); ctx.lineTo(ccx + 12, ccy); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(ccx, ccy - 12); ctx.lineTo(ccx, ccy + 12); ctx.stroke();
+    // Progress
     ctx.fillStyle = '#282828'; ctx.fillRect(mx, h - 14, mw, 2);
     ctx.fillStyle = '#cc4444'; ctx.fillRect(mx, h - 14, mw * 0.45, 2);
   },
 
-  'blueprint': function(canvas) {
-    var s = setupCanvas(canvas), ctx = s.ctx, w = s.w, h = s.h;
+  // 6. Blueprint — steel blue on navy, fine grid, dimension lines
+  'blueprint'(canvas) {
+    const { ctx, w, h } = setupCanvas(canvas);
     ctx.fillStyle = '#0c1824'; ctx.fillRect(0, 0, w, h);
+    // Fine grid
     ctx.strokeStyle = 'rgba(90,144,184,0.06)'; ctx.lineWidth = 0.5;
-    for (var x = 0; x < w; x += 10) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
-    for (var y = 0; y < h; y += 10) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+    for (let x = 0; x < w; x += 10) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+    for (let y = 0; y < h; y += 10) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+    // Major grid
     ctx.strokeStyle = 'rgba(90,144,184,0.1)';
-    for (var x2 = 0; x2 < w; x2 += 50) { ctx.beginPath(); ctx.moveTo(x2, 0); ctx.lineTo(x2, h); ctx.stroke(); }
-    for (var y2 = 0; y2 < h; y2 += 50) { ctx.beginPath(); ctx.moveTo(0, y2); ctx.lineTo(w, y2); ctx.stroke(); }
-    var layers = [
+    for (let x = 0; x < w; x += 50) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+    for (let y = 0; y < h; y += 50) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+    // Stacked layers — architecture diagram
+    const layers = [
       { y: 22, label: 'Edge', w: 0.65 },
       { y: 52, label: 'Service', w: 0.5 },
       { y: 82, label: 'Store', w: 0.35 },
     ];
-    layers.forEach(function(l, i) {
-      var lw = w * l.w, lx = (w - lw) / 2;
+    layers.forEach((l, i) => {
+      const lw = w * l.w, lx = (w - lw) / 2;
       ctx.strokeStyle = 'rgba(90,144,184,0.35)'; ctx.lineWidth = 1;
       ctx.fillStyle = 'rgba(90,144,184,0.04)';
       ctx.beginPath(); ctx.roundRect(lx, l.y, lw, 22, 2); ctx.fill(); ctx.stroke();
@@ -871,121 +713,158 @@ var STYLE_DRAWS = {
         ctx.setLineDash([]);
       }
     });
+    // Dimension annotation
     ctx.font = '5px "JetBrains Mono"'; ctx.fillStyle = '#4a6878'; ctx.textAlign = 'center';
     ctx.fillText('ARCH v2.1', w / 2, 114);
+    // Progress
     ctx.fillStyle = '#1e3448'; ctx.fillRect(14, h - 14, w - 28, 2);
     ctx.fillStyle = '#5a90b8'; ctx.fillRect(14, h - 14, (w - 28) * 0.4, 2);
   },
 
-  'studio': function(canvas) {
-    var s = setupCanvas(canvas), ctx = s.ctx, w = s.w, h = s.h;
+  // 7. Studio — kraft tan background, brown text, orange accents, ruled lines
+  'studio'(canvas) {
+    const { ctx, w, h } = setupCanvas(canvas);
     ctx.fillStyle = '#e2d6c0'; ctx.fillRect(0, 0, w, h);
+    // Ruled lines
     ctx.strokeStyle = '#bab0a020';
-    for (var y = 22; y < h - 14; y += 16) {
+    for (let y = 22; y < h - 14; y += 16) {
       ctx.beginPath(); ctx.moveTo(12, y); ctx.lineTo(w - 12, y); ctx.stroke();
     }
+    // Header — bold, brown
     ctx.font = '600 12px "DM Sans"'; ctx.fillStyle = '#3a3020'; ctx.textAlign = 'left';
     ctx.fillText('FIELD NOTES', 14, 18);
+    // Orange accent bar
     ctx.fillStyle = '#c85a28'; ctx.fillRect(14, 22, 40, 2);
+    // Handwritten-style entries
     ctx.font = '400 9px "DM Sans"'; ctx.fillStyle = '#3a3020';
     ctx.fillText('1. Observed pattern at node A', 14, 48);
-    ctx.fillText('2. Latency spike \u2014 340ms avg', 14, 64);
+    ctx.fillText('2. Latency spike — 340ms avg', 14, 64);
     ctx.fillText('3. Root cause: connection pool', 14, 80);
+    // Check mark on item 3
     ctx.font = '500 10px "DM Sans"'; ctx.fillStyle = '#c85a28';
-    ctx.fillText('\u2713', w - 28, 80);
-    var bars = [18, 30, 12, 24, 36, 20];
-    bars.forEach(function(bh, i) {
+    ctx.fillText('✓', w - 28, 80);
+    // Small sketch — bar chart
+    const bars = [18, 30, 12, 24, 36, 20];
+    bars.forEach((bh, i) => {
       ctx.fillStyle = i === 4 ? '#c85a28' : '#7a6e5830';
       ctx.fillRect(14 + i * 18, 115 - bh, 12, bh);
     });
     ctx.font = '400 6px "DM Sans"'; ctx.fillStyle = '#7a6e58';
     ctx.fillText('latency (ms)', 14, 124);
+    // Progress
     ctx.fillStyle = '#bab0a0'; ctx.fillRect(14, h - 12, w - 28, 2);
     ctx.fillStyle = '#c85a28'; ctx.fillRect(14, h - 12, (w - 28) * 0.55, 2);
   },
 
-  'clean-light': function(canvas) {
-    var s = setupCanvas(canvas), ctx = s.ctx, w = s.w, h = s.h;
+  // 8. Clean Light — cool grey, teal accent, bright and functional
+  'clean-light'(canvas) {
+    const { ctx, w, h } = setupCanvas(canvas);
     ctx.fillStyle = '#e8e8e8'; ctx.fillRect(0, 0, w, h);
+    // Heavy horizontal dividers
     ctx.fillStyle = '#b8b8b8'; ctx.fillRect(0, 0, w, 3);
     ctx.fillRect(0, 44, w, 1);
+    // Label — uppercase, tight tracking
     ctx.font = '600 8px "DM Sans"'; ctx.fillStyle = '#1a1a1a'; ctx.textAlign = 'left';
     ctx.letterSpacing = '0.1em';
     ctx.fillText('SECTION 01', 14, 18);
+    // Teal accent block
     ctx.fillStyle = '#1a6a6a'; ctx.fillRect(14, 24, 4, 14);
     ctx.font = '500 10px "DM Sans"'; ctx.fillStyle = '#1a1a1a';
     ctx.fillText('Core Module', 24, 35);
-    var cols = [14, w * 0.35, w * 0.65];
-    var rows = [56, 72, 88, 104];
+    // Data table — brutalist grid
+    const cols = [14, w * 0.35, w * 0.65];
+    const rows = [56, 72, 88, 104];
     ctx.font = '400 7px "DM Sans"';
+    // Header row
     ctx.fillStyle = '#dcdcdc'; ctx.fillRect(14, 48, w - 28, 16);
     ctx.fillStyle = '#6a6a6a';
     ctx.fillText('NAME', cols[0], 59); ctx.fillText('STATUS', cols[1], 59); ctx.fillText('LOAD', cols[2], 59);
-    var data = [
+    // Data rows
+    const data = [
       ['worker-01', 'active', '34%'],
       ['worker-02', 'active', '67%'],
-      ['worker-03', 'idle', '\u2014'],
+      ['worker-03', 'idle', '—'],
     ];
-    data.forEach(function(row, i) {
+    data.forEach((row, i) => {
       ctx.fillStyle = '#1a1a1a'; ctx.fillText(row[0], cols[0], rows[i + 1] - 4);
       ctx.fillStyle = row[1] === 'active' ? '#1a6a6a' : '#6a6a6a';
       ctx.fillText(row[1], cols[1], rows[i + 1] - 4);
       ctx.fillStyle = '#6a6a6a'; ctx.fillText(row[2], cols[2], rows[i + 1] - 4);
+      // Row divider
       ctx.fillStyle = '#d0d0d0'; ctx.fillRect(14, rows[i + 1], w - 28, 0.5);
     });
+    // Progress
     ctx.fillStyle = '#d0d0d0'; ctx.fillRect(14, h - 12, w - 28, 2);
     ctx.fillStyle = '#1a6a6a'; ctx.fillRect(14, h - 12, (w - 28) * 0.6, 2);
   },
 };
 
 function initPreviews() {
-  document.querySelectorAll('.style-card canvas').forEach(function(canvas) {
-    var fn = STYLE_DRAWS[canvas.dataset.style];
+  document.querySelectorAll('.style-card canvas').forEach(canvas => {
+    const fn = STYLE_DRAWS[canvas.dataset.style];
     if (fn) fn(canvas);
   });
 }
 window.addEventListener('resize', initPreviews);
+initPreviews();
 
-// ── Human-readable prompt for copy button ──
+// Load voices from manifest
+loadVoices();
+
+// ── Output generation ──
+function updateOutput() {
+  const preview = document.getElementById('output-preview');
+  const parts = [];
+  if (state.audience) parts.push(`audience: ${state.audience}`);
+  if (state.length) parts.push(`length: ${state.length}`);
+  if (state.interaction) parts.push(`interaction: ${state.interaction}`);
+  if (state.style) parts.push(`style: ${state.style}`);
+  if (state.voice) parts.push(`voice: ${state.voice}`);
+  if (state.topics.length && allTopics.length) parts.push(`${state.topics.length}/${allTopics.length} topics`);
+  preview.textContent = parts.length ? parts.join(' · ') : 'Select your preferences above...';
+}
+
 function generatePrompt() {
-  var parts = [];
-  if (state.audience) parts.push('Audience: ' + state.audience);
-  if (state.length) {
-    var lengthDesc = { quick: 'short (~3 min)', standard: 'standard (~6 min)', deep: 'deep dive (~10 min)' };
-    parts.push('Length: ' + (lengthDesc[state.length] || state.length));
-  }
-  if (state.interaction) {
-    var interDesc = { full: 'fully interactive (quizzes + widgets)', quizzes: 'quizzes after key concepts', narration: 'narration only, no stops' };
-    parts.push('Interaction: ' + (interDesc[state.interaction] || state.interaction));
-  }
-  if (state.style) parts.push('Visual style: ' + (STYLE_LABELS[state.style] || state.style));
-  if (state.voice) parts.push('Voice: ' + (state.voiceName || state.voice));
-  if (state.lang && state.lang !== 'en') parts.push('Language: ' + state.lang);
+  let prompt = '/interactive-video';
+  if (state.source) prompt += ` ${state.source}`;
+  prompt += '\n\nPreferences:';
+  if (state.audience) prompt += `\n- Audience: ${state.audience}`;
+  if (state.length) prompt += `\n- Length: ${state.length}`;
+  if (state.interaction) prompt += `\n- Interaction: ${state.interaction}`;
+  if (state.style) prompt += `\n- Visual style: ${state.style}`;
+  prompt += `\n- Language: ${state.lang}`;
+  if (state.voice) prompt += `\n- Voice: ${state.voice}`;
   if (state.topics.length && allTopics.length) {
-    parts.push('Topics:');
-    state.topics.forEach(function(id) {
-      var t = allTopics.find(function(t) { return t.id === id; });
-      if (t) parts.push('  - ' + t.label);
+    prompt += `\n- Topics:`;
+    state.topics.forEach(id => {
+      const t = allTopics.find(t => t.id === id);
+      if (t) prompt += `\n  - ${t.label}`;
     });
   }
-
-  var prompt = '';
-  if (state.source) prompt += 'Source: ' + state.source + '\n\n';
-  prompt += 'Preferences:\n' + parts.map(function(p) { return p.startsWith('  ') ? p : '- ' + p; }).join('\n');
   return prompt;
 }
 
-// ── Done button: POST /config ──
-document.getElementById('btn-done').addEventListener('click', async function() {
-  var btn = document.getElementById('btn-done');
-  if (!state.audience || !state.length) {
-    btn.textContent = 'Pick a preset first';
-    setTimeout(function() { btn.textContent = 'Done \u2014 Send to Claude'; }, 1500);
+// ── Copy button (fallback) ──
+document.getElementById('btn-copy').addEventListener('click', () => {
+  const prompt = generatePrompt();
+  navigator.clipboard.writeText(prompt).then(() => {
+    const btn = document.getElementById('btn-copy');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+});
+
+// ── Send button (POST /config) ──
+document.getElementById('btn-send').addEventListener('click', async () => {
+  const btn = document.getElementById('btn-send');
+  if (!port) {
+    // No server — fall back to copy
+    document.getElementById('btn-copy').click();
     return;
   }
-  var copyBtn = document.getElementById('btn-copy');
   try {
-    var res = await fetch('http://localhost:' + port + '/config', {
+    const res = await fetch('http://localhost:' + port + '/config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(state),
@@ -993,40 +872,23 @@ document.getElementById('btn-done').addEventListener('click', async function() {
     if (!res.ok) throw new Error('HTTP ' + res.status);
     btn.textContent = 'Sent! Closing\u2026';
     btn.classList.add('sent');
-    setTimeout(function() { window.close(); }, 800);
+    setTimeout(() => { window.close(); }, 800);
   } catch (e) {
     console.error('Failed to send config:', e);
-    btn.textContent = 'Failed \u2014 server not running';
+    btn.textContent = 'Failed \u2014 use Copy instead';
     btn.classList.add('error');
+    // Promote copy button
+    const copyBtn = document.getElementById('btn-copy');
+    copyBtn.style.borderColor = 'var(--accent)';
     copyBtn.style.color = 'var(--accent)';
-    copyBtn.style.fontWeight = '600';
-    copyBtn.style.textDecoration = 'none';
-    copyBtn.style.border = '1px solid var(--accent)';
-    copyBtn.style.padding = '8px 16px';
-    copyBtn.style.borderRadius = '6px';
-    setTimeout(function() { btn.textContent = 'Done \u2014 Send to Claude'; btn.classList.remove('error'); }, 3000);
+    setTimeout(() => { btn.textContent = 'Send to Claude'; btn.classList.remove('error'); }, 3000);
   }
 });
 
-// ── Copy button ──
-document.getElementById('btn-copy').addEventListener('click', function() {
-  var prompt = generatePrompt();
-  navigator.clipboard.writeText(prompt).then(function() {
-    var btn = document.getElementById('btn-copy');
-    btn.textContent = 'Copied!';
-    btn.classList.add('copied');
-    setTimeout(function() { btn.textContent = 'or copy to clipboard'; btn.classList.remove('copied'); }, 2000);
-  });
-});
-
-// ── Init ──
-renderPresets();
-
-// Don't auto-apply — let the user choose. Recommended preset is visually highlighted but not selected.
-updateSummary();
-
-requestAnimationFrame(initPreviews);
-loadVoices();
+// Hide send button if no server (opened manually without serve_configurator.ts)
+if (!port) {
+  document.getElementById('btn-send').style.display = 'none';
+}
 </script>
 </body>
 </html>
