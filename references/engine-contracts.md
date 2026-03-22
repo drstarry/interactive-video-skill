@@ -42,6 +42,20 @@ The configurator (`configurator.html`) fetches voice previews relative to its ow
 - `audio.js` fetches `./audio/lessons/{lessonId}/seg{n}.mp3` (default `basePath`)
 - Both paths are relative to the HTML file's location
 
+## Theme colors
+
+Pull hex values from `styles.json` for the selected theme. Pick variables by **meaning**, not appearance:
+
+| Variable | Use for |
+|----------|---------|
+| `--text` / `--text2` | Primary / muted text |
+| `--accent` / `--acc-dim` / `--acc-glow` | Emphasis, its border, its halo |
+| `--grn` / `--red` | Positive / negative states |
+| `--warm` / `--cool` | Energy-action / stability-context |
+| `--bg` / `--bg-card` / `--bg-el` | Background layers |
+
+---
+
 ## content.json schema
 
 ```jsonc

@@ -2,7 +2,7 @@
   "clean-dark": {
     "label": "Clean Dark",
     "desc": "Distraction-free \u2014 content speaks for itself.",
-    "fonts": "DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500",
+    "fonts": "Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700",
     "vars": {
       "--bg": "#111111",
       "--bg-card": "#1a1a1a",
@@ -19,15 +19,15 @@
       "--warm": "#999999",
       "--cool": "#999999",
       "--red": "#cc4444",
-      "--sans": "'DM Sans', -apple-system, sans-serif",
-      "--mono": "'JetBrains Mono', monospace",
-      "--serif": "'DM Sans', -apple-system, sans-serif"
+      "--sans": "'Plus Jakarta Sans', -apple-system, sans-serif",
+      "--mono": "'Space Mono', monospace",
+      "--serif": "'Plus Jakarta Sans', -apple-system, sans-serif"
     }
   },
   "terminal": {
     "label": "Terminal",
     "desc": "Code, DevOps, and CLI \u2014 the developer's screen.",
-    "fonts": "JetBrains+Mono:wght@300;400;500;700&family=DM+Sans:wght@300;400;500;600;700",
+    "fonts": "Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700",
     "vars": {
       "--bg": "#1a1816",
       "--bg-card": "#211f1c",
@@ -44,9 +44,9 @@
       "--warm": "#d4a054",
       "--cool": "#8a9ab0",
       "--red": "#c85a4a",
-      "--sans": "'DM Sans', -apple-system, sans-serif",
-      "--mono": "'JetBrains Mono', monospace",
-      "--serif": "'DM Sans', -apple-system, sans-serif"
+      "--sans": "'Space Grotesk', -apple-system, sans-serif",
+      "--mono": "'Space Mono', monospace",
+      "--serif": "'Space Grotesk', -apple-system, sans-serif"
     }
   },
   "notebook": {
@@ -77,7 +77,7 @@
   "chalkboard": {
     "label": "Chalkboard",
     "desc": "Math, physics, and theory \u2014 the classroom.",
-    "fonts": "DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500",
+    "fonts": "Fraunces:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Outfit:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500;700",
     "vars": {
       "--bg": "#1a2420",
       "--bg-card": "#202a26",
@@ -94,15 +94,15 @@
       "--warm": "#e8d878",
       "--cool": "#88aab0",
       "--red": "#d06848",
-      "--sans": "'DM Sans', -apple-system, sans-serif",
-      "--mono": "'JetBrains Mono', monospace",
-      "--serif": "'DM Sans', -apple-system, sans-serif"
+      "--sans": "'Outfit', -apple-system, sans-serif",
+      "--mono": "'Source Code Pro', monospace",
+      "--serif": "'Fraunces', Georgia, serif"
     }
   },
   "focus": {
     "label": "Focus",
     "desc": "Maximum concentration \u2014 near-black, no distractions.",
-    "fonts": "DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500",
+    "fonts": "Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500;700",
     "vars": {
       "--bg": "#0e0e0e",
       "--bg-card": "#161616",
@@ -119,15 +119,15 @@
       "--warm": "#cc8844",
       "--cool": "#6688aa",
       "--red": "#cc4444",
-      "--sans": "'DM Sans', -apple-system, sans-serif",
-      "--mono": "'JetBrains Mono', monospace",
-      "--serif": "'DM Sans', -apple-system, sans-serif"
+      "--sans": "'Outfit', -apple-system, sans-serif",
+      "--mono": "'Fira Code', monospace",
+      "--serif": "'Outfit', -apple-system, sans-serif"
     }
   },
   "blueprint": {
     "label": "Blueprint",
     "desc": "Engineering, architecture, and systems \u2014 the drafting table.",
-    "fonts": "JetBrains+Mono:wght@300;400;500;700&family=DM+Sans:wght@300;400;500;600;700",
+    "fonts": "Manrope:wght@400;500;600;700;800&family=Overpass+Mono:wght@400;500;700",
     "vars": {
       "--bg": "#0c1824",
       "--bg-card": "#10202e",
@@ -144,15 +144,15 @@
       "--warm": "#b08a50",
       "--cool": "#5a90b8",
       "--red": "#c06050",
-      "--sans": "'DM Sans', -apple-system, sans-serif",
-      "--mono": "'JetBrains Mono', monospace",
-      "--serif": "'DM Sans', -apple-system, sans-serif"
+      "--sans": "'Manrope', -apple-system, sans-serif",
+      "--mono": "'Overpass Mono', monospace",
+      "--serif": "'Manrope', -apple-system, sans-serif"
     }
   },
   "studio": {
     "label": "Studio",
     "desc": "Warm and approachable \u2014 casual, hands-on learning.",
-    "fonts": "DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500",
+    "fonts": "Syne:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;500;700",
     "vars": {
       "--bg": "#e2d6c0",
       "--bg-card": "#d8ccb4",
@@ -169,15 +169,15 @@
       "--warm": "#c85a28",
       "--cool": "#4a6a8a",
       "--red": "#b84028",
-      "--sans": "'DM Sans', -apple-system, sans-serif",
-      "--mono": "'JetBrains Mono', monospace",
-      "--serif": "'DM Sans', -apple-system, sans-serif"
+      "--sans": "'Plus Jakarta Sans', -apple-system, sans-serif",
+      "--mono": "'Source Code Pro', monospace",
+      "--serif": "'Syne', -apple-system, sans-serif"
     }
   },
   "clean-light": {
     "label": "Clean Light",
     "desc": "Bright and functional \u2014 easy on the eyes in daylight.",
-    "fonts": "DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500",
+    "fonts": "Work+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500;700",
     "vars": {
       "--bg": "#e8e8e8",
       "--bg-card": "#dcdcdc",
@@ -194,9 +194,9 @@
       "--warm": "#8a6a3a",
       "--cool": "#3a5a7a",
       "--red": "#8a2a2a",
-      "--sans": "'DM Sans', -apple-system, sans-serif",
-      "--mono": "'JetBrains Mono', monospace",
-      "--serif": "'DM Sans', -apple-system, sans-serif"
+      "--sans": "'Work Sans', -apple-system, sans-serif",
+      "--mono": "'Fira Code', monospace",
+      "--serif": "'Work Sans', -apple-system, sans-serif"
     }
   }
 }

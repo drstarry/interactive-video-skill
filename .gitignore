@@ -8,3 +8,6 @@ test-output/
 .superpowers/
 .playwright/
 .playwright-mcp/
+node_modules/
+interactive-video-workspace/
+.claude-exmode-active.json

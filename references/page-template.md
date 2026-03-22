@@ -196,7 +196,7 @@ const sceneElements = {
       x: 960,
       y: 440,
       text: "Lesson Title",
-      font: 'italic 400 48px "Instrument Serif"',
+      font: 'italic 400 48px "Instrument Serif"',  // substitute theme's serif font
       color: "#2a2420",
     },
     {
@@ -204,7 +204,7 @@ const sceneElements = {
       x: 960,
       y: 500,
       text: "A subtitle",
-      font: '400 20px "DM Sans"',
+      font: '400 20px "DM Sans"',  // substitute theme's sans font
       color: "#8a8070",
       revealAt: 0.2,
     },

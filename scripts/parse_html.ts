@@ -7,6 +7,7 @@ export interface ParsedScene {
   starts: number[];
   ends: number[];
   labels: string[];
+  bgKeys: string[];
 }
 
 export interface ParsedInteraction {
@@ -28,6 +29,7 @@ export function parseScenes(html: string): ParsedScene | null {
     starts: [...text.matchAll(/s:\s*([\d.]+)/g)].map(m => parseFloat(m[1])),
     ends: [...text.matchAll(/e:\s*([\d.]+)/g)].map(m => parseFloat(m[1])),
     labels: [...text.matchAll(/label:\s*['"]([^'"]+)['"]/g)].map(m => m[1]),
+    bgKeys: [...text.matchAll(/bg:\s*['"]([^'"]+)['"]/g)].map(m => m[1]),
   };
 }
 
