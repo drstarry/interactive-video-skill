@@ -986,9 +986,9 @@ document.getElementById('btn-done').addEventListener('click', async function() {
       body: JSON.stringify(state),
     });
     if (!res.ok) throw new Error('HTTP ' + res.status);
-    btn.textContent = 'Sent!';
+    btn.textContent = 'Sent! Closing\u2026';
     btn.classList.add('sent');
-    setTimeout(function() { btn.textContent = 'Done \u2014 Send to Claude'; btn.classList.remove('sent'); }, 2000);
+    setTimeout(function() { window.close(); }, 800);
   } catch (e) {
     console.error('Failed to send config:', e);
     btn.textContent = 'Failed \u2014 server not running';
