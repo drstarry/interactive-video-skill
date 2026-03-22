@@ -25,7 +25,9 @@ Parse `$ARGUMENTS` for source (URL, file, topic, or "codebase"), scope hints ("f
 
 - **Research grounds the content.** Verify facts before writing. Calibrate depth to the use case.
 - **Concrete beats generic.** "The auth service uses JWT with 15-min expiry" beats "many systems use tokens."
-- **Narration is conversational.** Direct, "you" voice. Like explaining to a new team member on their first day.
+- **Narration is conversational.** Direct, "you" voice. Like explaining to a new team member on their first day. See `design-guide.md` § Narration voice for banned patterns and anti-slop rules.
+- **Lesson title:** short noun phrase. Can include audience level if it sets expectations. No "Understanding...", "A Guide to...", "Introduction to...". Examples: "DNS Resolution", "Git Rebase for Beginners", "The Maillard Reaction — Advanced".
+- **Lesson subtitle:** one-line summary of what the lesson covers, followed by the source. Examples: "From query to IP in four hops. Based on [cloudflare.com/dns](...)." / "How this Rust CLI aggregates logs. Source: [github.com/foo/bar](...)." If multiple sources, list them. Never generic.
 
 ---
 
@@ -56,14 +58,15 @@ Extract the natural topic structure from the source as JSON:
 
 ```bash
 cd $SKILL_DIR && npx tsx scripts/build_audio.ts --generate-previews --lang {lang}
-cd $SKILL_DIR && npx --yes http-server -p {port} -c-1 --silent &
+cd $SKILL_DIR && npx tsx scripts/serve_configurator.ts \
+  --lang {lang} \
+  --source {encoded_source} \
+  --topics {encoded_topics_json} \
+  --audience-hint {hint_or_empty} \
+  --source-type {url|file|codebase|topic}
 ```
 
-Open (pick unused port 8100-8199):
-- macOS: `open "http://localhost:{port}/configurator.html?lang={lang}&source={encoded_source}&topics={encoded_topics}"`
-- Linux: `xdg-open "http://localhost:{port}/..."`
-
-Wait for user to paste configurator output.
+The server opens the configurator in the browser and blocks until the user clicks Done. Config JSON is returned via stdout. If the command times out (10 min) or the user pastes a `Preferences:` block manually, fall back to text parsing.
 
 ### 0.5 Set output directory + copy engine
 
@@ -79,7 +82,9 @@ cp -n $SKILL_DIR/engine/lesson.css {out}/src/
 
 ## Phase 1: PARSE PREFERENCES
 
-Parse the `Preferences:` block. Extract: Audience, Length, Interaction, Visual style, Language, Voice, Topics.
+Parse the config JSON from Phase 0.4 stdout. Extract: audience, length, interaction, style, voice, voiceName, topics, preset.
+
+If the user pasted a `Preferences:` text block instead (fallback), parse it as before: extract key-value pairs from the text.
 
 Theme keys are defined in `styles.json`. Length targets and interaction design rules are in `design-guide.md`.
 
