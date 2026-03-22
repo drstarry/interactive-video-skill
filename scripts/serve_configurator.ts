@@ -11,8 +11,8 @@
  */
 
 import { createServer, IncomingMessage, ServerResponse } from "http";
-import { readFileSync, existsSync } from "fs";
-import { join, extname } from "path";
+import { readFileSync, existsSync, realpathSync } from "fs";
+import { join, extname, sep } from "path";
 import { execFileSync } from "child_process";
 
 const MIME: Record<string, string> = {
@@ -49,8 +49,11 @@ function computeRecommendation(): { preset: string; reason: string } {
   let topicCount = 0;
   try { topicCount = JSON.parse(decodeURIComponent(topics)).length; } catch {}
 
-  if (audienceHint === "beginner" || topicCount < 5) {
-    return { preset: "quick-explainer", reason: topicCount > 0 ? `${topicCount} topics — a focused overview` : "beginner audience" };
+  if (audienceHint === "beginner") {
+    return { preset: "quick-explainer", reason: "beginner audience" };
+  }
+  if (topicCount < 5) {
+    return { preset: "quick-explainer", reason: topicCount > 0 ? `${topicCount} topics — a focused overview` : "short content" };
   }
   if (topicCount > 10) {
     return { preset: "deep-workshop", reason: `${topicCount} topics from a dense source — needs room` };
@@ -70,8 +73,12 @@ const TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
 const server = createServer((req: IncomingMessage, res: ServerResponse) => {
   // POST /config — the callback
   if (req.method === "POST" && req.url === "/config") {
+    const MAX_BODY = 1024 * 1024; // 1 MB
     let body = "";
-    req.on("data", (chunk) => (body += chunk));
+    req.on("data", (chunk) => {
+      body += chunk;
+      if (body.length > MAX_BODY) { req.destroy(); return; }
+    });
     req.on("end", () => {
       res.writeHead(200, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
       res.end('{"ok":true}');
@@ -92,9 +99,18 @@ const server = createServer((req: IncomingMessage, res: ServerResponse) => {
     return;
   }
 
-  // Static file serving
+  // Static file serving — contained to ROOT
   const urlPath = req.url?.split("?")[0] || "/";
   const filePath = join(ROOT, urlPath === "/" ? "configurator.html" : urlPath);
+
+  // Path traversal guard: resolve symlinks and ensure path stays under ROOT
+  let resolved: string;
+  try { resolved = realpathSync(filePath); } catch { resolved = filePath; }
+  if (!resolved.startsWith(ROOT + sep) && resolved !== ROOT) {
+    res.writeHead(403);
+    res.end("Forbidden");
+    return;
+  }
 
   if (!existsSync(filePath)) {
     res.writeHead(404);
