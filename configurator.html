@@ -360,12 +360,12 @@ body::after {
 <script>
 // ── URL params ──
 const params = new URLSearchParams(location.search);
-const port = params.get('port') || '3456';
+const port = String(parseInt(params.get('port') || '3456', 10) || 3456);
 const recommendKey = params.get('recommend') || '';
 const recommendReason = params.get('reason') || '';
 const paramSource = params.get('source') || '';
 const paramLang = params.get('lang') || 'en';
-const paramTopics = params.get('topics') || localStorage.getItem('iv-topics') || '';
+const paramTopics = params.get('topics') || '';
 
 // ── Presets ──
 const PRESETS = {
@@ -448,6 +448,10 @@ function applyPreset(key) {
   state.length = p.length;
   state.interaction = p.interaction;
   state.style = p.style;
+  state.voice = '';
+  state.voiceName = '';
+  // Clear voice selection in UI
+  document.querySelectorAll('.voice-item').forEach(function(v) { v.classList.remove('selected'); });
   // Update preset card selection
   document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('selected'));
   const card = document.querySelector('.preset-card[data-preset="' + key + '"]');
@@ -510,7 +514,8 @@ function updateChevron() {
 // ── Card selection in customize ──
 document.querySelectorAll('[data-group]').forEach(function(group) {
   var gName = group.dataset.group;
-  if (gName === 'topics-multi') return;
+  var VALID_GROUPS = { audience: 1, length: 1, interaction: 1, style: 1 };
+  if (!VALID_GROUPS[gName]) return;
   group.querySelectorAll('.card, .style-card').forEach(function(card) {
     card.addEventListener('click', function() {
       if (gName === 'style') {
@@ -671,6 +676,7 @@ function renderVoiceList() {
     playBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       var voiceId = playBtn.dataset.voiceId;
+      if (!/^[\w\-]+$/.test(voiceId)) return;
       if (currentPlayBtn === playBtn && currentAudio && !currentAudio.paused) { stopAudio(); return; }
       stopAudio();
       var audio = new Audio('audio/previews/' + voiceId + '.mp3');
@@ -1017,7 +1023,7 @@ if (recommendKey && PRESETS[recommendKey]) {
   updateSummary();
 }
 
-initPreviews();
+requestAnimationFrame(initPreviews);
 loadVoices();
 </script>
 </body>
