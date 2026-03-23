@@ -11,3 +11,4 @@ test-output/
 node_modules/
 interactive-video-workspace/
 .claude-exmode-active.json
+CLAUDE.md
